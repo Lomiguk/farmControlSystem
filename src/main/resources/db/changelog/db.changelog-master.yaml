@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/scripts/01_add_profile_table.sql
+  - include:
+      file: db/changelog/scripts/02_add_product_table.sql
+  - include:
+      file: db/changelog/scripts/03_add_action_table.sql

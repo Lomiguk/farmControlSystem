@@ -1,0 +1,14 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: farmControlSystem
+    url: jdbc:postgresql://localhost:5432/farm_system
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jdbc:
+    template:
+      query-timeout: PT5S
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml

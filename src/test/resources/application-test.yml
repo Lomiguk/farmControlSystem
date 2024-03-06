@@ -1,0 +1,11 @@
+
+spring.application.name = farmControlSystem
+spring.jdbc.template.query-timeout = PT5S
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:12.8-alpine:///inbound?TC_DAEMON=true
+    username: postgres
+    password: postgres
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
