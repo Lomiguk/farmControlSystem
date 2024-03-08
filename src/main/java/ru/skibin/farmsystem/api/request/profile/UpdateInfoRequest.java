@@ -1,4 +1,4 @@
-package ru.skibin.farmsystem.api.request;
+package ru.skibin.farmsystem.api.request.profile;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;

@@ -1,12 +1,12 @@
 package ru.skibin.farmsystem.repository;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.skibin.farmsystem.entity.ProfileEntity;
 import ru.skibin.farmsystem.repository.rowMapper.ProfileRowMapper;
 
+import java.util.Collection;
 import java.util.Map;
 
 @Repository
@@ -160,5 +160,20 @@ public class ProfileDAO {
         );
 
         jdbcTemplate.update(sql, params);
+    }
+
+    public Collection<ProfileEntity> getAllProfileWithPagination(Integer limit, Integer offset) {
+        String sql = """
+                SELECT *
+                FROM profile
+                ORDER BY id
+                LIMIT :limit
+                OFFSET :offset;
+                """;
+        Map<String, Object> params = Map.of(
+                "limit", limit,
+                "offset", offset
+        );
+        return jdbcTemplate.query(sql, params, new ProfileRowMapper());
     }
 }

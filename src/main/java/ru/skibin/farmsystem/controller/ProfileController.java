@@ -4,14 +4,24 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//TODO(disable *)
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.skibin.farmsystem.api.dto.ProfileDTO;
-import ru.skibin.farmsystem.api.request.AddProfileRequest;
-import ru.skibin.farmsystem.api.request.UpdateInfoRequest;
-import ru.skibin.farmsystem.api.request.UpdatePasswordRequest;
-import ru.skibin.farmsystem.api.request.UpdateProfileRequest;
+import ru.skibin.farmsystem.api.request.profile.AddProfileRequest;
+import ru.skibin.farmsystem.api.request.profile.UpdateInfoRequest;
+import ru.skibin.farmsystem.api.request.profile.UpdatePasswordRequest;
+import ru.skibin.farmsystem.api.request.profile.UpdateProfileRequest;
 import ru.skibin.farmsystem.service.ProfileService;
+
+import java.util.Collection;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +34,7 @@ public class ProfileController {
     ) {
         return new ResponseEntity<>(
                 profileService.add(
-                        addProfileRequest.getName(),
+                        addProfileRequest.getFio(),
                         addProfileRequest.getEmail(),
                         addProfileRequest.getPassword(),
                         addProfileRequest.getIsAdmin()
@@ -39,6 +49,17 @@ public class ProfileController {
     ) {
         return new ResponseEntity<>(
                 profileService.get(id),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Collection<ProfileDTO>> getAll(
+            @RequestParam("limit") Integer limit,
+            @RequestParam("offset") Integer offset
+    ) {
+        return new ResponseEntity<>(
+                profileService.getAllWithPagination(limit, offset),
                 HttpStatus.OK
         );
     }

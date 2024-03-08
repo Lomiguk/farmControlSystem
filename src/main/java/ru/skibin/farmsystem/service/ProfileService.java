@@ -1,15 +1,18 @@
 package ru.skibin.farmsystem.service;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skibin.farmsystem.api.dto.ProfileDTO;
 import ru.skibin.farmsystem.entity.ProfileEntity;
+import ru.skibin.farmsystem.exception.LimitOffsetException;
 import ru.skibin.farmsystem.exception.UpdatePasswordException;
 import ru.skibin.farmsystem.repository.ProfileDAO;
 import ru.skibin.farmsystem.util.PasswordUtil;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
@@ -115,5 +118,18 @@ public class ProfileService {
             throw new UpdatePasswordException("Old password is equal to the new one");
         if (!profileEntity.getPassword().equals(oldPassHash))
             throw new UpdatePasswordException("Wrong old password");
+    }
+
+    public Collection<ProfileDTO> getAllWithPagination(Integer limit, Integer offset) {
+        if (limit < 0 || offset < 0) throw new LimitOffsetException("Wrong limit/offset values.");
+
+        Collection<ProfileDTO> profiles = new ArrayList<>();
+        Collection<ProfileEntity> profileEntities = profileDAO.getAllProfileWithPagination(limit, offset);
+
+        for (var profileEntity : profileEntities) {
+            profiles.add(new ProfileDTO(profileEntity));
+        }
+
+        return profiles;
     }
 }
