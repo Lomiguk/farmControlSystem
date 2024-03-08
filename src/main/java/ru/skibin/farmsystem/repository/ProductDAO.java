@@ -27,7 +27,7 @@ public class ProductDAO {
         jdbcTemplate.update(sql, params);
     }
 
-    public ProductEntity getProductById(Long id) {
+    public ProductEntity findProduct(Long id) {
         String sql = """
                 SELECT *
                 FROM product
@@ -51,7 +51,7 @@ public class ProductDAO {
         return jdbcTemplate.queryForObject(sql, params, new ProductRowMapper());
     }
 
-    public Collection<ProductEntity> getProductAllWithPagination(Integer limit, Integer offset) {
+    public Collection<ProductEntity> findAllProductsWithPagination(Integer limit, Integer offset) {
         String sql = """
                 SELECT *
                 FROM product

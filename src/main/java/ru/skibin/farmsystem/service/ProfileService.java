@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skibin.farmsystem.api.dto.ProfileDTO;
 import ru.skibin.farmsystem.entity.ProfileEntity;
-import ru.skibin.farmsystem.exception.LimitOffsetException;
+import ru.skibin.farmsystem.exception.WrongLimitOffsetException;
 import ru.skibin.farmsystem.exception.UpdatePasswordException;
 import ru.skibin.farmsystem.repository.ProfileDAO;
 import ru.skibin.farmsystem.util.PasswordUtil;
@@ -121,7 +121,7 @@ public class ProfileService {
     }
 
     public Collection<ProfileDTO> getAllWithPagination(Integer limit, Integer offset) {
-        if (limit < 0 || offset < 0) throw new LimitOffsetException("Wrong limit/offset values.");
+        if (limit < 0 || offset < 0) throw new WrongLimitOffsetException("Wrong limit/offset values.");
 
         Collection<ProfileDTO> profiles = new ArrayList<>();
         Collection<ProfileEntity> profileEntities = profileDAO.getAllProfileWithPagination(limit, offset);

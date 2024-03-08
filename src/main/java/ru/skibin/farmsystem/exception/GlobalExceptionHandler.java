@@ -26,8 +26,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error("Valid exception:" + e.getMessage());
         return ResponseEntity.badRequest().body(e.getMessage());
     }
-    @ExceptionHandler(LimitOffsetException.class)
-    protected ResponseEntity<Object> handlerLimitOffsetException(LimitOffsetException e) {
+    @ExceptionHandler(WrongLimitOffsetException.class)
+    protected ResponseEntity<Object> handlerLimitOffsetException(WrongLimitOffsetException e) {
         logger.error("Wrong limit/offset values. limit/offset should be biggest then 0");
         return ResponseEntity.badRequest().body(e.getMessage());
     }
@@ -35,6 +35,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UpdatePasswordException.class)
     protected ResponseEntity<Object> handlerUpdatePasswordException(UpdatePasswordException e) {
         logger.error("Trouble with password: " + e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(TryToGetNotExistedEntityException.class)
+    protected ResponseEntity<Object> handleTryToGetNotExistedEntityException(TryToGetNotExistedEntityException e) {
+        logger.error("trying to get a non-existent entity: " + e.getMessage());
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

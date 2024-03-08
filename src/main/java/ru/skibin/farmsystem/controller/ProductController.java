@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.skibin.farmsystem.api.dto.ProductDTO;
+import ru.skibin.farmsystem.api.dto.ProductResponse;
 import ru.skibin.farmsystem.api.enumTypes.ValueType;
 import ru.skibin.farmsystem.api.request.product.AddProductRequest;
 import ru.skibin.farmsystem.api.request.product.UpdateProductRequest;
@@ -29,7 +29,7 @@ import java.util.Collection;
 public class ProductController {
     private final ProductService productService;
     @PostMapping
-    public ResponseEntity<ProductDTO> addProduct(
+    public ResponseEntity<ProductResponse> addProduct(
             @Valid
             @RequestBody
             AddProductRequest addProductRequest
@@ -41,7 +41,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProduct(
+    public ResponseEntity<ProductResponse> getProduct(
             @PathVariable("id") Long id
     ) {
         return new ResponseEntity<>(
@@ -51,28 +51,28 @@ public class ProductController {
     }
 
     @GetMapping()
-    public ResponseEntity<ProductDTO> getProductByName(
+    public ResponseEntity<ProductResponse> getProductByName(
             @NotNull @RequestParam("name") String name
     ) {
         return new ResponseEntity<>(
-                productService.getProductByName(name),
+                productService.findProductByName(name),
                 HttpStatus.OK
         );
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Collection<ProductDTO>> getAll(
+    public ResponseEntity<Collection<ProductResponse>> getAll(
             @RequestParam("limit") Integer limit,
             @RequestParam("offset") Integer offset
     ) {
         return new ResponseEntity<>(
-                productService.getAllProductWithPagination(limit, offset),
+                productService.findAllProductsWithPagination(limit, offset),
                 HttpStatus.OK
         );
     }
 
     @PatchMapping("/{id}/name")
-    public ResponseEntity<ProductDTO> updateProductName(
+    public ResponseEntity<ProductResponse> updateProductName(
             @PathVariable("id") Long id,
             @NotNull @RequestParam("new_name") String newName
     ) {
@@ -83,7 +83,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}/value-type")
-    public ResponseEntity<ProductDTO> updateProductValueType(
+    public ResponseEntity<ProductResponse> updateProductValueType(
             @PathVariable("id") Long id,
             @NotNull @RequestParam("value_type") ValueType valueType
     ) {
@@ -94,7 +94,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(
+    public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable("id") Long id,
             @Valid @RequestBody UpdateProductRequest updateProductRequest
     ){
