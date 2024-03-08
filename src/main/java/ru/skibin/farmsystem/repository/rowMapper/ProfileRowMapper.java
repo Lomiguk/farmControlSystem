@@ -2,7 +2,7 @@ package ru.skibin.farmsystem.repository.rowMapper;
 
 import ru.skibin.farmsystem.entity.ProfileEntity;
 import org.springframework.jdbc.core.RowMapper;
-import ru.skibin.farmsystem.exception.RowMapperException;
+import ru.skibin.farmsystem.exception.common.RowMapperException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
+import ru.skibin.farmsystem.exception.common.WrongLimitOffsetException;
+import ru.skibin.farmsystem.exception.profile.UpdatePasswordException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {

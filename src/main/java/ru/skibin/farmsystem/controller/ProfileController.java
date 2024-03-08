@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.skibin.farmsystem.api.dto.ProfileDTO;
+import ru.skibin.farmsystem.api.dto.ProfileResponse;
 import ru.skibin.farmsystem.api.request.profile.AddProfileRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdateInfoRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdatePasswordRequest;
@@ -29,7 +29,7 @@ import java.util.Collection;
 public class ProfileController {
     private final ProfileService profileService;
     @PostMapping
-    public ResponseEntity<ProfileDTO> add(
+    public ResponseEntity<ProfileResponse> add(
             @Valid @RequestBody AddProfileRequest addProfileRequest
     ) {
         return new ResponseEntity<>(
@@ -44,7 +44,7 @@ public class ProfileController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProfileDTO> get(
+    public ResponseEntity<ProfileResponse> get(
             @PathVariable("id") Long id
     ) {
         return new ResponseEntity<>(
@@ -54,7 +54,7 @@ public class ProfileController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Collection<ProfileDTO>> getAll(
+    public ResponseEntity<Collection<ProfileResponse>> getAll(
             @RequestParam("limit") Integer limit,
             @RequestParam("offset") Integer offset
     ) {
@@ -65,7 +65,7 @@ public class ProfileController {
     }
 
     @PatchMapping("/{id}/info")
-    public ResponseEntity<ProfileDTO> updateInfo(
+    public ResponseEntity<ProfileResponse> updateInfo(
             @PathVariable("id") Long id,
             @Valid @RequestBody UpdateInfoRequest updateInfoRequest
     ) {
@@ -80,7 +80,7 @@ public class ProfileController {
     }
 
     @PatchMapping("/{id}/password")
-    public ResponseEntity<ProfileDTO> updatePassword(
+    public ResponseEntity<ProfileResponse> updatePassword(
             @PathVariable("id") Long id,
             @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest
     ) {
@@ -95,7 +95,7 @@ public class ProfileController {
     }
 
     @PatchMapping("/{id}/admin?status=?")
-    public ResponseEntity<ProfileDTO> updateAdminStatus(
+    public ResponseEntity<ProfileResponse> updateAdminStatus(
         @PathVariable("id") Long id,
         @RequestParam("status") Boolean status
     ) {
@@ -108,7 +108,7 @@ public class ProfileController {
         );
     }
     @PatchMapping("/{id}/active?status=?")
-    public ResponseEntity<ProfileDTO> updateActiveStatus(
+    public ResponseEntity<ProfileResponse> updateActiveStatus(
             @PathVariable("id") Long id,
             @RequestParam("active") Boolean status
     ) {
@@ -122,7 +122,7 @@ public class ProfileController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProfileDTO> updateProfile(
+    public ResponseEntity<ProfileResponse> updateProfile(
         @PathVariable("id") Long id,
         @RequestBody UpdateProfileRequest updateProfileRequest
     ){

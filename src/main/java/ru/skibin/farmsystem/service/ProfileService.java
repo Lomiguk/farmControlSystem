@@ -4,10 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.skibin.farmsystem.api.dto.ProfileDTO;
+import ru.skibin.farmsystem.api.dto.ProfileResponse;
 import ru.skibin.farmsystem.entity.ProfileEntity;
-import ru.skibin.farmsystem.exception.WrongLimitOffsetException;
-import ru.skibin.farmsystem.exception.UpdatePasswordException;
+import ru.skibin.farmsystem.exception.common.WrongLimitOffsetException;
+import ru.skibin.farmsystem.exception.profile.UpdatePasswordException;
 import ru.skibin.farmsystem.repository.ProfileDAO;
 import ru.skibin.farmsystem.util.PasswordUtil;
 
@@ -20,7 +20,7 @@ public class ProfileService {
     private final ProfileDAO profileDAO;
 
     @Transactional
-    public ProfileDTO add(
+    public ProfileResponse add(
             @Valid String fio,
             @Valid String email,
             @Valid String nonHashPas,
@@ -31,11 +31,11 @@ public class ProfileService {
         profileDAO.add(fio, email, String.valueOf(hash), isAdmin);
 
         ProfileEntity profileEntity = profileDAO.getProfile(fio, email);
-        return new ProfileDTO(profileEntity);
+        return new ProfileResponse(profileEntity);
     }
 
     @Transactional
-    public ProfileDTO add(
+    public ProfileResponse add(
             @Valid String fio,
             @Valid String email,
             @Valid String nonHashPas
@@ -45,39 +45,39 @@ public class ProfileService {
         profileDAO.add(fio, email, String.valueOf(hash));
 
         ProfileEntity profileEntity = profileDAO.getProfile(fio, email);
-        return new ProfileDTO(profileEntity);
+        return new ProfileResponse(profileEntity);
     }
 
-    public ProfileDTO get(Long id) {
-        return new ProfileDTO(profileDAO.getProfile(id));
+    public ProfileResponse get(Long id) {
+        return new ProfileResponse(profileDAO.getProfile(id));
     }
 
     @Transactional
-    public ProfileDTO updateInf(Long id, String fio, String email) {
+    public ProfileResponse updateInf(Long id, String fio, String email) {
         profileDAO.updateProfileInformation(id, fio, email);
-        return new ProfileDTO(profileDAO.getProfile(id));
+        return new ProfileResponse(profileDAO.getProfile(id));
     }
 
     @Transactional
-    public ProfileDTO updatePassword(Long id, String oldPassword, String newPassword) {
+    public ProfileResponse updatePassword(Long id, String oldPassword, String newPassword) {
         checkPasswords(id, oldPassword, newPassword);
         String newPassHash = PasswordUtil.getHash(newPassword).toString();
 
         profileDAO.updatePassword(id, newPassHash);
 
-        return new ProfileDTO(profileDAO.getProfile(id));
+        return new ProfileResponse(profileDAO.getProfile(id));
     }
 
     @Transactional
-    public ProfileDTO updateAdminStatus(Long id, Boolean isAdmin) {
+    public ProfileResponse updateAdminStatus(Long id, Boolean isAdmin) {
         profileDAO.updateProfileAdminStatus(id, isAdmin);
-        return new ProfileDTO(profileDAO.getProfile(id));
+        return new ProfileResponse(profileDAO.getProfile(id));
     }
 
     @Transactional
-    public ProfileDTO updateActiveStatus(Long id, Boolean isActive) {
+    public ProfileResponse updateActiveStatus(Long id, Boolean isActive) {
         profileDAO.updateProfileActiveStatus(id, isActive);
-        return new ProfileDTO(profileDAO.getProfile(id));
+        return new ProfileResponse(profileDAO.getProfile(id));
     }
 
     public void delete(Long id) {
@@ -85,7 +85,7 @@ public class ProfileService {
     }
 
     @Transactional
-    public ProfileDTO update(
+    public ProfileResponse update(
             Long id,
             String oldPassword,
             String newFio,
@@ -106,7 +106,7 @@ public class ProfileService {
                 isActive
         );
 
-        return new ProfileDTO(profileDAO.getProfile(id));
+        return new ProfileResponse(profileDAO.getProfile(id));
     }
 
     private void checkPasswords(Long id, String oldPassword, String newPassword) {
@@ -120,14 +120,14 @@ public class ProfileService {
             throw new UpdatePasswordException("Wrong old password");
     }
 
-    public Collection<ProfileDTO> getAllWithPagination(Integer limit, Integer offset) {
+    public Collection<ProfileResponse> getAllWithPagination(Integer limit, Integer offset) {
         if (limit < 0 || offset < 0) throw new WrongLimitOffsetException("Wrong limit/offset values.");
 
-        Collection<ProfileDTO> profiles = new ArrayList<>();
+        Collection<ProfileResponse> profiles = new ArrayList<>();
         Collection<ProfileEntity> profileEntities = profileDAO.getAllProfileWithPagination(limit, offset);
 
         for (var profileEntity : profileEntities) {
-            profiles.add(new ProfileDTO(profileEntity));
+            profiles.add(new ProfileResponse(profileEntity));
         }
 
         return profiles;

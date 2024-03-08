@@ -3,7 +3,7 @@ package ru.skibin.farmsystem.repository.rowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import ru.skibin.farmsystem.api.enumTypes.ValueType;
 import ru.skibin.farmsystem.entity.ProductEntity;
-import ru.skibin.farmsystem.exception.RowMapperException;
+import ru.skibin.farmsystem.exception.common.RowMapperException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

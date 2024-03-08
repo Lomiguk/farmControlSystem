@@ -6,14 +6,14 @@ import ru.skibin.farmsystem.entity.ProfileEntity;
 
 @Data
 @AllArgsConstructor
-public class ProfileDTO {
+public class ProfileResponse {
     Long id;
     String fio;
     String email;
     Boolean isAdmin;
     Boolean isActual;
 
-    public ProfileDTO(ProfileEntity profileEntity) {
+    public ProfileResponse(ProfileEntity profileEntity) {
         this.id = profileEntity.getId();
         this.fio = profileEntity.getFio();
         this.email = profileEntity.getEmail();

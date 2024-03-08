@@ -8,10 +8,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.skibin.farmsystem.api.dto.ProductResponse;
 import ru.skibin.farmsystem.api.enumTypes.ValueType;
 import ru.skibin.farmsystem.entity.ProductEntity;
-import ru.skibin.farmsystem.exception.TryToGetNotExistedEntityException;
-import ru.skibin.farmsystem.exception.WrongLimitOffsetException;
-import ru.skibin.farmsystem.exception.WrongLongIdValueException;
-import ru.skibin.farmsystem.exception.WrongProductNameValueException;
+import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
+import ru.skibin.farmsystem.exception.common.WrongLimitOffsetException;
+import ru.skibin.farmsystem.exception.common.WrongLongIdValueException;
+import ru.skibin.farmsystem.exception.product.WrongProductNameValueException;
 import ru.skibin.farmsystem.repository.ProductDAO;
 
 import java.util.Collection;
