@@ -12,7 +12,7 @@ import lombok.Data;
 public class AddProfileRequest {
     @NotNull
     @NotEmpty
-    @Size(min = 2, max = 50, message = "FIO size: 2-50")
+    @Size(min = 2, max = 50, message = "\"profile name size 2-50 chars\"")
     private String fio;
     @NotNull
     @NotEmpty

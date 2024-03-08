@@ -1,10 +1,10 @@
 package ru.skibin.farmsystem.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -19,7 +19,9 @@ import ru.skibin.farmsystem.api.dto.ProductResponse;
 import ru.skibin.farmsystem.api.enumTypes.ValueType;
 import ru.skibin.farmsystem.api.request.product.AddProductRequest;
 import ru.skibin.farmsystem.api.request.product.UpdateProductRequest;
+import ru.skibin.farmsystem.exception.common.ValidationException;
 import ru.skibin.farmsystem.service.ProductService;
+import ru.skibin.farmsystem.util.BindingResultUtil;
 
 import java.util.Collection;
 
@@ -30,10 +32,14 @@ public class ProductController {
     private final ProductService productService;
     @PostMapping
     public ResponseEntity<ProductResponse> addProduct(
-            @Valid
-            @RequestBody
-            AddProductRequest addProductRequest
-    ){
+        @Valid
+        @RequestBody
+        AddProductRequest addProductRequest,
+        BindingResult bindingResult
+    ) throws ValidationException {
+        if (bindingResult.hasErrors()) throw new ValidationException(
+                BindingResultUtil.requestValidationToString(bindingResult)
+        );
         return new ResponseEntity<>(
                 productService.addProduct(addProductRequest.getName(), addProductRequest.getValueType()),
                 HttpStatus.OK
@@ -42,7 +48,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProduct(
-            @PathVariable("id") Long id
+        @PathVariable("id") Long id
     ) {
         return new ResponseEntity<>(
                 productService.getProduct(id),
@@ -52,7 +58,7 @@ public class ProductController {
 
     @GetMapping()
     public ResponseEntity<ProductResponse> getProductByName(
-            @NotNull @RequestParam("name") String name
+        @RequestParam("name") String name
     ) {
         return new ResponseEntity<>(
                 productService.findProductByName(name),
@@ -62,8 +68,8 @@ public class ProductController {
 
     @GetMapping("/all")
     public ResponseEntity<Collection<ProductResponse>> getAll(
-            @RequestParam("limit") Integer limit,
-            @RequestParam("offset") Integer offset
+        @RequestParam("limit") Integer limit,
+        @RequestParam("offset") Integer offset
     ) {
         return new ResponseEntity<>(
                 productService.findAllProductsWithPagination(limit, offset),
@@ -73,8 +79,8 @@ public class ProductController {
 
     @PatchMapping("/{id}/name")
     public ResponseEntity<ProductResponse> updateProductName(
-            @PathVariable("id") Long id,
-            @NotNull @RequestParam("new_name") String newName
+        @PathVariable("id") Long id,
+        @RequestParam("new_name") String newName
     ) {
         return new ResponseEntity<>(
                 productService.updateProductName(id, newName),
@@ -84,8 +90,8 @@ public class ProductController {
 
     @PatchMapping("/{id}/value-type")
     public ResponseEntity<ProductResponse> updateProductValueType(
-            @PathVariable("id") Long id,
-            @NotNull @RequestParam("value_type") ValueType valueType
+        @PathVariable("id") Long id,
+        @RequestParam("value_type") ValueType valueType
     ) {
         return new ResponseEntity<>(
                 productService.updateProductValueType(id, valueType),
@@ -95,9 +101,13 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(
-            @PathVariable("id") Long id,
-            @Valid @RequestBody UpdateProductRequest updateProductRequest
-    ){
+        @PathVariable("id") Long id,
+        @Valid @RequestBody UpdateProductRequest updateProductRequest,
+        BindingResult bindingResult
+    ) throws ValidationException {
+        if (bindingResult.hasErrors()) throw new ValidationException(
+                BindingResultUtil.requestValidationToString(bindingResult)
+        );
         return new ResponseEntity<>(
                 productService.updateProduct(id, updateProductRequest.getName(), updateProductRequest.getValueType()),
                 HttpStatus.OK

@@ -1,6 +1,5 @@
 package ru.skibin.farmsystem.exception;
 
-import jakarta.validation.ValidationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +10,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
 import ru.skibin.farmsystem.exception.common.WrongLimitOffsetException;
+import ru.skibin.farmsystem.exception.common.ValidationException;
 import ru.skibin.farmsystem.exception.profile.UpdatePasswordException;
 
 @RestControllerAdvice
@@ -24,8 +24,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.badRequest().body(ex.getBody().getTitle());
     }
 
-    @ExceptionHandler(ValidationException.class)
-    protected ResponseEntity<Object> handlerValidationException(ValidationException e) {
+    @ExceptionHandler(jakarta.validation.ValidationException.class)
+    protected ResponseEntity<Object> handlerValidationException(jakarta.validation.ValidationException e) {
         logger.error("Valid exception:" + e.getMessage());
         return ResponseEntity.badRequest().body(e.getMessage());
     }
@@ -43,7 +43,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(TryToGetNotExistedEntityException.class)
     protected ResponseEntity<Object> handleTryToGetNotExistedEntityException(TryToGetNotExistedEntityException e) {
-        logger.error("trying to get a non-existent entity: " + e.getMessage());
+        logger.error("Trying to get a non-existent entity: " + e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    protected ResponseEntity<Object> handleValidationException(ValidationException e) {
+        logger.error("Validation exception: " + e.getMessage());
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

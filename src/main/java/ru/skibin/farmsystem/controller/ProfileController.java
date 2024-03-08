@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -19,7 +20,9 @@ import ru.skibin.farmsystem.api.request.profile.AddProfileRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdateInfoRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdatePasswordRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdateProfileRequest;
+import ru.skibin.farmsystem.exception.common.ValidationException;
 import ru.skibin.farmsystem.service.ProfileService;
+import ru.skibin.farmsystem.util.BindingResultUtil;
 
 import java.util.Collection;
 
@@ -30,8 +33,14 @@ public class ProfileController {
     private final ProfileService profileService;
     @PostMapping
     public ResponseEntity<ProfileResponse> add(
-            @Valid @RequestBody AddProfileRequest addProfileRequest
-    ) {
+        @Valid @RequestBody AddProfileRequest addProfileRequest,
+        BindingResult bindingResult
+    ) throws ValidationException {
+
+        if (bindingResult.hasErrors()) throw new ValidationException(
+                    BindingResultUtil.requestValidationToString(bindingResult)
+            );
+
         return new ResponseEntity<>(
                 profileService.add(
                         addProfileRequest.getFio(),
@@ -45,7 +54,7 @@ public class ProfileController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProfileResponse> get(
-            @PathVariable("id") Long id
+        @PathVariable("id") Long id
     ) {
         return new ResponseEntity<>(
                 profileService.get(id),
@@ -55,8 +64,8 @@ public class ProfileController {
 
     @GetMapping("/all")
     public ResponseEntity<Collection<ProfileResponse>> getAll(
-            @RequestParam("limit") Integer limit,
-            @RequestParam("offset") Integer offset
+        @RequestParam("limit") Integer limit,
+        @RequestParam("offset") Integer offset
     ) {
         return new ResponseEntity<>(
                 profileService.getAllWithPagination(limit, offset),
@@ -66,9 +75,13 @@ public class ProfileController {
 
     @PatchMapping("/{id}/info")
     public ResponseEntity<ProfileResponse> updateInfo(
-            @PathVariable("id") Long id,
-            @Valid @RequestBody UpdateInfoRequest updateInfoRequest
-    ) {
+        @PathVariable("id") Long id,
+        @Valid @RequestBody UpdateInfoRequest updateInfoRequest,
+        BindingResult bindingResult
+    ) throws ValidationException {
+        if (bindingResult.hasErrors()) throw new ValidationException(
+                BindingResultUtil.requestValidationToString(bindingResult)
+        );
         return new ResponseEntity<>(
                 profileService.updateInf(
                         id,
@@ -81,9 +94,13 @@ public class ProfileController {
 
     @PatchMapping("/{id}/password")
     public ResponseEntity<ProfileResponse> updatePassword(
-            @PathVariable("id") Long id,
-            @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest
-    ) {
+        @PathVariable("id") Long id,
+        @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest,
+        BindingResult bindingResult
+    ) throws ValidationException {
+        if (bindingResult.hasErrors()) throw new ValidationException(
+                BindingResultUtil.requestValidationToString(bindingResult)
+        );
         return new ResponseEntity<>(
                 profileService.updatePassword(
                         id,
@@ -142,7 +159,7 @@ public class ProfileController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteProfile(
-            @PathVariable("id") Long id
+        @PathVariable("id") Long id
     ) {
         profileService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
