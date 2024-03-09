@@ -9,10 +9,9 @@ import ru.skibin.farmsystem.api.dto.ProductResponse;
 import ru.skibin.farmsystem.api.enumTypes.ValueType;
 import ru.skibin.farmsystem.entity.ProductEntity;
 import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
-import ru.skibin.farmsystem.exception.common.WrongLimitOffsetException;
-import ru.skibin.farmsystem.exception.common.WrongLongIdValueException;
-import ru.skibin.farmsystem.exception.product.WrongProductNameValueException;
+import ru.skibin.farmsystem.repository.ActionDAO;
 import ru.skibin.farmsystem.repository.ProductDAO;
+import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,12 +21,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
     @Mock
     ProductDAO productDAO;
+
+    @Mock
+    ActionDAO actionDAO;
+
+    @Mock
+    CommonCheckHelper checkHelper;
 
     @InjectMocks
     ProductService productService;
@@ -51,24 +58,6 @@ class ProductServiceTest {
         assertNotNull(productResponse);
         assertEquals(productResponse.getName(), name);
         assertEquals(productResponse.getValueType(), valueType);
-    }
-
-    @Test
-    void handleAddProduct_sendEmptyName_returnsWrongNameException() {
-        // given
-        boolean isWrongName = false;
-        String blankName = "";
-        ValueType valueType = ValueType.LITER;
-
-        // when
-        try {
-            productService.addProduct(blankName, valueType);
-        } catch (WrongProductNameValueException e) {
-            isWrongName = true;
-        }
-
-        //then
-        assertTrue(isWrongName);
     }
 
     @Test
@@ -165,21 +154,6 @@ class ProductServiceTest {
         assertEquals(productResponse.getValueType(), productEntity.getValueType());
     }
 
-    @Test
-    void handleFindProductByName_sendBlankName_returnsWrongProductNameException() {
-        // given
-        boolean isWrongName = false;
-        String blankName = "";
-
-        // when
-        try {
-            productService.findProductByName(blankName);
-        } catch (WrongProductNameValueException e) {
-            isWrongName = true;
-        }
-        //then
-        assertTrue(isWrongName);
-    }
 
     @Test
     void handleFindAllProductWithPagination_sendValidData_returnsValidProductResponse() {
@@ -210,24 +184,6 @@ class ProductServiceTest {
     }
 
     @Test
-    void handleFindAllProductWithPagination_sendInvalidData_returnsWrongLimitOffsetException() {
-        // given
-        boolean isWrongLimitOffset = false;
-        int limit = -5;
-        int offset = -2;
-
-
-        // when
-        try {
-            productService.findAllProductsWithPagination(limit, offset);
-        } catch (WrongLimitOffsetException e) {
-            isWrongLimitOffset = true;
-        }
-        //then
-        assertTrue(isWrongLimitOffset);
-    }
-
-    @Test
     void handleUpdateProductName_sendValidData_returnsValidResponse() {
         // given
         Long id = Math.abs(random.nextLong());
@@ -245,39 +201,6 @@ class ProductServiceTest {
         assertEquals(productResponse.getName(), newName);
         assertEquals(productResponse.getId(), id);
         assertEquals(productResponse.getValueType(), valueType);
-    }
-    @Test
-    void handleUpdateProductName_sendInvalidId_returnsWrongLongIdValueException() {
-        // given
-        boolean isWrongId = false;
-        Long wrongId = -Math.abs(random.nextLong());
-        String newName = "new test product Name";
-
-        // when
-        try {
-            productService.updateProductName(wrongId, newName);
-        } catch (WrongLongIdValueException e) {
-            isWrongId = true;
-        }
-        //then
-        assertTrue(isWrongId);
-    }
-
-    @Test
-    void handleUpdateProductName_sendInvalidName_returnsWrongProductNameValueException() {
-        // given
-        boolean isWrongName = false;
-        Long id = Math.abs(random.nextLong());
-        String blankNewName = "";
-
-        // when
-        try {
-            productService.updateProductName(id, blankNewName);
-        } catch (WrongProductNameValueException e) {
-            isWrongName = true;
-        }
-        //then
-        assertTrue(isWrongName);
     }
 
     @Test
@@ -299,29 +222,14 @@ class ProductServiceTest {
         assertEquals(productResponse.getId(), id);
         assertEquals(productResponse.getValueType(), newValueType);
     }
-    @Test
-    void handleUpdateProductValueType_sendInvalidId_returnsWrongLongIdValueException() {
-        // given
-        boolean isWrongId = false;
-        Long id = -Math.abs(random.nextLong());
-        ValueType newValueType = ValueType.LITER;
-
-        // when
-        try {
-            productService.updateProductValueType(id, newValueType);
-        } catch (WrongLongIdValueException e) {
-            isWrongId = true;
-        }
-        //then
-        assertTrue(isWrongId);
-    }
 
     @Test
-    void handleDeleteProduct_sendValidData_returnsValidResponse() {
+    void handleDeleteProduct_sendValidData_noneDependentProfile_returnsValidResponse() {
         // given
         Long id = Math.abs(random.nextLong());
 
         doReturn(1).when(productDAO).deleteProduct(id);
+        doReturn(true).when(checkHelper).boolCheckProductInActions(eq(id), any());
 
         // when
         boolean isDeleted = productService.deleteProduct(id);
@@ -329,20 +237,25 @@ class ProductServiceTest {
         //then
         assertTrue(isDeleted);
     }
+
     @Test
-    void handleDeleteProduct_sendInvalidId_returnsWrongLongIdValueException() {
+    void handleDeleteProduct_sendValidData_dependentProfile_returnsValidResponse() {
         // given
-        boolean isWrongId = false;
-        final Long id = -Math.abs(random.nextLong());
+        Long id = Math.abs(random.nextLong());
+        ProductEntity productEntity = new ProductEntity(
+                id,
+                "test product",
+                ValueType.LITER
+        );
+
+        doReturn(productEntity).when(productDAO).findProduct(id);
+        doReturn(false).when(checkHelper).boolCheckProductInActions(eq(id), any());
 
         // when
-        try {
-            productService.deleteProduct(id);
-        } catch (WrongLongIdValueException e) {
-            isWrongId = true;
-        }
+        boolean isDeleted = productService.deleteProduct(id);
+
         //then
-        assertTrue(isWrongId);
+        assertTrue(isDeleted);
     }
 
     @Test
@@ -356,47 +269,12 @@ class ProductServiceTest {
         doReturn(productEntity).when(productDAO).findProduct(id);
 
         // when
-        ProductResponse productResponse = productService.updateProduct(id, newName, newValueType);
+        ProductResponse productResponse = productService.updateProduct(id, newName, newValueType, true);
 
         //then
         assertNotNull(productResponse);
         assertEquals(productResponse.getName(), newName);
         assertEquals(productResponse.getId(), id);
         assertEquals(productResponse.getValueType(), newValueType);
-    }
-    @Test
-    void handleUpdateProduct_sendInvalidId_returnsWrongLongIdValueException() {
-        // given
-        boolean isWrongId = false;
-        final Long id = -Math.abs(random.nextLong());
-        final ValueType newValueType = ValueType.LITER;
-
-        // when
-        try {
-            productService.updateProduct(id, "new name", newValueType);
-        } catch (WrongLongIdValueException e) {
-            isWrongId = true;
-        }
-        //then
-        assertTrue(isWrongId);
-    }
-
-    @Test
-    void handleUpdateProduct_sendInvalidBlankName_returnsWrongProductNameValueException() {
-        // given
-        boolean isWrongName = false;
-        final Long id = Math.abs(random.nextLong());
-        final String blankName = "";
-        final ValueType newValueType = ValueType.LITER;
-
-        // when
-        try {
-            productService.updateProduct(id, blankName, newValueType);
-        } catch (WrongProductNameValueException e) {
-            isWrongName = true;
-        }
-
-        //then
-        assertTrue(isWrongName);
     }
 }

@@ -1,6 +1,7 @@
 package ru.skibin.farmsystem.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.skibin.farmsystem.api.enumTypes.ValueType;
@@ -29,31 +30,31 @@ public class ProductDAO {
 
     public ProductEntity findProduct(Long id) {
         String sql = """
-                SELECT *
+                SELECT id, name, value, is_actual
                 FROM product
                 WHERE id = :id;
                 """;
         Map<String, Object> params = Map.of(
                 "id", id
         );
-        return jdbcTemplate.queryForObject(sql, params, new ProductRowMapper());
+        return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ProductRowMapper()));
     }
 
     public ProductEntity getProductByName(String name) {
         String sql = """
-                SELECT *
+                SELECT id, name, value, is_actual
                 FROM product
                 WHERE name = :name;
                 """;
         Map<String, Object> params = Map.of(
                 "name", name
         );
-        return jdbcTemplate.queryForObject(sql, params, new ProductRowMapper());
+        return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ProductRowMapper()));
     }
 
     public Collection<ProductEntity> findAllProductsWithPagination(Integer limit, Integer offset) {
         String sql = """
-                SELECT *
+                SELECT id, name, value, is_actual
                 FROM product
                 ORDER BY id
                 LIMIT :limit
@@ -92,15 +93,29 @@ public class ProductDAO {
         jdbcTemplate.update(sql, params);
     }
 
-    public void updateProduct(Long id, String name, ValueType valueType) {
+    public void updateProduct(Long id, String name, ValueType valueType, Boolean isActual) {
         String sql = """
                 UPDATE product
-                SET name = :name, value = :value
+                SET name = :name, value = :value, is_actual = :is_actual
                 WHERE id = :id;
                 """;
         Map<String, Object> params = Map.of(
                 "name", name,
                 "value", valueType.name(),
+                "is_actual", isActual,
+                "id", id
+        );
+        jdbcTemplate.update(sql, params);
+    }
+
+    public void updateActualStatus(Long id, Boolean isActual) {
+        String sql = """
+                UPDATE product
+                SET is_actual = :is_actual
+                WHERE id = :id;
+                """;
+        Map<String, Object> params = Map.of(
+                "is_actual", isActual,
                 "id", id
         );
         jdbcTemplate.update(sql, params);

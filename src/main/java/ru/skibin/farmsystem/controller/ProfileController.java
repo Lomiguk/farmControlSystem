@@ -1,6 +1,7 @@
 package ru.skibin.farmsystem.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,15 +32,18 @@ import java.util.Collection;
 @RequestMapping("/profile")
 public class ProfileController {
     private final ProfileService profileService;
+
     @PostMapping
     public ResponseEntity<ProfileResponse> add(
-        @Valid @RequestBody AddProfileRequest addProfileRequest,
-        BindingResult bindingResult
+            @Valid
+            @RequestBody
+            AddProfileRequest addProfileRequest,
+            BindingResult bindingResult
     ) throws ValidationException {
 
         if (bindingResult.hasErrors()) throw new ValidationException(
-                    BindingResultUtil.requestValidationToString(bindingResult)
-            );
+                BindingResultUtil.requestValidationToString(bindingResult)
+        );
 
         return new ResponseEntity<>(
                 profileService.add(
@@ -54,7 +58,9 @@ public class ProfileController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProfileResponse> get(
-        @PathVariable("id") Long id
+            @PathVariable("id")
+            @Positive(message = "id must be positive")
+            Long id
     ) {
         return new ResponseEntity<>(
                 profileService.get(id),
@@ -64,8 +70,12 @@ public class ProfileController {
 
     @GetMapping("/all")
     public ResponseEntity<Collection<ProfileResponse>> getAll(
-        @RequestParam("limit") Integer limit,
-        @RequestParam("offset") Integer offset
+            @RequestParam("limit")
+            @Positive(message = "limit must be positive")
+            Integer limit,
+            @RequestParam("offset")
+            @Positive(message = "offset must be positive")
+            Integer offset
     ) {
         return new ResponseEntity<>(
                 profileService.getAllWithPagination(limit, offset),
@@ -75,9 +85,13 @@ public class ProfileController {
 
     @PatchMapping("/{id}/info")
     public ResponseEntity<ProfileResponse> updateInfo(
-        @PathVariable("id") Long id,
-        @Valid @RequestBody UpdateInfoRequest updateInfoRequest,
-        BindingResult bindingResult
+            @PathVariable("id")
+            @Positive(message = "id must be positive")
+            Long id,
+            @Valid
+            @RequestBody
+            UpdateInfoRequest updateInfoRequest,
+            BindingResult bindingResult
     ) throws ValidationException {
         if (bindingResult.hasErrors()) throw new ValidationException(
                 BindingResultUtil.requestValidationToString(bindingResult)
@@ -94,9 +108,13 @@ public class ProfileController {
 
     @PatchMapping("/{id}/password")
     public ResponseEntity<ProfileResponse> updatePassword(
-        @PathVariable("id") Long id,
-        @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest,
-        BindingResult bindingResult
+            @PathVariable("id")
+            @Positive(message = "id must be positive")
+            Long id,
+            @Valid
+            @RequestBody
+            UpdatePasswordRequest updatePasswordRequest,
+            BindingResult bindingResult
     ) throws ValidationException {
         if (bindingResult.hasErrors()) throw new ValidationException(
                 BindingResultUtil.requestValidationToString(bindingResult)
@@ -113,8 +131,10 @@ public class ProfileController {
 
     @PatchMapping("/{id}/admin?status=?")
     public ResponseEntity<ProfileResponse> updateAdminStatus(
-        @PathVariable("id") Long id,
-        @RequestParam("status") Boolean status
+            @PathVariable("id")
+            @Positive(message = "id must be positive")
+            Long id,
+            @RequestParam("status") Boolean status
     ) {
         return new ResponseEntity<>(
                 profileService.updateAdminStatus(
@@ -124,6 +144,7 @@ public class ProfileController {
                 HttpStatus.OK
         );
     }
+
     @PatchMapping("/{id}/active?status=?")
     public ResponseEntity<ProfileResponse> updateActiveStatus(
             @PathVariable("id") Long id,
@@ -140,9 +161,11 @@ public class ProfileController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProfileResponse> updateProfile(
-        @PathVariable("id") Long id,
-        @RequestBody UpdateProfileRequest updateProfileRequest
-    ){
+            @PathVariable("id")
+            @Positive(message = "id must be positive")
+            Long id,
+            @RequestBody UpdateProfileRequest updateProfileRequest
+    ) {
         return new ResponseEntity<>(
                 profileService.update(
                         id,
@@ -159,9 +182,13 @@ public class ProfileController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteProfile(
-        @PathVariable("id") Long id
+            @PathVariable("id")
+            @Positive(message = "id must be positive")
+            Long id
     ) {
-        profileService.delete(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(
+                profileService.delete(id),
+                HttpStatus.OK
+        );
     }
 }

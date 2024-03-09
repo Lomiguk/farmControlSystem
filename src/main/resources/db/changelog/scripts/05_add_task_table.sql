@@ -7,6 +7,7 @@ CREATE TABLE task (
     product_id  bigint    NOT NULL,
     value       float4    NOT NULL,
     is_done     bool      DEFAULT false,
+    is_abort    bool      DEFAULT false,
 
     CONSTRAINT task_profile_fk FOREIGN KEY (profile_id) REFERENCES profile(id),
     CONSTRAINT task_product_fk FOREIGN KEY (product_id) REFERENCES product(id),
@@ -20,3 +21,5 @@ COMMENT ON COLUMN task.description IS 'Описание задания';
 COMMENT ON COLUMN task.profile_id IS 'Идентификатор профиля';
 COMMENT ON COLUMN task.product_id IS 'Идентификатор продукта';
 COMMENT ON COLUMN task.value IS 'Объём работ';
+COMMENT ON COLUMN task.is_done IS 'Флаг - завершено ли задания';
+COMMENT ON COLUMN task.is_abort IS 'Флаг - отменено ли задание';

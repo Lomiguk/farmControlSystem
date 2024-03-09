@@ -14,5 +14,5 @@ COMMENT ON COLUMN profile.id IS 'Уникальный идентификатор
 COMMENT ON COLUMN profile.fio IS 'Фамилия, Имя, Отчество сотрудника';
 COMMENT ON COLUMN profile.email IS 'Электронная почта сотрудника';
 COMMENT ON COLUMN profile.password IS 'Хеш пароля сотрудника';
-COMMENT ON COLUMN profile.is_admin IS 'Флаг обозначающий наличие или отсутствие расширенных прав доступа';
-COMMENT ON COLUMN profile.is_actual IS 'Флаг является ли человек отражённый в профиле сотрудником на данный момент';
+COMMENT ON COLUMN profile.is_admin IS 'Флаг - наличие или отсутствие расширенных прав доступа';
+COMMENT ON COLUMN profile.is_actual IS 'Флаг - является ли человек отражённый в профиле сотрудником на данный момент';

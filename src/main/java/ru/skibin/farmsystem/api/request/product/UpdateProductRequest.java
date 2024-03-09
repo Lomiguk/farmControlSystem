@@ -16,4 +16,5 @@ public class UpdateProductRequest {
     private String name;
     @NotNull(message = "value type can't be null")
     private ValueType valueType;
+    private Boolean isActual;
 }

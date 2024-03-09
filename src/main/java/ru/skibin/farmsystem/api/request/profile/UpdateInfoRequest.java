@@ -11,8 +11,8 @@ import lombok.Data;
 public class UpdateInfoRequest {
     @NotNull
     @Size(min = 2, max = 50)
-    String fio;
+    private String fio;
     @NotNull
     @Email
-    String email;
+    private String email;
 }

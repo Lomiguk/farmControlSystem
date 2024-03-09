@@ -6,11 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.skibin.farmsystem.api.dto.ProductResponse;
 import ru.skibin.farmsystem.api.enumTypes.ValueType;
 import ru.skibin.farmsystem.entity.ProductEntity;
-import ru.skibin.farmsystem.exception.common.WrongLimitOffsetException;
 import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
-import ru.skibin.farmsystem.exception.common.WrongLongIdValueException;
-import ru.skibin.farmsystem.exception.product.WrongProductNameValueException;
 import ru.skibin.farmsystem.repository.ProductDAO;
+import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,12 +19,10 @@ import java.util.logging.Logger;
 public class ProductService {
     private final ProductDAO productDAO;
     private final Logger logger = Logger.getLogger(ProductService.class.getName());
+    private final CommonCheckHelper checkHelper;
 
     @Transactional
     public ProductResponse addProduct(String name, ValueType valueType) {
-        if (name.isBlank() || name.length() < 2 || name.length() > 50) {
-            throw new WrongProductNameValueException("Wrong name value (name length must be 2-50 chars)");
-        }
         productDAO.addProduct(name, valueType);
         ProductEntity productEntity = productDAO.getProductByName(name);
         logger.info("Add new product (" + productEntity.getId() + ")");
@@ -42,8 +38,6 @@ public class ProductService {
     }
 
     public ProductResponse findProduct(Long id) {
-        if (id < 0) { throw new WrongLongIdValueException("Wrong id value"); }
-
         ProductEntity productEntity = productDAO.findProduct(id);
         if (productEntity != null) {
             logger.info("Get product (" + id + ")");
@@ -54,9 +48,6 @@ public class ProductService {
     }
 
     public ProductResponse findProductByName(String name) {
-        if (name.isBlank() || name.length() < 2 || name.length() > 50) {
-            throw new WrongProductNameValueException("Wrong name value (name length must be 2-50 chars)");
-        }
         ProductEntity productEntity = productDAO.getProductByName(name);
         if (productEntity != null) {
             logger.info("Get product (" + productEntity.getId() + ")");
@@ -66,9 +57,8 @@ public class ProductService {
         return null;
     }
 
+    @Transactional
     public Collection<ProductResponse> findAllProductsWithPagination(Integer limit, Integer offset) {
-        if (limit < 0 || offset < 0) throw new WrongLimitOffsetException("Wrong limit/offset values.");
-
         Collection<ProductEntity> productEntities = productDAO.findAllProductsWithPagination(limit, offset);
         logger.info("Get " + limit + "products, with offset: " + offset);
         Collection<ProductResponse> products = new ArrayList<>();
@@ -81,10 +71,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponse updateProductName(Long id, String newName) {
-        if (id < 0) { throw new WrongLongIdValueException("Wrong id value"); }
-        if (newName.isBlank() || newName.length() < 2 || newName.length() > 50) {
-            throw new WrongProductNameValueException("Wrong new name value (name length must be 2-50 chars)");
-        }
+        checkHelper.checkProductForExist(id, "Non existed product can't be update");
         productDAO.updateProductName(id, newName);
         logger.info("Update product (" + id + ") name");
         return new ProductResponse(productDAO.findProduct(id));
@@ -92,28 +79,37 @@ public class ProductService {
 
     @Transactional
     public ProductResponse updateProductValueType(Long id, ValueType valueType) {
-        if (id < 0) { throw new WrongLongIdValueException("Wrong id value"); }
-
+        checkHelper.checkProductForExist(id, "Non existed product can't be update");
         productDAO.updateProductValueType(id, valueType);
         logger.info("Update product (" + id + ") value type to " + valueType);
         return new ProductResponse(productDAO.findProduct(id));
     }
 
-    public Boolean deleteProduct(Long id) {
-        if (id < 0) { throw new WrongLongIdValueException("Wrong id value"); }
-
-        int result = productDAO.deleteProduct(id);
-        logger.info("Delete product (" + id + ")");
-        return result == 1;
+    @Transactional
+    public ProductResponse updateProductActualStatus(Long id, Boolean status) {
+        checkHelper.checkProductForExist(id, "Non existed product can't be update");
+        productDAO.updateActualStatus(id, status);
+        logger.info("Update product (" + id + ") active status to " + status);
+        return new ProductResponse(productDAO.findProduct(id));
     }
 
     @Transactional
-    public ProductResponse updateProduct(Long id, String name, ValueType valueType) {
-        if (id < 0) { throw new WrongLongIdValueException("Wrong id value"); }
-        if (name.isBlank() || name.length() < 2 || name.length() > 50) {
-            throw new WrongProductNameValueException("Wrong new name value (name length must be 2-50 chars)");
+    public Boolean deleteProduct(Long id) {
+        checkHelper.checkProfileForExist(id, "Non-existed product for delete.");
+        if (checkHelper.boolCheckProductInActions(id, "Non-deletable product (has dependent actions)")) {
+            logger.info("Try to delete product (" + id + ")");
+            return productDAO.deleteProduct(id) > 0;
+        } else {
+            logger.info("product (" + id + ") set actual status to false");
+            updateProductActualStatus(id, false);
+            return true;
         }
-        productDAO.updateProduct(id, name, valueType);
+    }
+
+    @Transactional
+    public ProductResponse updateProduct(Long id, String name, ValueType valueType, Boolean isActual) {
+        checkHelper.checkProductForExist(id, "Non existed product can't be update");
+        productDAO.updateProduct(id, name, valueType, isActual);
         logger.info("Update product(" + id + ") info");
         return new ProductResponse(productDAO.findProduct(id));
     }

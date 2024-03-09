@@ -1,6 +1,7 @@
 package ru.skibin.farmsystem.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.skibin.farmsystem.entity.ProfileEntity;
@@ -41,7 +42,7 @@ public class ProfileDAO {
         jdbcTemplate.update(sql, params);
     }
 
-    public ProfileEntity getProfile(String fio, String email) {
+    public ProfileEntity findProfile(String fio, String email) {
         String sql = """
                 SELECT id, fio, email, password, is_admin, is_actual
                 FROM profile
@@ -52,10 +53,10 @@ public class ProfileDAO {
                 "email", email
         );
 
-        return jdbcTemplate.queryForObject(sql, params, new ProfileRowMapper());
+        return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ProfileRowMapper()));
     }
 
-    public ProfileEntity getProfile(Long id) {
+    public ProfileEntity findProfile(Long id) {
         String sql = """
                 SELECT id, fio, email, password, is_admin, is_actual
                 FROM profile
@@ -65,7 +66,7 @@ public class ProfileDAO {
                 "id", id
         );
 
-        return jdbcTemplate.queryForObject(sql, params, new ProfileRowMapper());
+        return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ProfileRowMapper()));
     }
 
     public void updateProfileInformation(Long id, String fio, String email) {
@@ -125,7 +126,7 @@ public class ProfileDAO {
         jdbcTemplate.update(sql, params);
     }
 
-    public void deleteProfile(Long id) {
+    public int deleteProfile(Long id) {
         String sql = """
                 DELETE FROM profile
                 WHERE id = :id;
@@ -134,7 +135,7 @@ public class ProfileDAO {
                 "id", id
         );
 
-        jdbcTemplate.update(sql, params);
+        return jdbcTemplate.update(sql, params);
     }
 
     public void updateProfile(

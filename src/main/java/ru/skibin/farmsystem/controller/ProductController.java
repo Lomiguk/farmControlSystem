@@ -30,13 +30,13 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+
     @PostMapping
     public ResponseEntity<ProductResponse> addProduct(
-        @Valid
-        @RequestBody
-        AddProductRequest addProductRequest,
-        BindingResult bindingResult
-    ) throws ValidationException {
+            @Valid @RequestBody
+            AddProductRequest addProductRequest,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) throw new ValidationException(
                 BindingResultUtil.requestValidationToString(bindingResult)
         );
@@ -48,7 +48,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProduct(
-        @PathVariable("id") Long id
+            @PathVariable("id") Long id
     ) {
         return new ResponseEntity<>(
                 productService.getProduct(id),
@@ -58,7 +58,7 @@ public class ProductController {
 
     @GetMapping()
     public ResponseEntity<ProductResponse> getProductByName(
-        @RequestParam("name") String name
+            @RequestParam("name") String name
     ) {
         return new ResponseEntity<>(
                 productService.findProductByName(name),
@@ -68,8 +68,8 @@ public class ProductController {
 
     @GetMapping("/all")
     public ResponseEntity<Collection<ProductResponse>> getAll(
-        @RequestParam("limit") Integer limit,
-        @RequestParam("offset") Integer offset
+            @RequestParam("limit") Integer limit,
+            @RequestParam("offset") Integer offset
     ) {
         return new ResponseEntity<>(
                 productService.findAllProductsWithPagination(limit, offset),
@@ -79,8 +79,8 @@ public class ProductController {
 
     @PatchMapping("/{id}/name")
     public ResponseEntity<ProductResponse> updateProductName(
-        @PathVariable("id") Long id,
-        @RequestParam("new_name") String newName
+            @PathVariable("id") Long id,
+            @RequestParam("new_name") String newName
     ) {
         return new ResponseEntity<>(
                 productService.updateProductName(id, newName),
@@ -90,8 +90,8 @@ public class ProductController {
 
     @PatchMapping("/{id}/value-type")
     public ResponseEntity<ProductResponse> updateProductValueType(
-        @PathVariable("id") Long id,
-        @RequestParam("value_type") ValueType valueType
+            @PathVariable("id") Long id,
+            @RequestParam("value") ValueType valueType
     ) {
         return new ResponseEntity<>(
                 productService.updateProductValueType(id, valueType),
@@ -99,17 +99,33 @@ public class ProductController {
         );
     }
 
+    @PatchMapping("/{id}/actual-status")
+    public ResponseEntity<ProductResponse> updateProductActualStatus(
+            @PathVariable("id") Long id,
+            @RequestParam("value") Boolean status
+    ) {
+        return new ResponseEntity<>(
+                productService.updateProductActualStatus(id, status),
+                HttpStatus.OK
+        );
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(
-        @PathVariable("id") Long id,
-        @Valid @RequestBody UpdateProductRequest updateProductRequest,
-        BindingResult bindingResult
-    ) throws ValidationException {
+            @PathVariable("id") Long id,
+            @Valid @RequestBody UpdateProductRequest updateProductRequest,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) throw new ValidationException(
                 BindingResultUtil.requestValidationToString(bindingResult)
         );
         return new ResponseEntity<>(
-                productService.updateProduct(id, updateProductRequest.getName(), updateProductRequest.getValueType()),
+                productService.updateProduct(
+                        id,
+                        updateProductRequest.getName(),
+                        updateProductRequest.getValueType(),
+                        updateProductRequest.getIsActual()
+                ),
                 HttpStatus.OK
         );
     }
