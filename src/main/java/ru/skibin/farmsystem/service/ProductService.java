@@ -71,25 +71,31 @@ public class ProductService {
 
     @Transactional
     public ProductResponse updateProductName(Long id, String newName) {
-        checkHelper.checkProductForExist(id, "Non existed product can't be update");
-        productDAO.updateProductName(id, newName);
+        ProductEntity productEntity = checkHelper.checkProductForExist(id, "Non existed product can't be update");
+        if (!productEntity.getName().equals(newName)) {
+            productDAO.updateProductName(id, newName);
+        }
         logger.info("Update product (" + id + ") name");
         return new ProductResponse(productDAO.findProduct(id));
     }
 
     @Transactional
-    public ProductResponse updateProductValueType(Long id, ValueType valueType) {
-        checkHelper.checkProductForExist(id, "Non existed product can't be update");
-        productDAO.updateProductValueType(id, valueType);
-        logger.info("Update product (" + id + ") value type to " + valueType);
+    public ProductResponse updateProductValueType(Long id, ValueType newValueType) {
+        ProductEntity productEntity = checkHelper.checkProductForExist(id, "Non existed product can't be update");
+        if (!productEntity.getValueType().equals(newValueType)) {
+            productDAO.updateProductValueType(id, newValueType);
+        }
+        logger.info("Update product (" + id + ") value type to " + newValueType);
         return new ProductResponse(productDAO.findProduct(id));
     }
 
     @Transactional
-    public ProductResponse updateProductActualStatus(Long id, Boolean status) {
-        checkHelper.checkProductForExist(id, "Non existed product can't be update");
-        productDAO.updateActualStatus(id, status);
-        logger.info("Update product (" + id + ") active status to " + status);
+    public ProductResponse updateProductActualStatus(Long id, Boolean newStatus) {
+        ProductEntity productEntity = checkHelper.checkProductForExist(id, "Non existed product can't be update");
+        if(!productEntity.getIsActual().equals(newStatus)) {
+            productDAO.updateActualStatus(id, newStatus);
+        }
+        logger.info("Update product (" + id + ") active status to " + newStatus);
         return new ProductResponse(productDAO.findProduct(id));
     }
 

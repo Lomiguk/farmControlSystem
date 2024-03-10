@@ -2,6 +2,7 @@ package ru.skibin.farmsystem.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,10 +72,10 @@ public class ProfileController {
     @GetMapping("/all")
     public ResponseEntity<Collection<ProfileResponse>> getAll(
             @RequestParam("limit")
-            @Positive(message = "limit must be positive")
+            @PositiveOrZero(message = "limit must be positive")
             Integer limit,
             @RequestParam("offset")
-            @Positive(message = "offset must be positive")
+            @PositiveOrZero(message = "offset must be positive")
             Integer offset
     ) {
         return new ResponseEntity<>(

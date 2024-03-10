@@ -48,7 +48,7 @@ class ProductServiceTest {
         String name = "test product";
         ValueType valueType = ValueType.LITER;
 
-        ProductEntity productEntity = new ProductEntity(random.nextLong(), name, valueType);
+        ProductEntity productEntity = new ProductEntity(random.nextLong(), name, valueType, true);
         doReturn(productEntity).when(productDAO).getProductByName(name);
 
         // when
@@ -64,11 +64,7 @@ class ProductServiceTest {
     void handleGetProductById_sendValidData_returnsValidProductResponse() {
         // given
         Long id = Math.abs(random.nextLong());
-        ProductEntity productEntity = new ProductEntity(
-                id,
-                "test product",
-                ValueType.LITER
-        );
+        ProductEntity productEntity = new ProductEntity(id, "test product", ValueType.LITER, true);
 
         doReturn(productEntity).when(productDAO).findProduct(id);
 
@@ -103,11 +99,7 @@ class ProductServiceTest {
     void handleFindProductById_sendValidData_returnsValidProductResponse() {
         // given
         Long id = Math.abs(random.nextLong());
-        ProductEntity productEntity = new ProductEntity(
-                id,
-                "test product",
-                ValueType.LITER
-        );
+        ProductEntity productEntity = new ProductEntity(id, "test product", ValueType.LITER, true);
 
         doReturn(productEntity).when(productDAO).findProduct(id);
 
@@ -137,11 +129,7 @@ class ProductServiceTest {
     void handleFindProductByName_sendValidData_returnsValidResponse() {
         // given
         Long id = Math.abs(random.nextLong());
-        ProductEntity productEntity = new ProductEntity(
-                id,
-                "test product",
-                ValueType.LITER
-        );
+        ProductEntity productEntity = new ProductEntity(id, "test product", ValueType.LITER, true);
         doReturn(productEntity).when(productDAO).getProductByName(productEntity.getName());
 
         // when
@@ -164,12 +152,14 @@ class ProductServiceTest {
                 new ProductEntity(
                         Math.abs(random.nextLong()),
                         "first test product",
-                        ValueType.LITER
+                        ValueType.LITER,
+                        true
                 ),
                 new ProductEntity(
                         Math.abs(random.nextLong()),
                         "second test product",
-                        ValueType.LITER
+                        ValueType.LITER,
+                        false
                 )
         );
 
@@ -190,7 +180,7 @@ class ProductServiceTest {
         String newName = "new test product Name";
         ValueType valueType = ValueType.LITER;
 
-        ProductEntity productEntity = new ProductEntity(id, newName, valueType);
+        ProductEntity productEntity = new ProductEntity(id, newName, valueType, true);
         doReturn(productEntity).when(productDAO).findProduct(id);
 
         // when
@@ -210,7 +200,7 @@ class ProductServiceTest {
         String name = "test product";
         ValueType newValueType = ValueType.LITER;
 
-        ProductEntity productEntity = new ProductEntity(id, name, newValueType);
+        ProductEntity productEntity = new ProductEntity(id, name, newValueType, true);
         doReturn(productEntity).when(productDAO).findProduct(id);
 
         // when
@@ -242,11 +232,7 @@ class ProductServiceTest {
     void handleDeleteProduct_sendValidData_dependentProfile_returnsValidResponse() {
         // given
         Long id = Math.abs(random.nextLong());
-        ProductEntity productEntity = new ProductEntity(
-                id,
-                "test product",
-                ValueType.LITER
-        );
+        ProductEntity productEntity = new ProductEntity(id, "test product", ValueType.LITER, true);
 
         doReturn(productEntity).when(productDAO).findProduct(id);
         doReturn(false).when(checkHelper).boolCheckProductInActions(eq(id), any());
@@ -265,7 +251,7 @@ class ProductServiceTest {
         final String newName = "new test product";
         final ValueType newValueType = ValueType.LITER;
 
-        ProductEntity productEntity = new ProductEntity(id, newName, newValueType);
+        ProductEntity productEntity = new ProductEntity(id, newName, newValueType, true);
         doReturn(productEntity).when(productDAO).findProduct(id);
 
         // when

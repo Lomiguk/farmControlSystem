@@ -1,6 +1,11 @@
 package ru.skibin.farmsystem.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +53,9 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProduct(
-            @PathVariable("id") Long id
+            @PathVariable("id")
+            @Positive
+            Long id
     ) {
         return new ResponseEntity<>(
                 productService.getProduct(id),
@@ -58,7 +65,11 @@ public class ProductController {
 
     @GetMapping()
     public ResponseEntity<ProductResponse> getProductByName(
-            @RequestParam("name") String name
+            @NotNull(message = "product name can't be null")
+            @NotEmpty(message = "product name can't be empty")
+            @Size(min = 2, max = 50, message = "product name: 2-50 chars")
+            @RequestParam("name")
+            String name
     ) {
         return new ResponseEntity<>(
                 productService.findProductByName(name),
@@ -68,8 +79,12 @@ public class ProductController {
 
     @GetMapping("/all")
     public ResponseEntity<Collection<ProductResponse>> getAll(
-            @RequestParam("limit") Integer limit,
-            @RequestParam("offset") Integer offset
+            @PositiveOrZero(message = "limit must be positive")
+            @RequestParam("limit")
+            Integer limit,
+            @PositiveOrZero(message = "offset must be positive")
+            @RequestParam("offset")
+            Integer offset
     ) {
         return new ResponseEntity<>(
                 productService.findAllProductsWithPagination(limit, offset),
@@ -90,7 +105,9 @@ public class ProductController {
 
     @PatchMapping("/{id}/value-type")
     public ResponseEntity<ProductResponse> updateProductValueType(
-            @PathVariable("id") Long id,
+            @PathVariable("id")
+            @Positive
+            Long id,
             @RequestParam("value") ValueType valueType
     ) {
         return new ResponseEntity<>(
@@ -101,7 +118,9 @@ public class ProductController {
 
     @PatchMapping("/{id}/actual-status")
     public ResponseEntity<ProductResponse> updateProductActualStatus(
-            @PathVariable("id") Long id,
+            @PathVariable("id")
+            @Positive
+            Long id,
             @RequestParam("value") Boolean status
     ) {
         return new ResponseEntity<>(
@@ -112,7 +131,9 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(
-            @PathVariable("id") Long id,
+            @PathVariable("id")
+            @Positive
+            Long id,
             @Valid @RequestBody UpdateProductRequest updateProductRequest,
             BindingResult bindingResult
     ) {
@@ -131,7 +152,11 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteProduct(@PathVariable("id") Long id) {
+    public ResponseEntity<Boolean> deleteProduct(
+            @PathVariable("id")
+            @Positive
+            Long id
+    ) {
         return new ResponseEntity<>(
                 productService.deleteProduct(id),
                 HttpStatus.OK

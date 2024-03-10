@@ -11,10 +11,12 @@ public class ProductResponse {
     private Long id;
     private String name;
     private ValueType valueType;
+    private Boolean isActual;
 
     public ProductResponse(ProductEntity productEntity) {
         this.id = productEntity.getId();
         this.name = productEntity.getName();
         this.valueType = productEntity.getValueType();
+        this.isActual = productEntity.getIsActual();
     }
 }

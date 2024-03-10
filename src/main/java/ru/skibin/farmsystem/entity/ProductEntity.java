@@ -10,4 +10,5 @@ public class ProductEntity {
     private Long id;
     private String name;
     private ValueType valueType;
+    private Boolean isActual;
 }

@@ -7,9 +7,8 @@ import ru.skibin.farmsystem.entity.ProductEntity;
 import ru.skibin.farmsystem.entity.ProfileEntity;
 import ru.skibin.farmsystem.exception.action.StartEndDateException;
 import ru.skibin.farmsystem.exception.common.FutureInstantException;
-import ru.skibin.farmsystem.exception.common.NonExistedActionException;
-import ru.skibin.farmsystem.exception.common.NonExistedProductException;
 import ru.skibin.farmsystem.exception.common.NonExistedProfileException;
+import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
 import ru.skibin.farmsystem.exception.common.WrongProductValueException;
 import ru.skibin.farmsystem.repository.ActionDAO;
 import ru.skibin.farmsystem.repository.ProductDAO;
@@ -46,7 +45,7 @@ public class CommonCheckHelper {
     public ProductEntity checkProductForExist(Long productId, String exceptionMessage) {
         ProductEntity product = productDAO.findProduct(productId);
         if (product == null) {
-            throw new NonExistedProductException(exceptionMessage);
+            throw new TryToGetNotExistedEntityException(exceptionMessage);
         }
         return product;
     }
@@ -77,7 +76,7 @@ public class CommonCheckHelper {
     public ActionEntity checkActionForExist(Long id, String exceptionMessage) {
         ActionEntity actionEntity = actionDAO.findAction(id);
         if (actionEntity == null) {
-            throw new NonExistedActionException(exceptionMessage);
+            throw new TryToGetNotExistedEntityException(exceptionMessage);
         }
         return actionEntity;
     }

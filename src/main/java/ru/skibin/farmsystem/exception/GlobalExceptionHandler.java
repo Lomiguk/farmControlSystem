@@ -10,8 +10,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.skibin.farmsystem.exception.action.StartEndDateException;
 import ru.skibin.farmsystem.exception.common.FutureInstantException;
-import ru.skibin.farmsystem.exception.common.NonExistedActionException;
-import ru.skibin.farmsystem.exception.common.NonExistedProductException;
 import ru.skibin.farmsystem.exception.common.NonExistedProfileException;
 import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
 import ru.skibin.farmsystem.exception.common.ValidationException;
@@ -41,7 +39,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(TryToGetNotExistedEntityException.class)
     protected ResponseEntity<Object> handleTryToGetNotExistedEntityException(TryToGetNotExistedEntityException e) {
-        return buildResponse("Trying to get a non-existent entity: ", e);
+        return buildResponse("Non-existent entity: ", e);
     }
 
     @ExceptionHandler(ValidationException.class)
@@ -56,12 +54,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NonExistedProfileException.class)
     protected ResponseEntity<Object> handleNonExistedProfileException(NonExistedProfileException e) {
-        return buildResponse("Request with non existed profile id", e);
-    }
-
-    @ExceptionHandler(NonExistedProductException.class)
-    protected ResponseEntity<Object> handleNonExistedProductException(NonExistedProductException e) {
-        return buildResponse("Request with non existed product id", e);
+        return buildResponse("Non-existed profile: ", e);
     }
 
     @ExceptionHandler(FutureInstantException.class)
@@ -72,11 +65,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(StartEndDateException.class)
     protected ResponseEntity<Object> handleStartEndDateException(StartEndDateException e) {
         return buildResponse("Wrong period format: ", e);
-    }
-
-    @ExceptionHandler(NonExistedActionException.class)
-    protected ResponseEntity<Object> handleNonExistedActionException(NonExistedActionException e) {
-        return buildResponse("Action doesn't exist", e);
     }
 
     // util

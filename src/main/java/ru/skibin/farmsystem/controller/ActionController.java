@@ -1,6 +1,7 @@
 package ru.skibin.farmsystem.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,9 +64,14 @@ public class ActionController {
 
     @GetMapping("/period")
     public ResponseEntity<Collection<ActionResponse>> getAllActions(
-            @Valid @RequestBody GetAllActionsForPeriodRequest request,
-            @RequestParam("limit") Integer limit,
-            @RequestParam("offset") Integer offset
+            @Valid @RequestBody
+            GetAllActionsForPeriodRequest request,
+            @RequestParam("limit")
+            @PositiveOrZero(message = "limit must be positive")
+            Integer limit,
+            @RequestParam("offset")
+            @PositiveOrZero(message = "offset must be positive")
+            Integer offset
     ) {
         return new ResponseEntity<>(
                 actionService.findPeriodActions(request.getStart(), request.getEnd(), limit, offset),

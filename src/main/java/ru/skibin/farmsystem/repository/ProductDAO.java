@@ -83,7 +83,7 @@ public class ProductDAO {
     public void updateProductValueType(Long id, ValueType valueType) {
         String sql = """
                 UPDATE product
-                SET value = :value
+                SET value = :value::value_type
                 WHERE id = :id;
                 """;
         Map<String, Object> params = Map.of(
@@ -96,7 +96,7 @@ public class ProductDAO {
     public void updateProduct(Long id, String name, ValueType valueType, Boolean isActual) {
         String sql = """
                 UPDATE product
-                SET name = :name, value = :value, is_actual = :is_actual
+                SET name = :name, value = :value::value_type, is_actual = :is_actual
                 WHERE id = :id;
                 """;
         Map<String, Object> params = Map.of(

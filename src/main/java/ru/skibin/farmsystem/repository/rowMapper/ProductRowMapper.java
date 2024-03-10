@@ -15,7 +15,8 @@ public class ProductRowMapper implements RowMapper<ProductEntity> {
             return new ProductEntity(
                     rs.getLong("id"),
                     rs.getString("name"),
-                    ValueType.valueOf(rs.getString("value"))
+                    ValueType.valueOf(rs.getString("value")),
+                    rs.getBoolean("is_actual")
             );
         } catch (SQLException e) {
             throw new RowMapperException("Product entity map exception");
