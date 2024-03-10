@@ -29,7 +29,7 @@ public class CommonCheckHelper {
 
     public ProfileEntity checkProfileForExist(Long id, String exceptionMessage) {
         ProfileEntity profileEntity = profileDAO.findProfile(id);
-        if (profileEntity == null) {
+        if (profileEntity == null || !profileEntity.getIsActual()) {
             throw new NonExistedProfileException(exceptionMessage);
         }
 
@@ -43,11 +43,11 @@ public class CommonCheckHelper {
     }
 
     public ProductEntity checkProductForExist(Long productId, String exceptionMessage) {
-        ProductEntity product = productDAO.findProduct(productId);
-        if (product == null) {
+        ProductEntity productEntity = productDAO.findProduct(productId);
+        if (productEntity == null || !productEntity.getIsActual()) {
             throw new TryToGetNotExistedEntityException(exceptionMessage);
         }
-        return product;
+        return productEntity;
     }
 
     public CommonCheckHelper chainCheckValueForPositive(Float value, String exceptionMessage) {
@@ -75,7 +75,7 @@ public class CommonCheckHelper {
 
     public ActionEntity checkActionForExist(Long id, String exceptionMessage) {
         ActionEntity actionEntity = actionDAO.findAction(id);
-        if (actionEntity == null) {
+        if (actionEntity == null || !actionEntity.getIsActual()) {
             throw new TryToGetNotExistedEntityException(exceptionMessage);
         }
         return actionEntity;
