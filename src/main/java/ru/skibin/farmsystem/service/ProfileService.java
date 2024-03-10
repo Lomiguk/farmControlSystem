@@ -77,9 +77,10 @@ public class ProfileService {
     }
 
     @Transactional
-    public ProfileResponse updateActiveStatus(Long id, Boolean isActive) {
-        commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update active status.");
-        profileDAO.updateProfileActiveStatus(id, isActive);
+    public ProfileResponse updateActualStatus(Long id, Boolean isActual) {
+        ProfileEntity profileEntity = commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update actual status.");
+        if (isActual == null) isActual = profileEntity.getIsActual();
+        profileDAO.updateProfileActualStatus(id, isActual);
         return new ProfileResponse(profileDAO.findProfile(id));
     }
 
@@ -91,7 +92,7 @@ public class ProfileService {
             return profileDAO.deleteProfile(id) > 0;
         } else {
             logger.info("Profile (" + id + ") set actual status to false");
-            updateActiveStatus(id, false);
+            updateActualStatus(id, false);
             return true;
         }
     }

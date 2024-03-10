@@ -112,7 +112,7 @@ public class ProfileDAO {
         jdbcTemplate.update(sql, params);
     }
 
-    public void updateProfileActiveStatus(Long id, Boolean isActual) {
+    public void updateProfileActualStatus(Long id, Boolean isActual) {
         String sql = """
                 UPDATE profile
                 SET is_actual = :is_actual

@@ -129,7 +129,7 @@ public class ProfileController {
         );
     }
 
-    @PatchMapping("/{id}/admin?status=?")
+    @PatchMapping("/{id}/admin")
     public ResponseEntity<ProfileResponse> updateAdminStatus(
             @PathVariable("id")
             @Positive(message = "id must be positive")
@@ -145,13 +145,13 @@ public class ProfileController {
         );
     }
 
-    @PatchMapping("/{id}/active?status=?")
+    @PatchMapping("/{id}/active")
     public ResponseEntity<ProfileResponse> updateActiveStatus(
-            @PathVariable("id") Long id,
+            @PathVariable("id") @Positive Long id,
             @RequestParam("active") Boolean status
     ) {
         return new ResponseEntity<>(
-                profileService.updateActiveStatus(
+                profileService.updateActualStatus(
                         id,
                         status
                 ),
