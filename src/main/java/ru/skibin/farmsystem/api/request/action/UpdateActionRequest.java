@@ -10,15 +10,14 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 public class UpdateActionRequest {
-    @NotNull(message = "")
-    @Positive(message = "")
+    @NotNull(message = "Profile id can't be null")
+    @Positive(message = "Profile id must be positive")
     private Long profileId;
-    @NotNull
+    @NotNull(message = "Product id can't be null")
+    @Positive(message = "Product idd must be positive")
     private Long productId;
-    @NotNull
+    @NotNull(message = "Message can't be null")
     private Float value;
-    @NotNull
     private Instant time;
-
     private Boolean isActual;
 }

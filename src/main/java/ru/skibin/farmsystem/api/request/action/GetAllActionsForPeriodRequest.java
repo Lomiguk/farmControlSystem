@@ -4,14 +4,14 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 
 @Data
 @AllArgsConstructor
 public class GetAllActionsForPeriodRequest {
     @NotNull
-    Date start;
+    private LocalDate start;
     @NotNull
-    Date end;
+    private LocalDate  end;
 }

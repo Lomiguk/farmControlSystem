@@ -14,8 +14,8 @@ import ru.skibin.farmsystem.repository.ActionDAO;
 import ru.skibin.farmsystem.repository.ProductDAO;
 import ru.skibin.farmsystem.repository.ProfileDAO;
 
-import java.sql.Date;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.logging.Logger;
 
@@ -27,7 +27,7 @@ public class CommonCheckHelper {
     private final ActionDAO  actionDAO;
     private final Logger logger = Logger.getLogger(CommonCheckHelper.class.getName());
 
-    public ProfileEntity checkProfileForExist(Long id, String exceptionMessage) {
+    public ProfileEntity checkProfileForActive(Long id, String exceptionMessage) {
         ProfileEntity profileEntity = profileDAO.findProfile(id);
         if (profileEntity == null || !profileEntity.getIsActual()) {
             throw new NonExistedProfileException(exceptionMessage);
@@ -36,15 +36,32 @@ public class CommonCheckHelper {
         return profileEntity;
     }
 
-    public CommonCheckHelper chainCheckProfileForExist(Long id, String exceptionMessage) {
-        checkProfileForExist(id, exceptionMessage);
+    public ProfileEntity checkProfileForExist(Long id, String exceptionMessage) {
+        ProfileEntity profileEntity = profileDAO.findProfile(id);
+        if (profileEntity == null) {
+            throw new NonExistedProfileException(exceptionMessage);
+        }
+
+        return profileEntity;
+    }
+
+    public CommonCheckHelper chainCheckProfileForActive(Long id, String exceptionMessage) {
+        checkProfileForActive(id, exceptionMessage);
 
         return this;
     }
 
-    public ProductEntity checkProductForExist(Long productId, String exceptionMessage) {
+    public ProductEntity checkProductForActive(Long productId, String exceptionMessage) {
         ProductEntity productEntity = productDAO.findProduct(productId);
         if (productEntity == null || !productEntity.getIsActual()) {
+            throw new TryToGetNotExistedEntityException(exceptionMessage);
+        }
+        return productEntity;
+    }
+
+    public ProductEntity checkProductForExist(Long productId, String exceptionMessage) {
+        ProductEntity productEntity = productDAO.findProduct(productId);
+        if (productEntity == null) {
             throw new TryToGetNotExistedEntityException(exceptionMessage);
         }
         return productEntity;
@@ -57,15 +74,15 @@ public class CommonCheckHelper {
         return this;
     }
 
-    public CommonCheckHelper chainCheckTimeForFutureException(Instant time, String exceptionMessage) {
-        if (Instant.now().compareTo(time) < 0) {
+    public CommonCheckHelper chainCheckTimeForFutureException(Instant checkedTime, String exceptionMessage) {
+        if (Instant.now().compareTo(checkedTime) < 0) {
             throw new FutureInstantException(exceptionMessage);
         }
 
         return this;
     }
 
-    public CommonCheckHelper chainCheckStartEndOfPeriod(Date start, Date end, String exceptionMessage) {
+    public CommonCheckHelper chainCheckStartEndOfPeriod(LocalDate start, LocalDate end, String exceptionMessage) {
         if (start.compareTo(end) > 0) {
             throw new StartEndDateException(exceptionMessage);
         }
@@ -73,9 +90,17 @@ public class CommonCheckHelper {
         return this;
     }
 
-    public ActionEntity checkActionForExist(Long id, String exceptionMessage) {
+    public ActionEntity checkActionForActive(Long id, String exceptionMessage) {
         ActionEntity actionEntity = actionDAO.findAction(id);
         if (actionEntity == null || !actionEntity.getIsActual()) {
+            throw new TryToGetNotExistedEntityException(exceptionMessage);
+        }
+        return actionEntity;
+    }
+
+    public ActionEntity checkActionForExist(Long id, String exceptionMessage) {
+        ActionEntity actionEntity = actionDAO.findAction(id);
+        if (actionEntity == null) {
             throw new TryToGetNotExistedEntityException(exceptionMessage);
         }
         return actionEntity;

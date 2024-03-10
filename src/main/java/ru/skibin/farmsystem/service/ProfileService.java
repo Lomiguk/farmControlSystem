@@ -47,20 +47,20 @@ public class ProfileService {
     }
 
     public ProfileResponse get(Long id) {
-        commonCheckHelper.checkProfileForExist(id, "Non-existed profile for getting.");
+        commonCheckHelper.checkProfileForActive(id, "Non-existed profile for getting.");
         return new ProfileResponse(profileDAO.findProfile(id));
     }
 
     @Transactional
     public ProfileResponse updateInf(Long id, String fio, String email) {
-        commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update.");
+        commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update.");
         profileDAO.updateProfileInformation(id, fio, email);
         return new ProfileResponse(profileDAO.findProfile(id));
     }
 
     @Transactional
     public ProfileResponse updatePassword(Long id, String oldPassword, String newPassword) {
-        commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update status.");
+        commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update status.");
         profileCheckHelper.checkPasswords(id, oldPassword, newPassword);
         String newPassHash = PasswordUtil.getHash(newPassword).toString();
 
@@ -71,7 +71,7 @@ public class ProfileService {
 
     @Transactional
     public ProfileResponse updateAdminStatus(Long id, Boolean isAdmin) {
-        commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update admin status.");
+        commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update admin status.");
         profileDAO.updateProfileAdminStatus(id, isAdmin);
         return new ProfileResponse(profileDAO.findProfile(id));
     }
@@ -86,7 +86,7 @@ public class ProfileService {
 
     @Transactional
     public Boolean delete(Long id) {
-        commonCheckHelper.checkProfileForExist(id, "Non-existed profile for delete.");
+        commonCheckHelper.checkProfileForActive(id, "Non-existed profile for delete.");
         if (commonCheckHelper.boolCheckProfileInActions(id, "Non-deletable (has dependent actions)")) {
             logger.info("Try to delete profile (" + id + ")");
             return profileDAO.deleteProfile(id) > 0;
@@ -107,8 +107,7 @@ public class ProfileService {
             Boolean isAdmin,
             Boolean isActual
     ) {
-        ProfileEntity profileEntity = commonCheckHelper
-                .checkProfileForExist(id, "Non-existed profile for update.");
+        ProfileEntity profileEntity = commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update.");
         profileCheckHelper.checkPasswords(id, oldPassword, newPassword);
         String newPassHash = PasswordUtil.getHash(newPassword).toString();
 

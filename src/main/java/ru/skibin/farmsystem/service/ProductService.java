@@ -71,7 +71,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponse updateProductName(Long id, String newName) {
-        ProductEntity productEntity = checkHelper.checkProductForExist(id, "Non existed product can't be update");
+        ProductEntity productEntity = checkHelper.checkProductForActive(id, "Non existed product can't be update");
         if (!productEntity.getName().equals(newName)) {
             productDAO.updateProductName(id, newName);
         }
@@ -81,7 +81,7 @@ public class ProductService {
 
     @Transactional
     public ProductResponse updateProductValueType(Long id, ValueType newValueType) {
-        ProductEntity productEntity = checkHelper.checkProductForExist(id, "Non existed product can't be update");
+        ProductEntity productEntity = checkHelper.checkProductForActive(id, "Non existed product can't be update");
         if (!productEntity.getValueType().equals(newValueType)) {
             productDAO.updateProductValueType(id, newValueType);
         }
@@ -92,6 +92,7 @@ public class ProductService {
     @Transactional
     public ProductResponse updateProductActualStatus(Long id, Boolean newStatus) {
         ProductEntity productEntity = checkHelper.checkProductForExist(id, "Non existed product can't be update");
+
         if(!productEntity.getIsActual().equals(newStatus)) {
             productDAO.updateActualStatus(id, newStatus);
         }
@@ -101,7 +102,7 @@ public class ProductService {
 
     @Transactional
     public Boolean deleteProduct(Long id) {
-        checkHelper.checkProfileForExist(id, "Non-existed product for delete.");
+        checkHelper.checkProfileForActive(id, "Non-existed product for delete.");
         if (checkHelper.boolCheckProductInActions(id, "Non-deletable product (has dependent actions)")) {
             logger.info("Try to delete product (" + id + ")");
             return productDAO.deleteProduct(id) > 0;

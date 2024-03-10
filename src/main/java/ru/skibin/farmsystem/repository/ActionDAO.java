@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.skibin.farmsystem.entity.ActionEntity;
 import ru.skibin.farmsystem.repository.rowMapper.ActionRowMapper;
 
+import java.time.LocalDate;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -92,12 +93,12 @@ public class ActionDAO {
         return jdbcTemplate.query(sql, params, new ActionRowMapper());
     }
 
-    public Collection<ActionEntity> findPeriodActions(Date start, Date end, Integer limit, Integer offset) {
+    public Collection<ActionEntity> findPeriodActions(LocalDate start, LocalDate end, Integer limit, Integer offset) {
         String sql = """
                 SELECT id, profile_id, product_id, value, time, is_actual
                 FROM action
-                WHERE DATE(time) => :start
-                  AND DATE(time) <= :end
+                WHERE time >= :start
+                  AND time <= :end
                 LIMIT :limit
                 OFFSET :offset;
                 """;

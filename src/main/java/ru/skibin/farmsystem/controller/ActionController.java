@@ -1,6 +1,7 @@
 package ru.skibin.farmsystem.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -54,7 +55,9 @@ public class ActionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ActionResponse> getAction(
-            @PathVariable("id") Long id
+            @PathVariable("id")
+            @Positive
+            Long id
     ) {
         return new ResponseEntity<>(
                 actionService.getAction(id),
@@ -62,9 +65,10 @@ public class ActionController {
         );
     }
 
-    @GetMapping("/period")
-    public ResponseEntity<Collection<ActionResponse>> getAllActions(
-            @Valid @RequestBody
+    @PostMapping("/period")
+    public ResponseEntity<Collection<ActionResponse>> getPeriodActions(
+            @Valid
+            @RequestBody
             GetAllActionsForPeriodRequest request,
             @RequestParam("limit")
             @PositiveOrZero(message = "limit must be positive")
@@ -81,8 +85,11 @@ public class ActionController {
 
     @PatchMapping("/{id}/profile")
     public ResponseEntity<ActionResponse> updateActionProfileId(
-            @PathVariable("id") Long id,
-            @RequestParam("new-id") Long newProfileId
+            @PathVariable("id")
+            @Positive
+            Long id,
+            @RequestParam("new-id")
+            Long newProfileId
     ) {
         return new ResponseEntity<>(
                 actionService.updateActionProfileId(id, newProfileId),
@@ -92,7 +99,9 @@ public class ActionController {
 
     @PatchMapping("/{id}/product")
     public ResponseEntity<ActionResponse> updateActionProductId(
-            @PathVariable("id") Long id,
+            @PathVariable("id")
+            @Positive
+            Long id,
             @RequestParam("newProfileId") Long newProductId,
             @RequestParam("value") Float value
     ) {
@@ -104,7 +113,9 @@ public class ActionController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<ActionResponse> updateActionActualStatus(
-            @PathVariable("id") Long id,
+            @PathVariable("id")
+            @Positive
+            Long id,
             @RequestParam("actual") Boolean isActual
     ) {
         return new ResponseEntity<>(
@@ -115,8 +126,11 @@ public class ActionController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ActionResponse> updateAction(
-            @PathVariable("id") Long id,
-            @Valid @RequestBody UpdateActionRequest request
+            @PathVariable("id")
+            @Positive
+            Long id,
+            @Valid @RequestBody
+            UpdateActionRequest request
     ) {
         return new ResponseEntity<>(
                 actionService.updateAction(
@@ -133,7 +147,9 @@ public class ActionController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteAction(
-            @PathVariable("id") Long id
+            @PathVariable("id")
+            @Positive
+            Long id
     ) {
         return new ResponseEntity<>(
                 actionService.deleteAction(id),

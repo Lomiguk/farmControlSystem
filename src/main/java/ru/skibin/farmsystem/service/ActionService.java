@@ -12,8 +12,8 @@ import ru.skibin.farmsystem.repository.ActionDAO;
 import ru.skibin.farmsystem.repository.ProductDAO;
 import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
 
-import java.sql.Date;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -35,9 +35,9 @@ public class ActionService {
             Instant time
     ) {
         ProductEntity product = checkHelper
-                .chainCheckProfileForExist(profileId, "Attempt to add an action for non-existed profile")
+                .chainCheckProfileForActive(profileId, "Attempt to add an action for non-existed profile")
                 .chainCheckTimeForFutureException(time, "Attempt to add an action with the future tense")
-                .checkProductForExist(productId, "Attempt to add an action for non-existed product");
+                .checkProductForActive(productId, "Attempt to add an action for non-existed product");
 
         actionDAO.addAction(profileId, productId, value, time);
         ActionEntity actionEntity = actionDAO.findProfileActionByProductAndTime(profileId, productId, time);
@@ -71,12 +71,12 @@ public class ActionService {
     }
 
     @Transactional
-    public Collection<ActionResponse> findPeriodActions(Date start, Date end) {
+    public Collection<ActionResponse> findPeriodActions(LocalDate  start, LocalDate  end) {
         return findPeriodActions(start, end, Integer.MAX_VALUE, 0);
     }
 
     @Transactional
-    public Collection<ActionResponse> findPeriodActions(Date start, Date end, Integer limit, Integer offset) {
+    public Collection<ActionResponse> findPeriodActions(LocalDate start, LocalDate  end, Integer limit, Integer offset) {
         checkHelper.chainCheckStartEndOfPeriod(start, end, "Start date biggest end date");
         Collection<ActionResponse> result = new ArrayList<>();
 
@@ -87,7 +87,12 @@ public class ActionService {
                 offset = 0;
             }
 
-            Collection<ActionEntity> actionEntities = actionDAO.findPeriodActions(start, end, limit, offset);
+            Collection<ActionEntity> actionEntities = actionDAO.findPeriodActions(
+                    start,
+                    end,
+                    limit,
+                    offset
+            );
             logger.info("Get " + actionEntities.size() + " actions at period (" + start + " - " + end + ")");
 
             for (var actionEntity : actionEntities) {
@@ -102,8 +107,8 @@ public class ActionService {
     @Transactional
     public ActionResponse updateActionProfileId(Long id, Long newProfileId) {
         ActionEntity actionEntity = checkHelper
-                .chainCheckProfileForExist(newProfileId, "Attempt to add an action for non-existed profile")
-                .checkActionForExist(id, "Action doesn't exist");
+                .chainCheckProfileForActive(newProfileId, "Attempt to add an action for non-existed profile")
+                .checkActionForActive(id, "Action doesn't exist");
 
         actionDAO.updateAction(
                 id,
@@ -123,24 +128,21 @@ public class ActionService {
     @Transactional
     public ActionResponse updateActionProductId(Long id, Long newProductId, Float value) {
         ProductEntity productEntity = checkHelper
-                .checkProductForExist(newProductId, "Attempt to add an action for non-existed product");
+                .checkProductForActive(newProductId, "Attempt to add an action for non-existed product");
 
-        ActionEntity actionEntity = checkHelper.checkActionForExist(id, "Action doesn't exist");
+        ActionEntity actionEntity = checkHelper.checkActionForActive(id, "Action doesn't exist");
 
-        Float newValue;
         if (value == null) {
-            newValue = actionEntity.getValue();
+            value = actionEntity.getValue();
         } else if (value < 0) {
             throw new WrongProductValueException("Negative value");
-        } else {
-            newValue = value;
         }
 
         actionDAO.updateAction(
                 id,
                 actionEntity.getProfileId(),
                 newProductId,
-                newValue,
+                value,
                 actionEntity.getTime(),
                 actionEntity.getIsActual()
         );
@@ -179,14 +181,18 @@ public class ActionService {
             Boolean newActualStatus
     ) {
         ProductEntity productEntity = checkHelper
-                .chainCheckProfileForExist(newProfileId, "Attempt to add an action for non-existed profile")
+                .chainCheckProfileForActive(newProfileId, "Attempt to add an action for non-existed profile")
                 .chainCheckValueForPositive(newValue, "Negative value")
-                .chainCheckTimeForFutureException(newTime, "Attempt to add an action with the future tense")
-                .checkProductForExist(newProductId, "Attempt to add an action for non-existed product");
+                .checkProductForActive(newProductId, "Attempt to add an action for non-existed product");
 
         ActionEntity actionEntity = actionDAO.findAction(id);
 
         if (newActualStatus == null) newActualStatus = actionEntity.getIsActual();
+        if (newTime == null) {
+            newTime = actionEntity.getTime();
+        } else {
+            checkHelper.chainCheckTimeForFutureException(newTime, "Attempt to add an action with the future tense");
+        }
 
         actionDAO.updateAction(
                 id,
@@ -206,7 +212,7 @@ public class ActionService {
         if (result) {
             logger.info("Action (" + id + ") was deleted");
         } else {
-            logger.info("Action (" + id + ") was deleted");
+            logger.info("Action (" + id + ") wasn't deleted");
         }
         return result;
     }

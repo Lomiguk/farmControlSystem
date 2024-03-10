@@ -182,7 +182,7 @@ class ProductServiceTest {
 
         ProductEntity productEntity = new ProductEntity(id, newName, valueType, true);
         doReturn(productEntity).when(productDAO).findProduct(id);
-
+        doReturn(productEntity).when(checkHelper).checkProductForActive(eq(id), any());
         // when
         ProductResponse productResponse = productService.updateProductName(id, newName);
 
@@ -202,7 +202,7 @@ class ProductServiceTest {
 
         ProductEntity productEntity = new ProductEntity(id, name, newValueType, true);
         doReturn(productEntity).when(productDAO).findProduct(id);
-
+        doReturn(productEntity).when(checkHelper).checkProductForActive(eq(id), any());
         // when
         ProductResponse productResponse = productService.updateProductValueType(id, newValueType);
 
@@ -236,6 +236,7 @@ class ProductServiceTest {
 
         doReturn(productEntity).when(productDAO).findProduct(id);
         doReturn(false).when(checkHelper).boolCheckProductInActions(eq(id), any());
+        doReturn(productEntity).when(checkHelper).checkProductForExist(eq(id), any());
 
         // when
         boolean isDeleted = productService.deleteProduct(id);
