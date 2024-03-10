@@ -145,13 +145,13 @@ public class ProfileController {
         );
     }
 
-    @PatchMapping("/{id}/active?status=?")
+    @PatchMapping("/{id}/active")
     public ResponseEntity<ProfileResponse> updateActiveStatus(
-            @PathVariable("id") Long id,
+            @PathVariable("id") @Positive Long id,
             @RequestParam("active") Boolean status
     ) {
         return new ResponseEntity<>(
-                profileService.updateActiveStatus(
+                profileService.updateActualStatus(
                         id,
                         status
                 ),
