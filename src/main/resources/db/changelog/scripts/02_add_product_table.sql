@@ -4,7 +4,9 @@ CREATE TABLE product (
     id         bigserial   PRIMARY KEY,
     name       text        NOT NULL,
     value      value_type  NOT NULL,
-    is_actual  bool        DEFAULT false
+    is_actual  bool        DEFAULT false,
+
+    CONSTRAINT product_name_u UNIQUE (name)
 );
 
 COMMENT ON COLUMN product.id IS 'Уникальный идентификатор продукта';

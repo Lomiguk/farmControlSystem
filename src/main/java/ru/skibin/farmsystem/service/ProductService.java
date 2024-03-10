@@ -23,8 +23,10 @@ public class ProductService {
 
     @Transactional
     public ProductResponse addProduct(String name, ValueType valueType) {
+        checkHelper.checkProductForExistByName(name, "Product with that name already exist");
+
         productDAO.addProduct(name, valueType);
-        ProductEntity productEntity = productDAO.getProductByName(name);
+        ProductEntity productEntity = productDAO.findProductByName(name);
         logger.info("Add new product (" + productEntity.getId() + ")");
         return new ProductResponse(productEntity);
     }
@@ -48,7 +50,7 @@ public class ProductService {
     }
 
     public ProductResponse findProductByName(String name) {
-        ProductEntity productEntity = productDAO.getProductByName(name);
+        ProductEntity productEntity = productDAO.findProductByName(name);
         if (productEntity != null) {
             logger.info("Get product (" + productEntity.getId() + ")");
             return new ProductResponse(productEntity);

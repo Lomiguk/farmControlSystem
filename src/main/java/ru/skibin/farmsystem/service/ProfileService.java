@@ -28,6 +28,8 @@ public class ProfileService {
             String nonHashPas,
             Boolean isAdmin
     ) {
+        commonCheckHelper.checkProfileForExistByEmail(email, "Profile with that profile already exist");
+
         long hash = PasswordUtil.getHash(nonHashPas);
 
         profileDAO.add(fio, email, String.valueOf(hash), isAdmin);

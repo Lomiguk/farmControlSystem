@@ -177,4 +177,16 @@ public class ProfileDAO {
         );
         return jdbcTemplate.query(sql, params, new ProfileRowMapper());
     }
+
+    public ProfileEntity findProfileByEmail(String email) {
+        String sql = """
+                SELECT *
+                FROM profile
+                WHERE email = :email
+                """;
+        Map<String, Object> params = Map.of(
+                "email", email
+        );
+        return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ProfileRowMapper()));
+    }
 }

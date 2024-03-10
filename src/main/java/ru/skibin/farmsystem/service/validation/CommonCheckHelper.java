@@ -9,6 +9,7 @@ import ru.skibin.farmsystem.exception.action.StartEndDateException;
 import ru.skibin.farmsystem.exception.common.FutureInstantException;
 import ru.skibin.farmsystem.exception.common.NonExistedProfileException;
 import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
+import ru.skibin.farmsystem.exception.common.UniqueConstraintException;
 import ru.skibin.farmsystem.exception.common.WrongProductValueException;
 import ru.skibin.farmsystem.repository.ActionDAO;
 import ru.skibin.farmsystem.repository.ProductDAO;
@@ -122,5 +123,21 @@ public class CommonCheckHelper {
             return false;
         }
         return true;
+    }
+
+    public ProfileEntity checkProfileForExistByEmail(String email, String exceptionMessage) {
+        ProfileEntity profileEntity = profileDAO.findProfileByEmail(email);
+        if (profileEntity == null) {
+            throw new UniqueConstraintException(exceptionMessage);
+        }
+        return profileEntity;
+    }
+
+    public ProductEntity checkProductForExistByName(String name, String exceptionMessage) {
+        ProductEntity productEntity = productDAO.findProductByName(name);
+        if (productEntity == null) {
+            throw new UniqueConstraintException(exceptionMessage);
+        }
+        return productEntity;
     }
 }

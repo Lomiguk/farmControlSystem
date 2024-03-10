@@ -49,7 +49,7 @@ class ProductServiceTest {
         ValueType valueType = ValueType.LITER;
 
         ProductEntity productEntity = new ProductEntity(random.nextLong(), name, valueType, true);
-        doReturn(productEntity).when(productDAO).getProductByName(name);
+        doReturn(productEntity).when(productDAO).findProductByName(name);
 
         // when
         ProductResponse productResponse = productService.addProduct(name, valueType);
@@ -130,7 +130,7 @@ class ProductServiceTest {
         // given
         Long id = Math.abs(random.nextLong());
         ProductEntity productEntity = new ProductEntity(id, "test product", ValueType.LITER, true);
-        doReturn(productEntity).when(productDAO).getProductByName(productEntity.getName());
+        doReturn(productEntity).when(productDAO).findProductByName(productEntity.getName());
 
         // when
         ProductResponse productResponse = productService.findProductByName(productEntity.getName());

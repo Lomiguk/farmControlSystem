@@ -40,7 +40,7 @@ public class ProductDAO {
         return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ProductRowMapper()));
     }
 
-    public ProductEntity getProductByName(String name) {
+    public ProductEntity findProductByName(String name) {
         String sql = """
                 SELECT id, name, value, is_actual
                 FROM product
