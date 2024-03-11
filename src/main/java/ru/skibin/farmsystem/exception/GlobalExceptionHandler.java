@@ -1,5 +1,7 @@
 package ru.skibin.farmsystem.exception;
 
+import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +19,13 @@ import ru.skibin.farmsystem.exception.common.WrongProductValueException;
 import ru.skibin.farmsystem.exception.profile.UpdatePasswordException;
 
 @RestControllerAdvice
+@AllArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers,
-                                                                  HttpStatusCode status,
-                                                                  WebRequest request) {
+                                                                  @NotNull HttpHeaders headers,
+                                                                  @NotNull HttpStatusCode status,
+                                                                  @NotNull WebRequest request) {
         logger.warn("Valid Exception");
         return ResponseEntity.badRequest().body(ex.getBody().getTitle());
     }

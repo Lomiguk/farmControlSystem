@@ -69,16 +69,15 @@ public class ProfileDAO {
         return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ProfileRowMapper()));
     }
 
-    public void updateProfileInformation(Long id, String fio, String email) {
+    public void updateProfileInformation(Long id, String fio) {
         String sql = """
                 UPDATE profile
-                SET fio = :fio, email = :email
+                SET fio = :fio
                 WHERE id = :id;
                 """;
         Map<String, Object> params = Map.of(
                 "id", id,
-                "fio", fio,
-                "email", email
+                "fio", fio
         );
 
         jdbcTemplate.update(sql, params);

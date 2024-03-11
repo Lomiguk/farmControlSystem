@@ -47,7 +47,7 @@ public class ProfileController {
         );
 
         return new ResponseEntity<>(
-                profileService.add(
+                profileService.save(
                         addProfileRequest.getFio(),
                         addProfileRequest.getEmail(),
                         addProfileRequest.getPassword(),
@@ -100,8 +100,7 @@ public class ProfileController {
         return new ResponseEntity<>(
                 profileService.updateInf(
                         id,
-                        updateInfoRequest.getFio(),
-                        updateInfoRequest.getEmail()
+                        updateInfoRequest.getFio()
                 ),
                 HttpStatus.OK
         );
