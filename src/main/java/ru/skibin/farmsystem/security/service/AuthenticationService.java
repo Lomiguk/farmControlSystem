@@ -3,9 +3,12 @@ package ru.skibin.farmsystem.security.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.skibin.farmsystem.api.dto.JwtAuthenticationResponse;
+import ru.skibin.farmsystem.api.dto.ProfileResponse;
 import ru.skibin.farmsystem.api.request.security.SignInRequest;
 import ru.skibin.farmsystem.api.request.security.SignUpRequest;
 import ru.skibin.farmsystem.entity.ProfileEntity;
@@ -25,18 +28,18 @@ public class AuthenticationService {
      * @param request user data
      * @return token
      */
-    public JwtAuthenticationResponse signUp(SignUpRequest request) {
+    @Transactional
+    public ProfileResponse signUp(SignUpRequest request) {
+        String encodedPassword = new BCryptPasswordEncoder()
+                .encode(PasswordUtil.getHash(request.getPassword()).toString());
         ProfileEntity profileEntity = ProfileEntity.builder()
                 .fio(request.getFio())
                 .email(request.getEmail())
-                .password(PasswordUtil.getHash(request.getPassword()).toString())
+                .password(encodedPassword)
                 .isAdmin(request.getIsAdmin())
                 .build();
 
-        ProfileEntity savedProfileEntity = profileService.save(profileEntity);
-
-        var jwt = jwtService.generateToken(savedProfileEntity);
-        return new JwtAuthenticationResponse(jwt);
+        return profileService.save(profileEntity);
     }
 
     /**
@@ -44,10 +47,11 @@ public class AuthenticationService {
      * @param request user data
      * @return token
      */
+    @Transactional
     public JwtAuthenticationResponse signIn(SignInRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
-                request.getPassword()
+                PasswordUtil.getHash(request.getPassword()).toString()
         ));
 
         var user = profileService

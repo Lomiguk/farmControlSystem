@@ -39,7 +39,7 @@ public class ProfileService {
             String nonHashPas,
             Boolean isAdmin
     ) {
-        commonCheckHelper.checkProfileForExistByEmail(email, "Profile with that profile already exist");
+        commonCheckHelper.chainCheckForProfileEmailUnique(email, "Profile with that email already exist");
 
         long hash = PasswordUtil.getHash(nonHashPas);
 
@@ -58,7 +58,7 @@ public class ProfileService {
      */
     @Transactional
     public ProfileResponse save(String fio, String email, String nonHashPas) {
-        commonCheckHelper.checkProfileForExistByEmail(email, "Profile with that profile already exist");
+        commonCheckHelper.chainCheckForProfileEmailUnique(email, "Profile with that email already exist");
 
         long hash = PasswordUtil.getHash(nonHashPas);
 
@@ -73,8 +73,9 @@ public class ProfileService {
      * @param profileEntity new entity
      * @return saved profile
      */
-    public ProfileEntity save(ProfileEntity profileEntity) {
-        commonCheckHelper.checkProfileForExistByEmail(profileEntity.getEmail(), "Profile with that profile already exist");
+    @Transactional
+    public ProfileResponse save(ProfileEntity profileEntity) {
+        commonCheckHelper.chainCheckForProfileEmailUnique(profileEntity.getEmail(), "Profile with that email already exist");
 
         profileDAO.add(
                 profileEntity.getFio(),
@@ -84,7 +85,7 @@ public class ProfileService {
         );
 
         profileEntity = profileDAO.findProfile(profileEntity.getFio(), profileEntity.getEmail());
-        return profileEntity;
+        return new ProfileResponse(profileEntity);
     }
 
 

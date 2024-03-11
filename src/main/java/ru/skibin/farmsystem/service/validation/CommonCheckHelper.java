@@ -125,12 +125,12 @@ public class CommonCheckHelper {
         return true;
     }
 
-    public ProfileEntity checkProfileForExistByEmail(String email, String exceptionMessage) {
+    public CommonCheckHelper chainCheckForProfileEmailUnique(String email, String exceptionMessage) {
         ProfileEntity profileEntity = profileDAO.findProfileByEmail(email);
-        if (profileEntity == null) {
+        if (profileEntity != null) {
             throw new UniqueConstraintException(exceptionMessage);
         }
-        return profileEntity;
+        return this;
     }
 
     public ProductEntity checkProductForExistByName(String name, String exceptionMessage) {
@@ -139,5 +139,13 @@ public class CommonCheckHelper {
             throw new UniqueConstraintException(exceptionMessage);
         }
         return productEntity;
+    }
+
+    public ProfileEntity checkProfileForExistByEmail(String email, String exceptionMessage) {
+        ProfileEntity profileEntity = profileDAO.findProfileByEmail(email);
+        if (profileEntity == null) {
+            throw new TryToGetNotExistedEntityException(exceptionMessage);
+        }
+        return profileEntity;
     }
 }

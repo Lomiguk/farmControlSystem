@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import ru.skibin.farmsystem.api.enumTypes.Role;
 import ru.skibin.farmsystem.entity.ProfileEntity;
 
 import java.security.Key;
@@ -41,7 +42,7 @@ public class JwtService {
         if (userDetails instanceof ProfileEntity customUserDetails) {
             claims.put("id", customUserDetails.getId());
             claims.put("email", customUserDetails.getEmail());
-            claims.put("role", customUserDetails.getIsAdmin() ? "ADMIN" : "USER");
+            claims.put("role", customUserDetails.getIsAdmin() ? Role.ADMIN.name() : Role.USER.name());
         }
         return generateToken(claims, userDetails);
     }

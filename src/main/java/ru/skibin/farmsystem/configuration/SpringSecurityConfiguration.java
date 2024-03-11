@@ -3,6 +3,7 @@ package ru.skibin.farmsystem.configuration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import ru.skibin.farmsystem.api.enumTypes.Role;
 import ru.skibin.farmsystem.security.filter.JwtFilter;
 import ru.skibin.farmsystem.service.ProfileService;
 
@@ -29,6 +31,7 @@ import java.util.List;
 public class SpringSecurityConfiguration {
     private final JwtFilter jwtFilter;
     private final ProfileService profileService;
+    private final String ADMIN_ROLE = Role.ADMIN.name();
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -48,7 +51,18 @@ public class SpringSecurityConfiguration {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/*", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/endpoint", "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/profile").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.DELETE, "/profile/*").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.PUT, "/profile/*").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.PATCH, "/profile/*/info").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.PATCH, "/profile/*/admin").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.PATCH, "/profile/*/active").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.PATCH, "/profile/*/password").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/product/*").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.DELETE, "/product/*").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.POST, "/product").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.PATCH, "/product/**").hasRole(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.PATCH, "/action/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
