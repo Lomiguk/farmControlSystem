@@ -16,16 +16,21 @@ import java.util.Map;
 public class ProductDAO {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public void addProduct(String name, ValueType valueType) {
+    public Long addProduct(String name, ValueType valueType) {
         String sql = """
                 INSERT INTO product (name, value)
-                VALUES (:name, :value::value_type);
+                VALUES (:name, :value::value_type)
+                RETURNING id;
                 """;
         Map<String, Object> params = Map.of(
                 "name", name,
                 "value", valueType.name()
         );
-        jdbcTemplate.update(sql, params);
+        return DataAccessUtils.singleResult(jdbcTemplate.query(
+                sql,
+                params,
+                ((rs, rowNum) -> rs.getLong("id")))
+        );
     }
 
     public ProductEntity findProduct(Long id) {

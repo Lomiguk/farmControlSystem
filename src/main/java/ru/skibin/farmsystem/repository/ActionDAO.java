@@ -19,10 +19,11 @@ import java.util.Map;
 public class ActionDAO {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public void addAction(Long profileId, Long productId, Float value, Instant time) {
+    public Long addAction(Long profileId, Long productId, Float value, Instant time) {
         String sql = """
                 INSERT INTO action (profile_id, product_id, value, time)
-                VALUES (:profile_id, :product_id, :value, :time);
+                VALUES (:profile_id, :product_id, :value, :time)
+                RETURNING id;
                 """;
         Map<String, Object> params = Map.of(
                 "profile_id", profileId,
@@ -30,7 +31,11 @@ public class ActionDAO {
                 "value", value,
                 "time", Timestamp.from(time)
         );
-        jdbcTemplate.update(sql, params);
+        return DataAccessUtils.singleResult(jdbcTemplate.query(
+                sql,
+                params,
+                ((rs, rowNum) -> rs.getLong("id")))
+        );
     }
 
     public ActionEntity findAction(Long id) {

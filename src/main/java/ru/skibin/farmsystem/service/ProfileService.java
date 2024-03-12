@@ -46,14 +46,14 @@ public class ProfileService {
 
         long hash = PasswordUtil.getHash(request.getPassword());
 
-        profileDAO.add(
+        Long id = profileDAO.add(
                 request.getFio(),
                 request.getEmail(),
                 String.valueOf(hash),
                 request.getRole()
         );
 
-        ProfileEntity profileEntity = profileDAO.findProfile(request.getFio(), request.getEmail());
+        ProfileEntity profileEntity = profileDAO.findProfile(id);
         return entityMapper.profileToResponse(profileEntity);
     }
 
@@ -66,14 +66,14 @@ public class ProfileService {
     public ProfileResponse save(ProfileEntity profileEntity) {
         commonCheckHelper.chainCheckForProfileEmailUnique(profileEntity.getEmail(), "Profile with that email already exist");
 
-        profileDAO.add(
+        Long id = profileDAO.add(
                 profileEntity.getFio(),
                 profileEntity.getEmail(),
                 profileEntity.getPassword(),
                 profileEntity.getRole()
         );
 
-        profileEntity = profileDAO.findProfile(profileEntity.getFio(), profileEntity.getEmail());
+        profileEntity = profileDAO.findProfile(id);
         return entityMapper.profileToResponse(profileEntity);
     }
 

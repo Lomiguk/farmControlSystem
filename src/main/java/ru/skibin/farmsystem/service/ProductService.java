@@ -29,8 +29,8 @@ public class ProductService {
     public ProductResponse addProduct(AddProductRequest request) {
         checkHelper.checkProductForExistByName(request.getName(), "Product with that name already exist");
 
-        productDAO.addProduct(request.getName(), request.getValueType());
-        ProductEntity productEntity = productDAO.findProductByName(request.getName());
+        Long id = productDAO.addProduct(request.getName(), request.getValueType());
+        ProductEntity productEntity = productDAO.findProduct(id);
         logger.info(String.format("Add new product (%d)", productEntity.getId()));
         return entityMapper.productToResponse(productEntity);
     }

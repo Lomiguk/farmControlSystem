@@ -47,7 +47,7 @@ public class ActionService {
                         "Attempt to add an action for non-existed product"
                 );
 
-        actionDAO.addAction(
+        Long id = actionDAO.addAction(
                 addActionRequest.getProfileId(),
                 addActionRequest.getProductId(),
                 addActionRequest.getValue(),
@@ -85,11 +85,6 @@ public class ActionService {
             return actionResponse;
         }
         throw new TryToGetNotExistedEntityException(String.format("Trying to get a non-existent action(%s)", id));
-    }
-
-    @Transactional
-    public Collection<ActionResponse> findPeriodActions(GetAllActionsForPeriodRequest request) {
-        return findPeriodActions(request, Integer.MAX_VALUE, 0);
     }
 
     @Transactional

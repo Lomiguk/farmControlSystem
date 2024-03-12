@@ -29,10 +29,11 @@ public class ProfileDAO {
         jdbcTemplate.update(sql, params);
     }
 
-    public void add(String fio, String email, String password, Role role) {
+    public Long add(String fio, String email, String password, Role role) {
         String sql = """
                 INSERT INTO profile (fio, email, password, role)
-                VALUES (:fio, :email, :password, :role::profile_status);
+                VALUES (:fio, :email, :password, :role::profile_status)
+                RETURNING id;
                 """;
         Map<String, Object> params = Map.of(
                 "fio", fio,
@@ -40,21 +41,11 @@ public class ProfileDAO {
                 "password", password,
                 "role", role.name()
         );
-        jdbcTemplate.update(sql, params);
-    }
-
-    public ProfileEntity findProfile(String fio, String email) {
-        String sql = """
-                SELECT id, fio, email, password, role, is_actual
-                FROM profile
-                WHERE fio = :fio AND email = :email;
-                """;
-        Map<String, Object> params = Map.of(
-                "fio", fio,
-                "email", email
+        return DataAccessUtils.singleResult(jdbcTemplate.query(
+                sql,
+                params,
+                ((rs, rowNum) -> rs.getLong("id")))
         );
-
-        return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ProfileRowMapper()));
     }
 
     public ProfileEntity findProfile(Long id) {
