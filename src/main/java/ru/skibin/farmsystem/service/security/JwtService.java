@@ -92,8 +92,6 @@ public class JwtService {
                 .getPayload();
     }
 
-
-
     /**
      * Check token for expiration
      * @param token token
