@@ -26,7 +26,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   @NotNull HttpHeaders headers,
                                                                   @NotNull HttpStatusCode status,
                                                                   @NotNull WebRequest request) {
-        logger.warn("Valid Exception");
+        logger.info("Valid Exception");
         return ResponseEntity.badRequest().body(ex.getBody().getTitle());
     }
 

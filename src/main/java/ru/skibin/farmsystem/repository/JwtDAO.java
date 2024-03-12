@@ -5,7 +5,7 @@ import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.skibin.farmsystem.api.enumTypes.JwtType;
-import ru.skibin.farmsystem.entity.JwtToken;
+import ru.skibin.farmsystem.entity.JwtTokenEntity;
 import ru.skibin.farmsystem.repository.rowMapper.JwtTokenRowMapper;
 
 import java.util.Map;
@@ -28,7 +28,7 @@ public class JwtDAO {
         jdbcTemplate.update(sql, params);
     }
 
-    public JwtToken findToken(String token) {
+    public JwtTokenEntity findToken(String token) {
         String sql = """
                 SELECT id, profile_id, token, type
                 FROM jwt_token

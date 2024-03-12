@@ -66,4 +66,13 @@ public class AuthController {
                 HttpStatus.OK
         );
     }
+
+    @Operation(summary = "Updating user access token")
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtAuthenticationResponse> refreshToken(@RequestBody String refreshToken) {
+        return new ResponseEntity<>(
+                authenticationService.refreshTokens(refreshToken),
+                HttpStatus.OK
+        );
+    }
 }

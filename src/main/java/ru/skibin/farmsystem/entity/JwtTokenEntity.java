@@ -6,7 +6,7 @@ import ru.skibin.farmsystem.api.enumTypes.JwtType;
 
 @Data
 @AllArgsConstructor
-public class JwtToken {
+public class JwtTokenEntity {
     Long id;
     Long profileId;
     String token;

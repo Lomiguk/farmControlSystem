@@ -11,14 +11,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.skibin.farmsystem.api.enumTypes.JwtType;
 import ru.skibin.farmsystem.repository.JwtDAO;
+import ru.skibin.farmsystem.service.validation.AuthorizationCheckHelper;
 import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
 
+import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +39,9 @@ public class JwtService {
     private Duration refreshLifetime;
 
     private final JwtDAO jwtDAO;
-    private final CommonCheckHelper checkHelper;
+    private final CommonCheckHelper commonCheckHelper;
+    private final AuthorizationCheckHelper authorizationCheckHelper;
+    private final Logger logger = Logger.getLogger(JwtService.class.getName());
     /**
      * Extract user login
      * @param token token
@@ -45,19 +50,8 @@ public class JwtService {
     public String extractUserLogin(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-
-    /**
-     * Checking token for validation
-     * @param token       token
-     * @param userDetails user data
-     * @return true, if token is valid
-     */
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String userLogin = extractUserLogin(token);
-        boolean isTokenExisted = jwtDAO.findToken(token) != null;
-        return userLogin.equals(userDetails.getUsername()) &&
-                !isTokenExpired(token) &&
-                isTokenExisted;
+    public String extractRefreshUserLogin(String refreshToken) {
+        return extractClaimRefresh(refreshToken, Claims::getSubject);
     }
 
     /**
@@ -72,10 +66,36 @@ public class JwtService {
         return claimsResolvers.apply(claims);
     }
 
+    private <T> T extractClaimRefresh(String token, Function<Claims, T> claimsResolvers) {
+        final var claims = extractAllClaimsRefresh(token);
+        return claimsResolvers.apply(claims);
+    }
+
+    /**
+     * Getting all data from token
+     * @param token token
+     * @return data
+     */
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(getSigKey())
+                .build()
+                .parseClaimsJws(token)
+                .getPayload();
+    }
+
+    private Claims extractAllClaimsRefresh(String token) {
+        return Jwts.parser()
+                .setSigningKey(getRefreshSigKey())
+                .build()
+                .parseClaimsJws(token)
+                .getPayload();
+    }
+
+
 
     /**
      * Check token for expiration
-     *
      * @param token token
      * @return true, if token is expired
      */
@@ -85,7 +105,6 @@ public class JwtService {
 
     /**
      * Getting time of expiration
-     *
      * @param token token
      * @return time og expiration
      */
@@ -93,27 +112,17 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    /**
-     * Getting all data from token
-     *
-     * @param token token
-     * @return data
-     */
-    private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(Keys.hmacShaKeyFor(getSigningKey()))
-                .build()
-                .parseClaimsJws(token)
-                .getPayload();
+    private Key getRefreshSigKey() {
+        return getKey(refreshJwtSigningKey);
     }
-
-    /**
-     * Getting key for token signing
-     *
-     * @return key
-     */
-    private byte[] getSigningKey() {
-        return  Decoders.BASE64.decode(jwtSigningKey);
+    private Key getSigKey() {
+        return getKey(jwtSigningKey);
+    }
+    private Key getKey(String key) {
+        return Keys.hmacShaKeyFor(getByteKey(key));
+    }
+    private byte[] getByteKey(String key) {
+        return  Decoders.BASE64.decode(key);
     }
 
     /**
@@ -122,17 +131,8 @@ public class JwtService {
      * @return deleting status
      */
     public Boolean deleteProfileToken(Long profileId) {
-        checkHelper.checkProfileForExist(profileId, "Try to remove non-existed profile tokens");
+        commonCheckHelper.checkProfileForExist(profileId, "Try to remove non-existed profile tokens");
         return jwtDAO.deleteProfileTokens(profileId) > 0;
-    }
-
-    /**
-     * Deleting token from repository
-     * @param tokenId token identifier
-     * @return deleting status
-     */
-    public Boolean deleteToken(Long tokenId) {
-        return jwtDAO.deleteToken(tokenId) > 0;
     }
 
     public String generateAccessToken(UserDetails userDetails) {
@@ -149,7 +149,7 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(issuedDate)
                 .setExpiration(expiredDate)
-                .signWith(Keys.hmacShaKeyFor(getSigningKey()))
+                .signWith(getSigKey())
                 .compact();
     }
 
@@ -161,7 +161,7 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(issuedDate)
                 .setExpiration(expiredDate)
-                .signWith(Keys.hmacShaKeyFor(getSigningKey()))
+                .signWith(getRefreshSigKey())
                 .compact();
     }
 
@@ -172,5 +172,13 @@ public class JwtService {
                 jwtType
         );
         return jwtDAO.findToken(accessToken).getToken();
+    }
+
+    public Boolean validateRefreshToken(String refreshToken) {
+        return authorizationCheckHelper.boolCheckTokenForValidation(refreshToken, getRefreshSigKey());
+    }
+
+    public Boolean validateAccessToken(String token) {
+        return authorizationCheckHelper.boolCheckTokenForValidation(token, getSigKey());
     }
 }

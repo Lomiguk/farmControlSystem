@@ -110,7 +110,7 @@ public class CommonCheckHelper {
     public Boolean boolCheckProfileInActions(Long id, String warningMessage) {
         Collection<ActionEntity> actions = actionDAO.findProfileActions(id, 10, 0);
         if (!actions.isEmpty()) {
-            logger.warning(warningMessage);
+            logger.info(warningMessage);
             return false;
         }
         return true;
@@ -119,7 +119,7 @@ public class CommonCheckHelper {
     public boolean boolCheckProductInActions(Long id, String warningMessage) {
         Collection<ActionEntity> actions = actionDAO.findProductActions(id, 10, 0);
         if (!actions.isEmpty()) {
-            logger.warning(warningMessage);
+            logger.info(warningMessage);
             return false;
         }
         return true;

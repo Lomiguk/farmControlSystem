@@ -3,6 +3,7 @@ package ru.skibin.farmsystem.service.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import ru.skibin.farmsystem.entity.ProfileEntity;
 import ru.skibin.farmsystem.repository.ProfileDAO;
 import ru.skibin.farmsystem.service.ProfileService;
 import ru.skibin.farmsystem.service.validation.AuthorizationCheckHelper;
+import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
 import ru.skibin.farmsystem.util.PasswordUtil;
 
 @Service
@@ -23,7 +25,8 @@ public class AuthenticationService {
     private final ProfileDAO profileDAO;
     private final ProfileService profileService;
     private final JwtService jwtService;
-    private final AuthorizationCheckHelper checkHelper;
+    private final AuthorizationCheckHelper authorizationCheckHelper;
+    private final CommonCheckHelper checkHelper;
     private final AuthenticationManager authenticationManager;
 
     /**
@@ -74,7 +77,7 @@ public class AuthenticationService {
      * @return authorized profile id
      */
     public Long getProfileId() {
-        ProfileEntity authProfile = checkHelper.checkForExistedAuthorizedProfile();
+        ProfileEntity authProfile = authorizationCheckHelper.checkForExistedAuthorizedProfile();
 
         return authProfile == null ? null : authProfile.getId();
     }
@@ -88,5 +91,23 @@ public class AuthenticationService {
         Long profileId = getProfileId();
 
         return profileId != null && jwtService.deleteProfileToken(profileId);
+    }
+    @Transactional
+    public JwtAuthenticationResponse refreshTokens(String refreshToken) {
+        jwtService.validateRefreshToken(refreshToken);
+        String userLogin = jwtService.extractRefreshUserLogin(refreshToken);
+        UserDetails userDetails = profileService
+                .userDetailsService()
+                .loadUserByUsername(userLogin);
+
+        ProfileEntity profile = profileDAO.findProfileByEmail(userLogin);
+        checkHelper.checkProfileForExistByEmail(userLogin, "Profile wasn't found");
+        jwtService.deleteProfileToken(profile.getId());
+        String newAccessToken = jwtService.generateAccessToken(userDetails);
+        String newRefreshToken = jwtService.generateRefreshToken(userDetails);
+        jwtService.registerToken(profile.getId(), newAccessToken, JwtType.ACCESS);
+        jwtService.registerToken(profile.getId(), newRefreshToken, JwtType.REFRESH);
+
+        return new JwtAuthenticationResponse(newAccessToken, newRefreshToken);
     }
 }

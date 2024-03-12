@@ -44,12 +44,13 @@ public class JwtFilter extends OncePerRequestFilter {
         var jwt = authHeader.substring(BEARER_PREFIX.length());
         var userLogin = jwtService.extractUserLogin(jwt);
 
-        if (!userLogin.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = profileService
-                    .userDetailsService()
-                    .loadUserByUsername(userLogin);
-            // validate user if token is valid
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+        if (!userLogin.isEmpty() &&
+            SecurityContextHolder.getContext().getAuthentication() == null &&
+            jwtService.validateAccessToken(jwt)
+        ) {
+                UserDetails userDetails = profileService
+                        .userDetailsService()
+                        .loadUserByUsername(userLogin);
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -61,7 +62,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 context.setAuthentication(authToken);
                 SecurityContextHolder.setContext(context);
-            }
         }
         filterChain.doFilter(request, response);
     }
