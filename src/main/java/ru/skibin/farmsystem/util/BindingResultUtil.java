@@ -7,7 +7,7 @@ import org.springframework.validation.ObjectError;
 public class BindingResultUtil {
     public static String requestValidationToString (BindingResult bindingResult) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Add profile request validation exception:\r\n");
+        stringBuilder.append("\nAdd profile request validation exception:");
 
         for (Object object : bindingResult.getAllErrors()) {
             if(object instanceof FieldError fieldError) {

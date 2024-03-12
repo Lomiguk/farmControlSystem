@@ -9,10 +9,10 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 public class ActionEntity {
-    Long id;
-    Long profileId;
-    Long productId;
-    Float value;
-    Instant time;
-    Boolean isActual;
+    private Long id;
+    private Long profileId;
+    private Long productId;
+    private Float value;
+    private Instant time;
+    private Boolean isActual;
 }

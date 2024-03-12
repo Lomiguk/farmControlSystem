@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,13 +18,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.skibin.farmsystem.api.dto.ActionResponse;
 import ru.skibin.farmsystem.api.request.action.AddActionRequest;
 import ru.skibin.farmsystem.api.request.action.GetAllActionsForPeriodRequest;
 import ru.skibin.farmsystem.api.request.action.UpdateActionRequest;
+import ru.skibin.farmsystem.api.response.ActionResponse;
 import ru.skibin.farmsystem.exception.common.ValidationException;
 import ru.skibin.farmsystem.service.ActionService;
-import ru.skibin.farmsystem.util.BindingResultUtil;
 
 import java.util.Collection;
 
@@ -39,16 +39,11 @@ public class ActionController {
             AddActionRequest addActionRequest,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) throw new ValidationException(
-                BindingResultUtil.requestValidationToString(bindingResult)
-        );
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
         return new ResponseEntity<>(
-                actionService.addAction(
-                        addActionRequest.getProfileId(),
-                        addActionRequest.getProductId(),
-                        addActionRequest.getValue(),
-                        addActionRequest.getTime()
-                ),
+                actionService.addAction(addActionRequest),
                 HttpStatus.OK
         );
     }
@@ -56,6 +51,7 @@ public class ActionController {
     @GetMapping("/{id}")
     public ResponseEntity<ActionResponse> getAction(
             @PathVariable("id")
+            @Validated
             @Positive
             Long id
     ) {
@@ -68,9 +64,11 @@ public class ActionController {
     @PostMapping("/period")
     public ResponseEntity<Collection<ActionResponse>> getPeriodActions(
             @RequestParam("limit")
+            @Validated
             @PositiveOrZero(message = "limit must be positive")
             Integer limit,
             @RequestParam("offset")
+            @Validated
             @PositiveOrZero(message = "offset must be positive")
             Integer offset,
             @Valid
@@ -78,11 +76,11 @@ public class ActionController {
             GetAllActionsForPeriodRequest request,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) throw new ValidationException(
-                BindingResultUtil.requestValidationToString(bindingResult)
-        );
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
         return new ResponseEntity<>(
-                actionService.findPeriodActions(request.getStart(), request.getEnd(), limit, offset),
+                actionService.findPeriodActions(request, limit, offset),
                 HttpStatus.OK
         );
     }
@@ -90,6 +88,7 @@ public class ActionController {
     @PatchMapping("/{id}/profile")
     public ResponseEntity<ActionResponse> updateActionProfileId(
             @PathVariable("id")
+            @Validated
             @Positive
             Long id,
             @RequestParam("new-id")
@@ -104,6 +103,7 @@ public class ActionController {
     @PatchMapping("/{id}/product")
     public ResponseEntity<ActionResponse> updateActionProductId(
             @PathVariable("id")
+            @Validated
             @Positive
             Long id,
             @RequestParam("newProfileId") Long newProductId,
@@ -118,6 +118,7 @@ public class ActionController {
     @PatchMapping("/{id}/actual-status")
     public ResponseEntity<ActionResponse> updateActionActualStatus(
             @PathVariable("id")
+            @Validated
             @Positive
             Long id,
             @RequestParam("actual") Boolean isActual
@@ -131,24 +132,18 @@ public class ActionController {
     @PutMapping("/{id}")
     public ResponseEntity<ActionResponse> updateAction(
             @PathVariable("id")
+            @Validated
             @Positive
             Long id,
             @Valid @RequestBody
             UpdateActionRequest request,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) throw new ValidationException(
-                BindingResultUtil.requestValidationToString(bindingResult)
-        );
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
         return new ResponseEntity<>(
-                actionService.updateAction(
-                        id,
-                        request.getProfileId(),
-                        request.getProductId(),
-                        request.getValue(),
-                        request.getTime(),
-                        request.getIsActual()
-                ),
+                actionService.updateAction(id, request),
                 HttpStatus.OK
         );
     }
@@ -156,6 +151,7 @@ public class ActionController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteAction(
             @PathVariable("id")
+            @Validated
             @Positive
             Long id
     ) {

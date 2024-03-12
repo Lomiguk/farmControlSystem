@@ -141,20 +141,18 @@ public class ProfileDAO {
     public void updateProfile(
             Long id,
             String fio,
-            String email,
             String password,
             Role role,
             Boolean isActual
     ) {
         String sql = """
                 UPDATE profile
-                SET fio = :fio, email = :email, password = :password, role = :role::profile_status, is_actual = :is_actual
+                SET fio = :fio, password = :password, role = :role::profile_status, is_actual = :is_actual
                 WHERE id = :id;
                 """;
         Map<String, Object> params = Map.of(
                 "id", id,
                 "fio", fio,
-                "email", email,
                 "password", password,
                 "role", role,
                 "is_actual", isActual

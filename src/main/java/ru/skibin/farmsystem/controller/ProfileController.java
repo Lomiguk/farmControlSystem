@@ -3,10 +3,12 @@ package ru.skibin.farmsystem.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,15 +19,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.skibin.farmsystem.api.dto.ProfileResponse;
 import ru.skibin.farmsystem.api.enumTypes.Role;
 import ru.skibin.farmsystem.api.request.profile.AddProfileRequest;
-import ru.skibin.farmsystem.api.request.profile.UpdateInfoRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdatePasswordRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdateProfileRequest;
+import ru.skibin.farmsystem.api.response.ProfileResponse;
 import ru.skibin.farmsystem.exception.common.ValidationException;
 import ru.skibin.farmsystem.service.ProfileService;
-import ru.skibin.farmsystem.util.BindingResultUtil;
 
 import java.util.Collection;
 
@@ -41,19 +41,13 @@ public class ProfileController {
             @RequestBody
             AddProfileRequest addProfileRequest,
             BindingResult bindingResult
-    ) throws ValidationException {
-
-        if (bindingResult.hasErrors()) throw new ValidationException(
-                BindingResultUtil.requestValidationToString(bindingResult)
-        );
-
+    ) throws ValidationException
+    {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
         return new ResponseEntity<>(
-                profileService.save(
-                        addProfileRequest.getFio(),
-                        addProfileRequest.getEmail(),
-                        addProfileRequest.getPassword(),
-                        addProfileRequest.getRole()
-                ),
+                profileService.save(addProfileRequest),
                 HttpStatus.OK
         );
     }
@@ -61,6 +55,7 @@ public class ProfileController {
     @GetMapping("/{id}")
     public ResponseEntity<ProfileResponse> get(
             @PathVariable("id")
+            @Validated
             @Positive(message = "id must be positive")
             Long id
     ) {
@@ -73,9 +68,11 @@ public class ProfileController {
     @GetMapping("/all")
     public ResponseEntity<Collection<ProfileResponse>> getAll(
             @RequestParam("limit")
+            @Validated
             @PositiveOrZero(message = "limit must be positive")
             Integer limit,
             @RequestParam("offset")
+            @Validated
             @PositiveOrZero(message = "offset must be positive")
             Integer offset
     ) {
@@ -88,21 +85,16 @@ public class ProfileController {
     @PatchMapping("/{id}/info")
     public ResponseEntity<ProfileResponse> updateInfo(
             @PathVariable("id")
+            @Validated
             @Positive(message = "id must be positive")
             Long id,
-            @Valid
+            @Validated
+            @Size(min = 2, max = 50, message = "\"profile name size 2-50 chars\"")
             @RequestBody
-            UpdateInfoRequest updateInfoRequest,
-            BindingResult bindingResult
+            String fio
     ) throws ValidationException {
-        if (bindingResult.hasErrors()) throw new ValidationException(
-                BindingResultUtil.requestValidationToString(bindingResult)
-        );
         return new ResponseEntity<>(
-                profileService.updateInf(
-                        id,
-                        updateInfoRequest.getFio()
-                ),
+                profileService.updateInf(id, fio),
                 HttpStatus.OK
         );
     }
@@ -110,6 +102,7 @@ public class ProfileController {
     @PatchMapping("/{id}/password")
     public ResponseEntity<ProfileResponse> updatePassword(
             @PathVariable("id")
+            @Validated
             @Positive(message = "id must be positive")
             Long id,
             @Valid
@@ -117,15 +110,11 @@ public class ProfileController {
             UpdatePasswordRequest updatePasswordRequest,
             BindingResult bindingResult
     ) throws ValidationException {
-        if (bindingResult.hasErrors()) throw new ValidationException(
-                BindingResultUtil.requestValidationToString(bindingResult)
-        );
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
         return new ResponseEntity<>(
-                profileService.updatePassword(
-                        id,
-                        updatePasswordRequest.getOldPassword(),
-                        updatePasswordRequest.getNewPassword()
-                ),
+                profileService.updatePassword(id, updatePasswordRequest),
                 HttpStatus.OK
         );
     }
@@ -133,29 +122,27 @@ public class ProfileController {
     @PatchMapping("/{id}/role")
     public ResponseEntity<ProfileResponse> updateRole(
             @PathVariable("id")
+            @Validated
             @Positive(message = "id must be positive")
             Long id,
             @RequestParam("role") Role role
     ) {
         return new ResponseEntity<>(
-                profileService.updateRole(
-                        id,
-                        role
-                ),
+                profileService.updateRole(id, role),
                 HttpStatus.OK
         );
     }
 
     @PatchMapping("/{id}/active")
     public ResponseEntity<ProfileResponse> updateActiveStatus(
-            @PathVariable("id") @Positive Long id,
+            @PathVariable("id")
+            @Validated
+            @Positive
+            Long id,
             @RequestParam("active") Boolean status
     ) {
         return new ResponseEntity<>(
-                profileService.updateActualStatus(
-                        id,
-                        status
-                ),
+                profileService.updateActualStatus(id, status),
                 HttpStatus.OK
         );
     }
@@ -163,24 +150,17 @@ public class ProfileController {
     @PutMapping("/{id}")
     public ResponseEntity<ProfileResponse> updateProfile(
             @PathVariable("id")
+            @Validated
             @Positive(message = "id must be positive")
             Long id,
             @Valid @RequestBody UpdateProfileRequest updateProfileRequest,
             BindingResult bindingResult
     ) throws ValidationException {
-        if (bindingResult.hasErrors()) throw new ValidationException(
-                BindingResultUtil.requestValidationToString(bindingResult)
-        );
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
         return new ResponseEntity<>(
-                profileService.update(
-                        id,
-                        updateProfileRequest.getOldPassword(),
-                        updateProfileRequest.getFio(),
-                        updateProfileRequest.getEmail(),
-                        updateProfileRequest.getNewPassword(),
-                        updateProfileRequest.getRole(),
-                        updateProfileRequest.getIsActive()
-                ),
+                profileService.update(id, updateProfileRequest),
                 HttpStatus.OK
         );
     }
@@ -188,6 +168,7 @@ public class ProfileController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteProfile(
             @PathVariable("id")
+            @Validated
             @Positive(message = "id must be positive")
             Long id
     ) {

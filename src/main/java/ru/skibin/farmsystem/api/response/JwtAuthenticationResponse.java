@@ -1,4 +1,4 @@
-package ru.skibin.farmsystem.api.dto;
+package ru.skibin.farmsystem.api.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

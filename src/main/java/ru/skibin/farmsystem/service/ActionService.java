@@ -3,17 +3,20 @@ package ru.skibin.farmsystem.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.skibin.farmsystem.api.dto.ActionResponse;
+import ru.skibin.farmsystem.api.request.action.AddActionRequest;
+import ru.skibin.farmsystem.api.request.action.GetAllActionsForPeriodRequest;
+import ru.skibin.farmsystem.api.request.action.UpdateActionRequest;
+import ru.skibin.farmsystem.api.response.ActionResponse;
 import ru.skibin.farmsystem.entity.ActionEntity;
 import ru.skibin.farmsystem.entity.ProductEntity;
 import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
 import ru.skibin.farmsystem.exception.common.WrongProductValueException;
 import ru.skibin.farmsystem.repository.ActionDAO;
 import ru.skibin.farmsystem.repository.ProductDAO;
+import ru.skibin.farmsystem.service.mapper.EntityToResponseMapper;
 import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -23,28 +26,42 @@ import java.util.logging.Logger;
 public class ActionService {
     private final ActionDAO actionDAO;
     private final ProductDAO productDAO;
+    private final EntityToResponseMapper entityMapper;
 
     private final Logger logger = Logger.getLogger(ProductService.class.getName());
     private final CommonCheckHelper checkHelper;
 
     @Transactional
-    public ActionResponse addAction(
-            Long profileId,
-            Long productId,
-            Float value,
-            Instant time
-    ) {
+    public ActionResponse addAction(AddActionRequest addActionRequest) {
         ProductEntity product = checkHelper
-                .chainCheckProfileForActive(profileId, "Attempt to add an action for non-existed profile")
-                .chainCheckTimeForFutureException(time, "Attempt to add an action with the future tense")
-                .checkProductForActive(productId, "Attempt to add an action for non-existed product");
+                .chainCheckProfileForActive(
+                        addActionRequest.getProfileId(),
+                        "Attempt to add an action for non-existed profile"
+                )
+                .chainCheckTimeForFutureException(
+                        addActionRequest.getTime(),
+                        "Attempt to add an action with the future tense"
+                )
+                .checkProductForActive(
+                        addActionRequest.getProductId(),
+                        "Attempt to add an action for non-existed product"
+                );
 
-        actionDAO.addAction(profileId, productId, value, time);
-        ActionEntity actionEntity = actionDAO.findProfileActionByProductAndTime(profileId, productId, time);
+        actionDAO.addAction(
+                addActionRequest.getProfileId(),
+                addActionRequest.getProductId(),
+                addActionRequest.getValue(),
+                addActionRequest.getTime()
+        );
+        ActionEntity actionEntity = actionDAO.findProfileActionByProductAndTime(
+                addActionRequest.getProfileId(),
+                addActionRequest.getProductId(),
+                addActionRequest.getTime()
+        );
 
-        logger.info("Add action (" + actionEntity.getId() + ")");
+        logger.info(String.format("Add action (%s)", actionEntity.getId()));
 
-        return new ActionResponse(actionEntity, product.getValueType());
+        return entityMapper.actionMapper(actionEntity, product.getValueType());
     }
 
     @Transactional
@@ -53,11 +70,11 @@ public class ActionService {
         ActionEntity actionEntity = actionDAO.findAction(id);
 
         if (actionEntity != null) {
-            logger.info("Get action (" + id + ")");
+            logger.info(String.format("Get action (%s)", id));
             ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
-            return new ActionResponse(actionEntity, productEntity.getValueType());
+            return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
         }
-        logger.info("Action (" + id + ") doesn't exist");
+        logger.info(String.format("Action (%s) doesn't exist", id));
         return null;
     }
 
@@ -67,38 +84,50 @@ public class ActionService {
         if (actionResponse != null) {
             return actionResponse;
         }
-        throw new TryToGetNotExistedEntityException("Trying to get a non-existent action(" + id + ")");
+        throw new TryToGetNotExistedEntityException(String.format("Trying to get a non-existent action(%s)", id));
     }
 
     @Transactional
-    public Collection<ActionResponse> findPeriodActions(LocalDate  start, LocalDate  end) {
-        return findPeriodActions(start, end, Integer.MAX_VALUE, 0);
+    public Collection<ActionResponse> findPeriodActions(GetAllActionsForPeriodRequest request) {
+        return findPeriodActions(request, Integer.MAX_VALUE, 0);
     }
 
     @Transactional
-    public Collection<ActionResponse> findPeriodActions(LocalDate start, LocalDate  end, Integer limit, Integer offset) {
-        checkHelper.chainCheckStartEndOfPeriod(start, end, "Start date biggest end date");
+    public Collection<ActionResponse> findPeriodActions(
+            GetAllActionsForPeriodRequest request,
+            Integer limit,
+            Integer offset
+    ) {
+        checkHelper.chainCheckStartEndOfPeriod(
+                request.getStart(),
+                request.getEnd(),
+                "Start date biggest end date"
+        );
         Collection<ActionResponse> result = new ArrayList<>();
 
         if (limit == null) {
-            result = findPeriodActions(start, end);
-        } else {
-            if (offset == null) {
-                offset = 0;
-            }
+            limit = Integer.MAX_VALUE;
+        }
+        if (offset == null) {
+            offset = 0;
+        }
 
-            Collection<ActionEntity> actionEntities = actionDAO.findPeriodActions(
-                    start,
-                    end,
-                    limit,
-                    offset
-            );
-            logger.info("Get " + actionEntities.size() + " actions at period (" + start + " - " + end + ")");
+        Collection<ActionEntity> actionEntities = actionDAO.findPeriodActions(
+                request.getStart(),
+                request.getEnd(),
+                limit,
+                offset
+        );
+        logger.info(String.format(
+                "Get %d actions at period (%s - %s)",
+                actionEntities.size(),
+                request.getStart(),
+                request.getEnd()
+        ));
 
-            for (var actionEntity : actionEntities) {
-                ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
-                result.add(new ActionResponse(actionEntity, productEntity.getValueType()));
-            }
+        for (var actionEntity : actionEntities) {
+            ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
+            result.add(entityMapper.actionMapper(actionEntity, productEntity.getValueType()));
         }
 
         return result;
@@ -119,10 +148,10 @@ public class ActionService {
                 actionEntity.getIsActual()
         );
 
-        logger.info("Action (" + id + ") was updated (profile id)");
+        logger.info(String.format("Action (%d) was updated (profile id)", id));
         actionEntity = actionDAO.findAction(id);
         ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
-        return new ActionResponse(actionEntity, productEntity.getValueType());
+        return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
     }
 
     @Transactional
@@ -146,9 +175,9 @@ public class ActionService {
                 actionEntity.getTime(),
                 actionEntity.getIsActual()
         );
-        logger.info("Action (" + id + ") was updated (product id)");
+        logger.info(String.format("Action (%d) was updated (product id)", id));
         actionEntity = actionDAO.findAction(id);
-        return new ActionResponse(actionEntity, productEntity.getValueType());
+        return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
 
     }
 
@@ -165,29 +194,32 @@ public class ActionService {
                 actionEntity.getTime(),
                 newActualStatus
         );
-        logger.info("Action (" + id + ") was updated (actual status)");
+        logger.info(String.format("Action (%d) was updated (actual status)", id));
         actionEntity = actionDAO.findAction(id);
         ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
-        return new ActionResponse(actionEntity, productEntity.getValueType());
+        return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
     }
 
     @Transactional
-    public ActionResponse updateAction(
-            Long id,
-            Long newProfileId,
-            Long newProductId,
-            Float newValue,
-            Instant newTime,
-            Boolean newActualStatus
-    ) {
+    public ActionResponse updateAction(Long id, UpdateActionRequest request) {
         ProductEntity productEntity = checkHelper
-                .chainCheckProfileForActive(newProfileId, "Attempt to add an action for non-existed profile")
-                .chainCheckValueForPositive(newValue, "Negative value")
-                .checkProductForActive(newProductId, "Attempt to add an action for non-existed product");
+                .chainCheckProfileForActive(
+                        request.getProfileId(),
+                        "Attempt to add an action for non-existed profile"
+                )
+                .chainCheckValueForPositive(request.getValue(), "Negative value")
+                .checkProductForActive(
+                        request.getProductId(),
+                        "Attempt to add an action for non-existed product"
+                );
 
         ActionEntity actionEntity = actionDAO.findAction(id);
 
-        if (newActualStatus == null) newActualStatus = actionEntity.getIsActual();
+        Boolean newIsActual = request.getIsActual();
+        Instant newTime = request.getTime();
+        if (newIsActual == null) {
+            newIsActual = actionEntity.getIsActual();
+        }
         if (newTime == null) {
             newTime = actionEntity.getTime();
         } else {
@@ -196,23 +228,23 @@ public class ActionService {
 
         actionDAO.updateAction(
                 id,
-                newProfileId,
-                newProductId,
-                newValue,
+                request.getProfileId(),
+                request.getProductId(),
+                request.getValue(),
                 newTime,
-                newActualStatus
+                newIsActual
         );
-        logger.info("Action (" + id + ") was updated");
+        logger.info(String.format("Action (%d) was updated", id));
         actionEntity = actionDAO.findAction(id);
-        return new ActionResponse(actionEntity, productEntity.getValueType());
+        return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
     }
 
     public Boolean deleteAction(Long id) {
         boolean result = actionDAO.deleteAction(id) > 1;
         if (result) {
-            logger.info("Action (" + id + ") was deleted");
+            logger.info(String.format("Action (%d) was deleted", id));
         } else {
-            logger.info("Action (" + id + ") wasn't deleted");
+            logger.info(String.format("Action (%d) wasn't deleted", id));
         }
         return result;
     }

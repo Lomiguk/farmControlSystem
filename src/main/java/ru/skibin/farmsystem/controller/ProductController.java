@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,13 +21,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.skibin.farmsystem.api.dto.ProductResponse;
 import ru.skibin.farmsystem.api.enumTypes.ValueType;
 import ru.skibin.farmsystem.api.request.product.AddProductRequest;
 import ru.skibin.farmsystem.api.request.product.UpdateProductRequest;
+import ru.skibin.farmsystem.api.response.ProductResponse;
 import ru.skibin.farmsystem.exception.common.ValidationException;
 import ru.skibin.farmsystem.service.ProductService;
-import ru.skibin.farmsystem.util.BindingResultUtil;
 
 import java.util.Collection;
 
@@ -42,11 +42,11 @@ public class ProductController {
             AddProductRequest addProductRequest,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) throw new ValidationException(
-                BindingResultUtil.requestValidationToString(bindingResult)
-        );
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
         return new ResponseEntity<>(
-                productService.addProduct(addProductRequest.getName(), addProductRequest.getValueType()),
+                productService.addProduct(addProductRequest),
                 HttpStatus.OK
         );
     }
@@ -54,6 +54,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProduct(
             @PathVariable("id")
+            @Validated
             @Positive
             Long id
     ) {
@@ -65,6 +66,7 @@ public class ProductController {
 
     @GetMapping()
     public ResponseEntity<ProductResponse> getProductByName(
+            @Validated
             @NotNull(message = "product name can't be null")
             @NotEmpty(message = "product name can't be empty")
             @Size(min = 2, max = 50, message = "product name: 2-50 chars")
@@ -79,9 +81,11 @@ public class ProductController {
 
     @GetMapping("/all")
     public ResponseEntity<Collection<ProductResponse>> getAll(
+            @Validated
             @PositiveOrZero(message = "limit must be positive")
             @RequestParam("limit")
             Integer limit,
+            @Validated
             @PositiveOrZero(message = "offset must be positive")
             @RequestParam("offset")
             Integer offset
@@ -106,6 +110,7 @@ public class ProductController {
     @PatchMapping("/{id}/value-type")
     public ResponseEntity<ProductResponse> updateProductValueType(
             @PathVariable("id")
+            @Validated
             @Positive
             Long id,
             @RequestParam("value") ValueType valueType
@@ -119,6 +124,7 @@ public class ProductController {
     @PatchMapping("/{id}/actual-status")
     public ResponseEntity<ProductResponse> updateProductActualStatus(
             @PathVariable("id")
+            @Validated
             @Positive
             Long id,
             @RequestParam("value") Boolean status
@@ -132,21 +138,17 @@ public class ProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable("id")
+            @Validated
             @Positive
             Long id,
             @Valid @RequestBody UpdateProductRequest updateProductRequest,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) throw new ValidationException(
-                BindingResultUtil.requestValidationToString(bindingResult)
-        );
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
         return new ResponseEntity<>(
-                productService.updateProduct(
-                        id,
-                        updateProductRequest.getName(),
-                        updateProductRequest.getValueType(),
-                        updateProductRequest.getIsActual()
-                ),
+                productService.updateProduct(id, updateProductRequest),
                 HttpStatus.OK
         );
     }
@@ -154,6 +156,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteProduct(
             @PathVariable("id")
+            @Validated
             @Positive
             Long id
     ) {

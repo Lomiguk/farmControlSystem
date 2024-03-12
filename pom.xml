@@ -21,6 +21,7 @@
         <guava.version>33.0.0-jre</guava.version>
         <jjwt.version>0.12.5</jjwt.version>
         <jakarta-xml.version>4.0.2</jakarta-xml.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
     </properties>
     <dependencies>
         <!-- Spring -->

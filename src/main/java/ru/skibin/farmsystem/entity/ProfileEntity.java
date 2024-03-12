@@ -17,12 +17,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProfileEntity implements UserDetails {
-    Long id;
-    String fio;
-    String email;
-    String password;
-    Role role;
-    Boolean isActual;
+    private Long id;
+    private String fio;
+    private String email;
+    private String password;
+    private Role role;
+    private Boolean isActual;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
