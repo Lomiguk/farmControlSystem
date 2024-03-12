@@ -10,9 +10,9 @@ CREATE TABLE action (
     CONSTRAINT action_product_fk FOREIGN KEY (product_id) REFERENCES product(id)
 );
 
-COMMENT ON COLUMN action.id IS 'Уникальный идентификатор действия сотрудника';
-COMMENT ON COLUMN action.profile_id IS 'Идентификатор пользователя';
-COMMENT ON COLUMN action.product_id IS 'Идентификатор продукта';
-COMMENT ON COLUMN action.value IS 'Кол-во / масса / объём';
-COMMENT ON COLUMN action.time IS 'Время выполнения';
-COMMENT ON COLUMN action.is_actual IS 'Флаг - удалено ли действие';
+COMMENT ON COLUMN action.id IS 'Unique numerical action identifier';
+COMMENT ON COLUMN action.profile_id IS 'ID of the responsible user';
+COMMENT ON COLUMN action.product_id IS 'ID of the assembled product';
+COMMENT ON COLUMN action.value IS 'Quantity / weight / volume';
+COMMENT ON COLUMN action.time IS 'Moment of the check';
+COMMENT ON COLUMN action.is_actual IS 'flag - is the action actual';

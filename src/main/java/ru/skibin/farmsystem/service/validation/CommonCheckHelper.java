@@ -84,7 +84,7 @@ public class CommonCheckHelper {
     }
 
     public CommonCheckHelper chainCheckStartEndOfPeriod(LocalDate start, LocalDate end, String exceptionMessage) {
-        if (start.compareTo(end) > 0) {
+        if (start.isAfter(end)) {
             throw new StartEndDateException(exceptionMessage);
         }
 
@@ -110,7 +110,7 @@ public class CommonCheckHelper {
     public Boolean boolCheckProfileInActions(Long id, String warningMessage) {
         Collection<ActionEntity> actions = actionDAO.findProfileActions(id, 10, 0);
         if (!actions.isEmpty()) {
-            logger.warning(warningMessage);
+            logger.info(warningMessage);
             return false;
         }
         return true;
@@ -119,25 +119,33 @@ public class CommonCheckHelper {
     public boolean boolCheckProductInActions(Long id, String warningMessage) {
         Collection<ActionEntity> actions = actionDAO.findProductActions(id, 10, 0);
         if (!actions.isEmpty()) {
-            logger.warning(warningMessage);
+            logger.info(warningMessage);
             return false;
         }
         return true;
     }
 
-    public ProfileEntity checkProfileForExistByEmail(String email, String exceptionMessage) {
+    public CommonCheckHelper chainCheckForProfileEmailUnique(String email, String exceptionMessage) {
         ProfileEntity profileEntity = profileDAO.findProfileByEmail(email);
-        if (profileEntity == null) {
+        if (profileEntity != null) {
             throw new UniqueConstraintException(exceptionMessage);
         }
-        return profileEntity;
+        return this;
     }
 
     public ProductEntity checkProductForExistByName(String name, String exceptionMessage) {
         ProductEntity productEntity = productDAO.findProductByName(name);
-        if (productEntity == null) {
+        if (productEntity != null) {
             throw new UniqueConstraintException(exceptionMessage);
         }
         return productEntity;
+    }
+
+    public ProfileEntity checkProfileForExistByEmail(String email, String exceptionMessage) {
+        ProfileEntity profileEntity = profileDAO.findProfileByEmail(email);
+        if (profileEntity == null) {
+            throw new TryToGetNotExistedEntityException(exceptionMessage);
+        }
+        return profileEntity;
     }
 }

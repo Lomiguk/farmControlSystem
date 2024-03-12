@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.skibin.farmsystem.api.enumTypes.Role;
 import ru.skibin.farmsystem.entity.ProfileEntity;
 import ru.skibin.farmsystem.repository.rowMapper.ProfileRowMapper;
 
@@ -28,23 +29,23 @@ public class ProfileDAO {
         jdbcTemplate.update(sql, params);
     }
 
-    public void add(String fio, String email, String password, Boolean isAdmin) {
+    public void add(String fio, String email, String password, Role role) {
         String sql = """
-                INSERT INTO profile (fio, email, password, is_admin)
-                VALUES (:fio, :email, :password, :is_admin);
+                INSERT INTO profile (fio, email, password, role)
+                VALUES (:fio, :email, :password, :role::profile_status);
                 """;
         Map<String, Object> params = Map.of(
                 "fio", fio,
                 "email", email,
                 "password", password,
-                "is_admin", isAdmin
+                "role", role.name()
         );
         jdbcTemplate.update(sql, params);
     }
 
     public ProfileEntity findProfile(String fio, String email) {
         String sql = """
-                SELECT id, fio, email, password, is_admin, is_actual
+                SELECT id, fio, email, password, role, is_actual
                 FROM profile
                 WHERE fio = :fio AND email = :email;
                 """;
@@ -58,7 +59,7 @@ public class ProfileDAO {
 
     public ProfileEntity findProfile(Long id) {
         String sql = """
-                SELECT id, fio, email, password, is_admin, is_actual
+                SELECT id, fio, email, password, role, is_actual
                 FROM profile
                 WHERE id = :id;
                 """;
@@ -69,16 +70,15 @@ public class ProfileDAO {
         return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ProfileRowMapper()));
     }
 
-    public void updateProfileInformation(Long id, String fio, String email) {
+    public void updateProfileInformation(Long id, String fio) {
         String sql = """
                 UPDATE profile
-                SET fio = :fio, email = :email
+                SET fio = :fio
                 WHERE id = :id;
                 """;
         Map<String, Object> params = Map.of(
                 "id", id,
-                "fio", fio,
-                "email", email
+                "fio", fio
         );
 
         jdbcTemplate.update(sql, params);
@@ -98,15 +98,15 @@ public class ProfileDAO {
         jdbcTemplate.update(sql, params);
     }
 
-    public void updateProfileAdminStatus(Long id, Boolean isAdmin) {
+    public void updateProfileRole(Long id, Role role) {
         String sql = """
                 UPDATE profile
-                SET is_admin = :is_admin
+                SET role = :role::profile_status
                 WHERE id = :id;
                 """;
         Map<String, Object> params = Map.of(
                 "id", id,
-                "is_admin", isAdmin
+                "role", role
         );
 
         jdbcTemplate.update(sql, params);
@@ -143,12 +143,12 @@ public class ProfileDAO {
             String fio,
             String email,
             String password,
-            Boolean isAdmin,
+            Role role,
             Boolean isActual
     ) {
         String sql = """
                 UPDATE profile
-                SET fio = :fio, email = :email, password = :password, is_admin = :is_admin, is_actual = :is_actual
+                SET fio = :fio, email = :email, password = :password, role = :role::profile_status, is_actual = :is_actual
                 WHERE id = :id;
                 """;
         Map<String, Object> params = Map.of(
@@ -156,7 +156,7 @@ public class ProfileDAO {
                 "fio", fio,
                 "email", email,
                 "password", password,
-                "is_admin", isAdmin,
+                "role", role,
                 "is_actual", isActual
         );
 
@@ -165,7 +165,7 @@ public class ProfileDAO {
 
     public Collection<ProfileEntity> getAllProfileWithPagination(Integer limit, Integer offset) {
         String sql = """
-                SELECT *
+                SELECT id, fio, email, password, role, is_actual
                 FROM profile
                 ORDER BY id
                 LIMIT :limit
@@ -180,7 +180,7 @@ public class ProfileDAO {
 
     public ProfileEntity findProfileByEmail(String email) {
         String sql = """
-                SELECT *
+                SELECT id, fio, email, password, role, is_actual
                 FROM profile
                 WHERE email = :email
                 """;

@@ -1,9 +1,11 @@
 package ru.skibin.farmsystem.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skibin.farmsystem.api.dto.ProfileResponse;
+import ru.skibin.farmsystem.api.enumTypes.Role;
 import ru.skibin.farmsystem.entity.ProfileEntity;
 import ru.skibin.farmsystem.repository.ProfileDAO;
 import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
@@ -21,45 +23,83 @@ public class ProfileService {
     private final Logger logger = Logger.getLogger(ProductService.class.getName());
     private final CommonCheckHelper commonCheckHelper;
     private final ProfileCheckHelper profileCheckHelper;
+
+    /**
+     * Adding profile to repository
+     * @param fio F - Surname, i - name, o - patronymic
+     * @param email email/login
+     * @param nonHashPas non-hashed password
+     * @param role employee role - set of permissions
+     * @return saved profile
+     */
     @Transactional
-    public ProfileResponse add(
+    public ProfileResponse save(
             String fio,
             String email,
             String nonHashPas,
-            Boolean isAdmin
+            Role role
     ) {
-        commonCheckHelper.checkProfileForExistByEmail(email, "Profile with that profile already exist");
+        commonCheckHelper.chainCheckForProfileEmailUnique(email, "Profile with that email already exist");
 
         long hash = PasswordUtil.getHash(nonHashPas);
 
-        profileDAO.add(fio, email, String.valueOf(hash), isAdmin);
+        profileDAO.add(fio, email, String.valueOf(hash), role);
 
         ProfileEntity profileEntity = profileDAO.findProfile(fio, email);
         return new ProfileResponse(profileEntity);
     }
 
+    /**
+     * Save entity to repository
+     * @param profileEntity new entity
+     * @return saved profile
+     */
     @Transactional
-    public ProfileResponse add(String fio, String email, String nonHashPas) {
-        long hash = PasswordUtil.getHash(nonHashPas);
+    public ProfileResponse save(ProfileEntity profileEntity) {
+        commonCheckHelper.chainCheckForProfileEmailUnique(profileEntity.getEmail(), "Profile with that email already exist");
 
-        profileDAO.add(fio, email, String.valueOf(hash));
+        profileDAO.add(
+                profileEntity.getFio(),
+                profileEntity.getEmail(),
+                profileEntity.getPassword(),
+                profileEntity.getRole()
+        );
 
-        ProfileEntity profileEntity = profileDAO.findProfile(fio, email);
+        profileEntity = profileDAO.findProfile(profileEntity.getFio(), profileEntity.getEmail());
         return new ProfileResponse(profileEntity);
     }
 
+
+    /**
+     * Getting profile from repository
+     * @param id unique numerical identifier
+     * @return searched profile
+     */
     public ProfileResponse get(Long id) {
         commonCheckHelper.checkProfileForActive(id, "Non-existed profile for getting.");
         return new ProfileResponse(profileDAO.findProfile(id));
     }
 
+    /**
+     * Updating profile
+     * @param id  unique numerical identifier
+     * @param fio F - Surname, I - name, O - patronymic
+     * @return updated profile
+     */
     @Transactional
-    public ProfileResponse updateInf(Long id, String fio, String email) {
+    public ProfileResponse updateInf(Long id, String fio) {
         commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update.");
-        profileDAO.updateProfileInformation(id, fio, email);
+        profileDAO.updateProfileInformation(id, fio);
         return new ProfileResponse(profileDAO.findProfile(id));
     }
 
+    /**
+     * Updating profile password
+     * @param id unique numerical identifier
+     * @param oldPassword old password
+     * @param newPassword new password
+     * @return updated profile
+     */
     @Transactional
     public ProfileResponse updatePassword(Long id, String oldPassword, String newPassword) {
         commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update status.");
@@ -71,13 +111,25 @@ public class ProfileService {
         return new ProfileResponse(profileDAO.findProfile(id));
     }
 
+    /**
+     * Updating profile admin status
+     * @param id unique numerical identifier
+     * @param role flag - is admin profile
+     * @return updated profile
+     */
     @Transactional
-    public ProfileResponse updateAdminStatus(Long id, Boolean isAdmin) {
+    public ProfileResponse updateRole(Long id, Role role) {
         commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update admin status.");
-        profileDAO.updateProfileAdminStatus(id, isAdmin);
+        profileDAO.updateProfileRole(id, role);
         return new ProfileResponse(profileDAO.findProfile(id));
     }
 
+    /**
+     * Updating profile active status
+     * @param id unique numerical identifier
+     * @param isActual flag - is active profile
+     * @return update profile live status
+     */
     @Transactional
     public ProfileResponse updateActualStatus(Long id, Boolean isActual) {
         ProfileEntity profileEntity = commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update actual status.");
@@ -86,6 +138,11 @@ public class ProfileService {
         return new ProfileResponse(profileDAO.findProfile(id));
     }
 
+    /**
+     * Deleting or deactivate profile
+     * @param id unique numerical identifier
+     * @return deleting status
+     */
     @Transactional
     public Boolean delete(Long id) {
         commonCheckHelper.checkProfileForActive(id, "Non-existed profile for delete.");
@@ -99,6 +156,17 @@ public class ProfileService {
         }
     }
 
+    /**
+     * Updating profile
+     * @param id unique numerical identifier
+     * @param oldPassword old password
+     * @param newFio new F - Surname, I - name, O - patronymic
+     * @param newEmail new email
+     * @param newPassword new password
+     * @param role flag - is admin profile
+     * @param isActual flag - is active profile
+     * @return updated profile
+     */
     @Transactional
     public ProfileResponse update(
             Long id,
@@ -106,14 +174,14 @@ public class ProfileService {
             String newFio,
             String newEmail,
             String newPassword,
-            Boolean isAdmin,
+            Role role,
             Boolean isActual
     ) {
         ProfileEntity profileEntity = commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update.");
         profileCheckHelper.checkPasswords(id, oldPassword, newPassword);
         String newPassHash = PasswordUtil.getHash(newPassword).toString();
 
-        if (isAdmin == null) isAdmin = profileEntity.getIsAdmin();
+        if (role == null) role = profileEntity.getRole();
         if (isActual == null) isActual = profileEntity.getIsActual();
 
         profileDAO.updateProfile(
@@ -121,13 +189,19 @@ public class ProfileService {
                 newFio,
                 newEmail,
                 newPassHash,
-                isAdmin,
+                role,
                 isActual
         );
 
         return new ProfileResponse(profileDAO.findProfile(id));
     }
 
+    /**
+     * Getting profiles
+     * @param limit count of profiles
+     * @param offset table offset
+     * @return searched profiles
+     */
     public Collection<ProfileResponse> getAllWithPagination(Integer limit, Integer offset) {
         Collection<ProfileResponse> profiles = new ArrayList<>();
         Collection<ProfileEntity> profileEntities = profileDAO.getAllProfileWithPagination(limit, offset);
@@ -138,4 +212,35 @@ public class ProfileService {
 
         return profiles;
     }
+
+    /**
+     * Getting profile entity by email
+     * @param email email
+     * @return searched profile entity
+     */
+    private ProfileEntity getProfileEntityByEmail(String email) {
+        return  commonCheckHelper.checkProfileForExistByEmail(email, String.format("Profile %s is not found", email));
+    }
+
+    /**
+     * Getting profile by email
+     * @param email email
+     * @return searched profile
+     */
+    public ProfileResponse getProfileByEmail(String email) {
+        return new ProfileResponse(
+                commonCheckHelper.checkProfileForExistByEmail(email, String.format("Profile %s is not found", email))
+        );
+    }
+
+    /**
+     * Getting profile by email/login
+     * <p>
+     * Needed for Spring Security
+     * @return пользователь
+     */
+    public UserDetailsService userDetailsService() {
+        return this::getProfileEntityByEmail;
+    }
+
 }

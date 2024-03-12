@@ -55,7 +55,7 @@ public class ProductService {
             logger.info("Get product (" + productEntity.getId() + ")");
             return new ProductResponse(productEntity);
         }
-        logger.warning("Product (\"" + name + "\") doesn't exist");
+        logger.info("Product (\"" + name + "\") doesn't exist");
         return null;
     }
 

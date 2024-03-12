@@ -1,4 +1,4 @@
-package ru.skibin.farmsystem.api.request.profile;
+package ru.skibin.farmsystem.api.request.security;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,7 +10,7 @@ import ru.skibin.farmsystem.api.enumTypes.Role;
 
 @Data
 @AllArgsConstructor
-public class AddProfileRequest {
+public class SignUpRequest {
     @NotNull
     @Size(min = 2, max = 50, message = "\"profile name size 2-50 chars\"")
     private String fio;

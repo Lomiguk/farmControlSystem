@@ -67,16 +67,20 @@ public class ActionController {
 
     @PostMapping("/period")
     public ResponseEntity<Collection<ActionResponse>> getPeriodActions(
-            @Valid
-            @RequestBody
-            GetAllActionsForPeriodRequest request,
             @RequestParam("limit")
             @PositiveOrZero(message = "limit must be positive")
             Integer limit,
             @RequestParam("offset")
             @PositiveOrZero(message = "offset must be positive")
-            Integer offset
+            Integer offset,
+            @Valid
+            @RequestBody
+            GetAllActionsForPeriodRequest request,
+            BindingResult bindingResult
     ) {
+        if (bindingResult.hasErrors()) throw new ValidationException(
+                BindingResultUtil.requestValidationToString(bindingResult)
+        );
         return new ResponseEntity<>(
                 actionService.findPeriodActions(request.getStart(), request.getEnd(), limit, offset),
                 HttpStatus.OK
@@ -111,7 +115,7 @@ public class ActionController {
         );
     }
 
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/{id}/actual-status")
     public ResponseEntity<ActionResponse> updateActionActualStatus(
             @PathVariable("id")
             @Positive
@@ -130,8 +134,12 @@ public class ActionController {
             @Positive
             Long id,
             @Valid @RequestBody
-            UpdateActionRequest request
+            UpdateActionRequest request,
+            BindingResult bindingResult
     ) {
+        if (bindingResult.hasErrors()) throw new ValidationException(
+                BindingResultUtil.requestValidationToString(bindingResult)
+        );
         return new ResponseEntity<>(
                 actionService.updateAction(
                         id,
