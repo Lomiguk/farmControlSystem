@@ -115,7 +115,7 @@ public class ActionController {
         );
     }
 
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/{id}/actual-status")
     public ResponseEntity<ActionResponse> updateActionActualStatus(
             @PathVariable("id")
             @Positive

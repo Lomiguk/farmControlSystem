@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.skibin.farmsystem.api.enumTypes.Role;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,14 +21,12 @@ public class ProfileEntity implements UserDetails {
     String fio;
     String email;
     String password;
-    Boolean isAdmin;
+    Role role;
     Boolean isActual;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String role = isAdmin ? "ADMIN" : "USER";
-
-        return List.of(new SimpleGrantedAuthority(role));
+        return List.of(new SimpleGrantedAuthority(this.role.name()));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ru.skibin.farmsystem.security.controller;
+package ru.skibin.farmsystem.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +17,7 @@ import ru.skibin.farmsystem.api.dto.ProfileResponse;
 import ru.skibin.farmsystem.api.request.security.SignInRequest;
 import ru.skibin.farmsystem.api.request.security.SignUpRequest;
 import ru.skibin.farmsystem.exception.common.ValidationException;
-import ru.skibin.farmsystem.security.service.AuthenticationService;
+import ru.skibin.farmsystem.service.security.AuthenticationService;
 import ru.skibin.farmsystem.util.BindingResultUtil;
 
 @RestController
@@ -42,13 +43,14 @@ public class AuthController {
         );
     }
 
-    /*
+    @Operation(summary = "User logout")
     @DeleteMapping("/logout")
-    public ResponseEntity<Object> deleteToken() {
-        Long profileId = authenticationService.getProfileId();
-        authenticationService.deleteToken(profileId);
-        return ResponseEntity.noContent().build();
-    }*/
+    public ResponseEntity<Boolean> deleteToken() {
+                return new ResponseEntity<>(
+                authenticationService.invalidateToken(),
+                HttpStatus.OK
+        );
+    }
 
     @Operation(summary = "User sign-in")
     @PostMapping("/sign-in")
@@ -64,5 +66,4 @@ public class AuthController {
                 HttpStatus.OK
         );
     }
-
 }

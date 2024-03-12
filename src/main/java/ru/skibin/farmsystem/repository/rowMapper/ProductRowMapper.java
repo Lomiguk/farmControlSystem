@@ -19,7 +19,7 @@ public class ProductRowMapper implements RowMapper<ProductEntity> {
                     rs.getBoolean("is_actual")
             );
         } catch (SQLException e) {
-            throw new RowMapperException("Product entity map exception");
+            throw new RowMapperException("Product entity map exception: " + e.getMessage());
         }
     }
 }

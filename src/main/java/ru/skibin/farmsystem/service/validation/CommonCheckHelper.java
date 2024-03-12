@@ -84,7 +84,7 @@ public class CommonCheckHelper {
     }
 
     public CommonCheckHelper chainCheckStartEndOfPeriod(LocalDate start, LocalDate end, String exceptionMessage) {
-        if (start.compareTo(end) > 0) {
+        if (start.isAfter(end)) {
             throw new StartEndDateException(exceptionMessage);
         }
 
@@ -135,7 +135,7 @@ public class CommonCheckHelper {
 
     public ProductEntity checkProductForExistByName(String name, String exceptionMessage) {
         ProductEntity productEntity = productDAO.findProductByName(name);
-        if (productEntity == null) {
+        if (productEntity != null) {
             throw new UniqueConstraintException(exceptionMessage);
         }
         return productEntity;

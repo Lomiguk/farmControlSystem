@@ -16,5 +16,10 @@ public class JwtAuthenticationResponse {
             description = "Access token",
             example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aW..."
     )
-    private String token;
+    private String accessToken;
+    @Schema(
+            description = "Refresh token",
+            example = "KV1QiLCJhbGciiJPbmxpbmOiJIUzI1eyJ0eXAiOiJNiJ9.eyJpc3MiOUgSldUIEJ1aW..."
+    )
+    private String refreshToken;
 }

@@ -1,11 +1,11 @@
 package ru.skibin.farmsystem.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skibin.farmsystem.api.dto.ProfileResponse;
+import ru.skibin.farmsystem.api.enumTypes.Role;
 import ru.skibin.farmsystem.entity.ProfileEntity;
 import ru.skibin.farmsystem.repository.ProfileDAO;
 import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
@@ -29,7 +29,7 @@ public class ProfileService {
      * @param fio F - Surname, i - name, o - patronymic
      * @param email email/login
      * @param nonHashPas non-hashed password
-     * @param isAdmin flag - is admin profile
+     * @param role employee role - set of permissions
      * @return saved profile
      */
     @Transactional
@@ -37,32 +37,13 @@ public class ProfileService {
             String fio,
             String email,
             String nonHashPas,
-            Boolean isAdmin
+            Role role
     ) {
         commonCheckHelper.chainCheckForProfileEmailUnique(email, "Profile with that email already exist");
 
         long hash = PasswordUtil.getHash(nonHashPas);
 
-        profileDAO.add(fio, email, String.valueOf(hash), isAdmin);
-
-        ProfileEntity profileEntity = profileDAO.findProfile(fio, email);
-        return new ProfileResponse(profileEntity);
-    }
-
-    /**
-     * Adding profile to repository with default non-admin status
-     * @param fio F - Surname, I - name, O - patronymic
-     * @param email email/login
-     * @param nonHashPas non-hashed password
-     * @return saved profile
-     */
-    @Transactional
-    public ProfileResponse save(String fio, String email, String nonHashPas) {
-        commonCheckHelper.chainCheckForProfileEmailUnique(email, "Profile with that email already exist");
-
-        long hash = PasswordUtil.getHash(nonHashPas);
-
-        profileDAO.add(fio, email, String.valueOf(hash));
+        profileDAO.add(fio, email, String.valueOf(hash), role);
 
         ProfileEntity profileEntity = profileDAO.findProfile(fio, email);
         return new ProfileResponse(profileEntity);
@@ -81,7 +62,7 @@ public class ProfileService {
                 profileEntity.getFio(),
                 profileEntity.getEmail(),
                 profileEntity.getPassword(),
-                profileEntity.getIsAdmin()
+                profileEntity.getRole()
         );
 
         profileEntity = profileDAO.findProfile(profileEntity.getFio(), profileEntity.getEmail());
@@ -133,13 +114,13 @@ public class ProfileService {
     /**
      * Updating profile admin status
      * @param id unique numerical identifier
-     * @param isAdmin flag - is admin profile
+     * @param role flag - is admin profile
      * @return updated profile
      */
     @Transactional
-    public ProfileResponse updateAdminStatus(Long id, Boolean isAdmin) {
+    public ProfileResponse updateRole(Long id, Role role) {
         commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update admin status.");
-        profileDAO.updateProfileAdminStatus(id, isAdmin);
+        profileDAO.updateProfileRole(id, role);
         return new ProfileResponse(profileDAO.findProfile(id));
     }
 
@@ -182,7 +163,7 @@ public class ProfileService {
      * @param newFio new F - Surname, I - name, O - patronymic
      * @param newEmail new email
      * @param newPassword new password
-     * @param isAdmin flag - is admin profile
+     * @param role flag - is admin profile
      * @param isActual flag - is active profile
      * @return updated profile
      */
@@ -193,14 +174,14 @@ public class ProfileService {
             String newFio,
             String newEmail,
             String newPassword,
-            Boolean isAdmin,
+            Role role,
             Boolean isActual
     ) {
         ProfileEntity profileEntity = commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update.");
         profileCheckHelper.checkPasswords(id, oldPassword, newPassword);
         String newPassHash = PasswordUtil.getHash(newPassword).toString();
 
-        if (isAdmin == null) isAdmin = profileEntity.getIsAdmin();
+        if (role == null) role = profileEntity.getRole();
         if (isActual == null) isActual = profileEntity.getIsActual();
 
         profileDAO.updateProfile(
@@ -208,7 +189,7 @@ public class ProfileService {
                 newFio,
                 newEmail,
                 newPassHash,
-                isAdmin,
+                role,
                 isActual
         );
 
@@ -262,13 +243,4 @@ public class ProfileService {
         return this::getProfileEntityByEmail;
     }
 
-    /**
-     * Getting current profile
-     * @return current profile
-     */
-    public ProfileResponse getCurrentUser() {
-        // Получение имени пользователя из контекста Spring Security
-        var login = SecurityContextHolder.getContext().getAuthentication().getName();
-        return getProfileByEmail(login);
-    }
 }

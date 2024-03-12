@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skibin.farmsystem.api.dto.ProfileResponse;
+import ru.skibin.farmsystem.api.enumTypes.Role;
 import ru.skibin.farmsystem.api.request.profile.AddProfileRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdateInfoRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdatePasswordRequest;
@@ -51,7 +52,7 @@ public class ProfileController {
                         addProfileRequest.getFio(),
                         addProfileRequest.getEmail(),
                         addProfileRequest.getPassword(),
-                        addProfileRequest.getIsAdmin()
+                        addProfileRequest.getRole()
                 ),
                 HttpStatus.OK
         );
@@ -129,17 +130,17 @@ public class ProfileController {
         );
     }
 
-    @PatchMapping("/{id}/admin")
-    public ResponseEntity<ProfileResponse> updateAdminStatus(
+    @PatchMapping("/{id}/role")
+    public ResponseEntity<ProfileResponse> updateRole(
             @PathVariable("id")
             @Positive(message = "id must be positive")
             Long id,
-            @RequestParam("status") Boolean status
+            @RequestParam("role") Role role
     ) {
         return new ResponseEntity<>(
-                profileService.updateAdminStatus(
+                profileService.updateRole(
                         id,
-                        status
+                        role
                 ),
                 HttpStatus.OK
         );
@@ -164,8 +165,12 @@ public class ProfileController {
             @PathVariable("id")
             @Positive(message = "id must be positive")
             Long id,
-            @RequestBody UpdateProfileRequest updateProfileRequest
-    ) {
+            @Valid @RequestBody UpdateProfileRequest updateProfileRequest,
+            BindingResult bindingResult
+    ) throws ValidationException {
+        if (bindingResult.hasErrors()) throw new ValidationException(
+                BindingResultUtil.requestValidationToString(bindingResult)
+        );
         return new ResponseEntity<>(
                 profileService.update(
                         id,
@@ -173,7 +178,7 @@ public class ProfileController {
                         updateProfileRequest.getFio(),
                         updateProfileRequest.getEmail(),
                         updateProfileRequest.getNewPassword(),
-                        updateProfileRequest.getIsAdmin(),
+                        updateProfileRequest.getRole(),
                         updateProfileRequest.getIsActive()
                 ),
                 HttpStatus.OK

@@ -1,26 +1,29 @@
-package ru.skibin.farmsystem.security.service;
+package ru.skibin.farmsystem.service.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skibin.farmsystem.api.dto.JwtAuthenticationResponse;
 import ru.skibin.farmsystem.api.dto.ProfileResponse;
+import ru.skibin.farmsystem.api.enumTypes.JwtType;
 import ru.skibin.farmsystem.api.request.security.SignInRequest;
 import ru.skibin.farmsystem.api.request.security.SignUpRequest;
 import ru.skibin.farmsystem.entity.ProfileEntity;
+import ru.skibin.farmsystem.repository.ProfileDAO;
 import ru.skibin.farmsystem.service.ProfileService;
+import ru.skibin.farmsystem.service.validation.AuthorizationCheckHelper;
 import ru.skibin.farmsystem.util.PasswordUtil;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+    private final ProfileDAO profileDAO;
     private final ProfileService profileService;
     private final JwtService jwtService;
-    private final PasswordEncoder passwordEncoder;
+    private final AuthorizationCheckHelper checkHelper;
     private final AuthenticationManager authenticationManager;
 
     /**
@@ -36,7 +39,7 @@ public class AuthenticationService {
                 .fio(request.getFio())
                 .email(request.getEmail())
                 .password(encodedPassword)
-                .isAdmin(request.getIsAdmin())
+                .role(request.getRole())
                 .build();
 
         return profileService.save(profileEntity);
@@ -54,11 +57,36 @@ public class AuthenticationService {
                 PasswordUtil.getHash(request.getPassword()).toString()
         ));
 
-        var user = profileService
+        var userDetails = profileService
                 .userDetailsService()
                 .loadUserByUsername(request.getEmail());
+        ProfileEntity profileEntity = profileDAO.findProfileByEmail(request.getEmail());
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        String accessJwt = jwtService.registerToken(profileEntity.getId(), accessToken, JwtType.ACCESS);
+        String refreshJwt = jwtService.registerToken(profileEntity.getId(), refreshToken, JwtType.REFRESH);
 
-        var jwt = jwtService.generateToken(user);
-        return new JwtAuthenticationResponse(jwt);
+        return new JwtAuthenticationResponse(accessJwt, refreshJwt);
+    }
+
+    /**
+     * Getting authorized profile id
+     * @return authorized profile id
+     */
+    public Long getProfileId() {
+        ProfileEntity authProfile = checkHelper.checkForExistedAuthorizedProfile();
+
+        return authProfile == null ? null : authProfile.getId();
+    }
+
+    /**
+     * Invalidate authorized profile token
+     * @return invalidation status
+     */
+    @Transactional
+    public Boolean invalidateToken() {
+        Long profileId = getProfileId();
+
+        return profileId != null && jwtService.deleteProfileToken(profileId);
     }
 }

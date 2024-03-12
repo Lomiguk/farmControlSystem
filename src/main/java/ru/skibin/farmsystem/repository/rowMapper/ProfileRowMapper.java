@@ -1,5 +1,6 @@
 package ru.skibin.farmsystem.repository.rowMapper;
 
+import ru.skibin.farmsystem.api.enumTypes.Role;
 import ru.skibin.farmsystem.entity.ProfileEntity;
 import org.springframework.jdbc.core.RowMapper;
 import ru.skibin.farmsystem.exception.common.RowMapperException;
@@ -17,12 +18,11 @@ public class ProfileRowMapper implements RowMapper<ProfileEntity> {
                     rs.getString("fio"),
                     rs.getString("email"),
                     rs.getString("password"),
-                    rs.getBoolean("is_admin"),
+                    Role.valueOf(rs.getString("role")),
                     rs.getBoolean("is_actual")
             );
         } catch (SQLException e) {
-            throw new RowMapperException("Profile entity map exception");
+            throw new RowMapperException("Profile entity map exception: " + e.getMessage());
         }
-
     }
 }

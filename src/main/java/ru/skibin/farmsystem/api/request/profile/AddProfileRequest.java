@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import ru.skibin.farmsystem.api.enumTypes.Role;
 
 @Data
 @AllArgsConstructor
@@ -20,5 +21,5 @@ public class AddProfileRequest {
     @NotNull
     @Size(min = 5, message = "min password size - 5")
     private String password;
-    private Boolean isAdmin;
+    private Role role;
 }
