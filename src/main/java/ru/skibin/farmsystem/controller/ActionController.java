@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skibin.farmsystem.api.request.action.AddActionRequest;
-import ru.skibin.farmsystem.api.request.action.GetAllActionsForPeriodRequest;
+import ru.skibin.farmsystem.api.request.action.PeriodRequest;
 import ru.skibin.farmsystem.api.request.action.UpdateActionRequest;
 import ru.skibin.farmsystem.api.response.ActionResponse;
 import ru.skibin.farmsystem.exception.common.ValidationException;
@@ -96,7 +96,7 @@ public class ActionController {
             Integer offset,
             @Valid
             @RequestBody
-            GetAllActionsForPeriodRequest request,
+            PeriodRequest request,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {

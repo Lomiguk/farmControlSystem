@@ -3,7 +3,7 @@ package ru.skibin.farmsystem.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.skibin.farmsystem.api.enumTypes.ValueType;
+import ru.skibin.farmsystem.api.data.enumTypes.ValueType;
 import ru.skibin.farmsystem.api.request.product.AddProductRequest;
 import ru.skibin.farmsystem.api.request.product.UpdateProductRequest;
 import ru.skibin.farmsystem.api.response.ProductResponse;
@@ -37,7 +37,7 @@ public class ProductService {
         Long id = productDAO.addProduct(request.getName(), request.getValueType());
         ProductEntity productEntity = productDAO.findProduct(id);
         logger.info(String.format("Add new product (%d)", productEntity.getId()));
-        return entityMapper.productToResponse(productEntity);
+        return entityMapper.toResponse(productEntity);
     }
 
     /**
@@ -62,7 +62,7 @@ public class ProductService {
         ProductEntity productEntity = productDAO.findProduct(id);
         if (productEntity != null) {
             logger.info(String.format("Get product (%d)", id));
-            return entityMapper.productToResponse(productEntity);
+            return entityMapper.toResponse(productEntity);
         }
         logger.info(String.format("Product (%d) doesn't exist", id));
         return null;
@@ -77,7 +77,7 @@ public class ProductService {
         ProductEntity productEntity = productDAO.findProductByName(name);
         if (productEntity != null) {
             logger.info(String.format("Get product (%d)", productEntity.getId()));
-            return entityMapper.productToResponse(productEntity);
+            return entityMapper.toResponse(productEntity);
         }
         logger.info(String.format("Product (\"%s\") doesn't exist", name));
         return null;
@@ -95,7 +95,7 @@ public class ProductService {
         logger.info(String.format("Get %d products, with offset: %d", limit, offset));
         Collection<ProductResponse> products = new ArrayList<>();
         for (var productEntity : productEntities) {
-            products.add(entityMapper.productToResponse(productEntity));
+            products.add(entityMapper.toResponse(productEntity));
         }
 
         return products;
@@ -114,7 +114,7 @@ public class ProductService {
             productDAO.updateProductName(id, newName);
         }
         logger.info(String.format("Update product (%d) name", id));
-        return entityMapper.productToResponse(productDAO.findProduct(id));
+        return entityMapper.toResponse(productDAO.findProduct(id));
     }
 
     /**
@@ -130,7 +130,7 @@ public class ProductService {
             productDAO.updateProductValueType(id, newValueType);
         }
         logger.info(String.format("Update product (%d) value type to %s", id, newValueType));
-        return entityMapper.productToResponse(productDAO.findProduct(id));
+        return entityMapper.toResponse(productDAO.findProduct(id));
     }
 
     /**
@@ -147,7 +147,7 @@ public class ProductService {
             productDAO.updateActualStatus(id, newStatus);
         }
         logger.info(String.format("Update product (%d) active status to %s", id, newStatus));
-        return entityMapper.productToResponse(productDAO.findProduct(id));
+        return entityMapper.toResponse(productDAO.findProduct(id));
     }
 
     /**
@@ -161,7 +161,7 @@ public class ProductService {
         checkHelper.checkProductForExist(id, "Non existed product can't be update");
         productDAO.updateProduct(id, request.getName(), request.getValueType(), request.getIsActual());
         logger.info(String.format("Update product(%d) info", id));
-        return entityMapper.productToResponse(productDAO.findProduct(id));
+        return entityMapper.toResponse(productDAO.findProduct(id));
     }
 
     /**

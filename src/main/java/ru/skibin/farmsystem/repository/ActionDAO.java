@@ -8,7 +8,6 @@ import ru.skibin.farmsystem.entity.ActionEntity;
 import ru.skibin.farmsystem.repository.rowMapper.ActionRowMapper;
 
 import java.time.LocalDate;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collection;
@@ -82,7 +81,7 @@ public class ActionDAO {
         return jdbcTemplate.query(sql, params, new ActionRowMapper());
     }
 
-    public Collection<ActionEntity> findDayActions(Date time, Integer limit, Integer offset) {
+    public Collection<ActionEntity> findDayActions(LocalDate time, Integer limit, Integer offset) {
         String sql = """
                 SELECT id, profile_id, product_id, value, time, is_actual
                 FROM action
@@ -94,6 +93,18 @@ public class ActionDAO {
                 "day", time,
                 "limit", limit,
                 "offset", offset
+        );
+        return jdbcTemplate.query(sql, params, new ActionRowMapper());
+    }
+
+    public Collection<ActionEntity> findDayActions(LocalDate time) {
+        String sql = """
+                SELECT id, profile_id, product_id, value, time, is_actual
+                FROM action
+                WHERE DATE(time) = :day;
+                """;
+        Map<String, Object> params = Map.of(
+                "day", time
         );
         return jdbcTemplate.query(sql, params, new ActionRowMapper());
     }
