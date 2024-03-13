@@ -1,5 +1,6 @@
 package ru.skibin.farmsystem.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -36,6 +37,13 @@ import java.util.Collection;
 public class ProductController {
     private final ProductService productService;
 
+    /**
+     * Adding product to repository
+     * @param addProductRequest Request with new product data
+     * @param bindingResult     Request validation data
+     * @return Http response with new product response model
+     */
+    @Operation(summary = "dding product to repository")
     @PostMapping
     public ResponseEntity<ProductResponse> addProduct(
             @Valid @RequestBody
@@ -51,6 +59,12 @@ public class ProductController {
         );
     }
 
+    /**
+     * Getting product from repository
+     * @param id Product numerical identifier
+     * @return Http response with product response model
+     */
+    @Operation(summary = "Getting product from repository")
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProduct(
             @PathVariable("id")
@@ -64,6 +78,12 @@ public class ProductController {
         );
     }
 
+    /**
+     * Getting product from repository by name
+     * @param name Product name
+     * @return Http response with product response model
+     */
+    @Operation(summary = "Getting product from repository by name")
     @GetMapping()
     public ResponseEntity<ProductResponse> getProductByName(
             @Validated
@@ -79,6 +99,13 @@ public class ProductController {
         );
     }
 
+    /**
+     * Getting products from repository with pagination
+     * @param limit  Pagination limit
+     * @param offset Pagination offset
+     * @return Http response with collection of product response models
+     */
+    @Operation(summary = "Getting products from repository with pagination")
     @GetMapping("/all")
     public ResponseEntity<Collection<ProductResponse>> getAll(
             @Validated
@@ -96,6 +123,13 @@ public class ProductController {
         );
     }
 
+    /**
+     * Updating product name
+     * @param id      Product numerical identifier
+     * @param newName New product name
+     * @return Http response with product response model
+     */
+    @Operation(summary = "Updating product name")
     @PatchMapping("/{id}/name")
     public ResponseEntity<ProductResponse> updateProductName(
             @PathVariable("id") Long id,
@@ -107,6 +141,13 @@ public class ProductController {
         );
     }
 
+    /**
+     * Updating product valueType
+     * @param id        Product numerical identifier
+     * @param valueType New product name
+     * @return Http response with product response model
+     */
+    @Operation(summary = "Updating product valueType")
     @PatchMapping("/{id}/value-type")
     public ResponseEntity<ProductResponse> updateProductValueType(
             @PathVariable("id")
@@ -121,6 +162,13 @@ public class ProductController {
         );
     }
 
+    /**
+     * Updating product status of actuality
+     * @param id        Product numerical identifier
+     * @param status    New product actuality status
+     * @return Http response with product response model
+     */
+    @Operation(summary = "Updating product status of actuality")
     @PatchMapping("/{id}/actual-status")
     public ResponseEntity<ProductResponse> updateProductActualStatus(
             @PathVariable("id")
@@ -135,6 +183,13 @@ public class ProductController {
         );
     }
 
+    /**
+     * Updating product
+     * @param id                      Product numerical identifier
+     * @param updateProductRequest    Request with new data of the product
+     * @return Http response with product response model
+     */
+    @Operation(summary = "Updating product")
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable("id")
@@ -153,6 +208,11 @@ public class ProductController {
         );
     }
 
+    /**
+     * Deleting or deactivate product
+     * @param id product numerical idetifier
+     * @return Http response with product response model
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteProduct(
             @PathVariable("id")

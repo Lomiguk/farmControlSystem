@@ -3,10 +3,10 @@ package ru.skibin.farmsystem.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.skibin.farmsystem.api.enumTypes.ValueType;
 import ru.skibin.farmsystem.api.request.product.AddProductRequest;
 import ru.skibin.farmsystem.api.request.product.UpdateProductRequest;
 import ru.skibin.farmsystem.api.response.ProductResponse;
-import ru.skibin.farmsystem.api.enumTypes.ValueType;
 import ru.skibin.farmsystem.entity.ProductEntity;
 import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
 import ru.skibin.farmsystem.repository.ProductDAO;
@@ -25,6 +25,11 @@ public class ProductService {
     private final CommonCheckHelper checkHelper;
     private final EntityToResponseMapper entityMapper;
 
+    /**
+     * Adding product to repository
+     * @param request Request with new product data
+     * @return Product response model
+     */
     @Transactional
     public ProductResponse addProduct(AddProductRequest request) {
         checkHelper.checkProductForExistByName(request.getName(), "Product with that name already exist");
@@ -35,6 +40,11 @@ public class ProductService {
         return entityMapper.productToResponse(productEntity);
     }
 
+    /**
+     * Getting product from repository
+     * @param id Product numerical identifier
+     * @return Product response model
+     */
     public ProductResponse getProduct(Long id) {
         ProductResponse productResponse = findProduct(id);
         if (productResponse != null) {
@@ -43,6 +53,11 @@ public class ProductService {
         throw new TryToGetNotExistedEntityException(String.format("Trying to get a non-existent product(%d)", id));
     }
 
+    /**
+     * Searching product from repository
+     * @param id Product numerical identifier
+     * @return Product response model or nul
+     */
     public ProductResponse findProduct(Long id) {
         ProductEntity productEntity = productDAO.findProduct(id);
         if (productEntity != null) {
@@ -53,6 +68,11 @@ public class ProductService {
         return null;
     }
 
+    /**
+     * Searching product from repository by name
+     * @param name Product name
+     * @return Product response model or nul
+     */
     public ProductResponse findProductByName(String name) {
         ProductEntity productEntity = productDAO.findProductByName(name);
         if (productEntity != null) {
@@ -63,6 +83,12 @@ public class ProductService {
         return null;
     }
 
+    /**
+     * Searching products with pagination
+     * @param limit  Pagination limit
+     * @param offset Pagination offset
+     * @return Product response model or nul
+     */
     @Transactional
     public Collection<ProductResponse> findAllProductsWithPagination(Integer limit, Integer offset) {
         Collection<ProductEntity> productEntities = productDAO.findAllProductsWithPagination(limit, offset);
@@ -75,6 +101,12 @@ public class ProductService {
         return products;
     }
 
+    /**
+     * Updating product name
+     * @param id Product numerical identifier
+     * @param newName New name for product
+     * @return Product response model or nul
+     */
     @Transactional
     public ProductResponse updateProductName(Long id, String newName) {
         ProductEntity productEntity = checkHelper.checkProductForActive(id, "Non existed product can't be update");
@@ -85,6 +117,12 @@ public class ProductService {
         return entityMapper.productToResponse(productDAO.findProduct(id));
     }
 
+    /**
+     * Updating product value Type
+     * @param id Product numerical identifier
+     * @param newValueType New value type for product
+     * @return Product response model or nul
+     */
     @Transactional
     public ProductResponse updateProductValueType(Long id, ValueType newValueType) {
         ProductEntity productEntity = checkHelper.checkProductForActive(id, "Non existed product can't be update");
@@ -95,6 +133,12 @@ public class ProductService {
         return entityMapper.productToResponse(productDAO.findProduct(id));
     }
 
+    /**
+     * Updating product actuality status
+     * @param id Product numerical identifier
+     * @param newStatus New status for product
+     * @return Product response model or nul
+     */
     @Transactional
     public ProductResponse updateProductActualStatus(Long id, Boolean newStatus) {
         ProductEntity productEntity = checkHelper.checkProductForExist(id, "Non existed product can't be update");
@@ -106,6 +150,25 @@ public class ProductService {
         return entityMapper.productToResponse(productDAO.findProduct(id));
     }
 
+    /**
+     * Updating product
+     * @param id Product numerical identifier
+     * @param request New data for the product
+     * @return Product response model or nul
+     */
+    @Transactional
+    public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
+        checkHelper.checkProductForExist(id, "Non existed product can't be update");
+        productDAO.updateProduct(id, request.getName(), request.getValueType(), request.getIsActual());
+        logger.info(String.format("Update product(%d) info", id));
+        return entityMapper.productToResponse(productDAO.findProduct(id));
+    }
+
+    /**
+     * Deleting or deactivate product
+     * @param id product numerical identifier
+     * @return true - if successful
+     */
     @Transactional
     public Boolean deleteProduct(Long id) {
         checkHelper.checkProfileForActive(id, "Non-existed product for delete.");
@@ -117,13 +180,5 @@ public class ProductService {
             updateProductActualStatus(id, false);
             return true;
         }
-    }
-
-    @Transactional
-    public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
-        checkHelper.checkProductForExist(id, "Non existed product can't be update");
-        productDAO.updateProduct(id, request.getName(), request.getValueType(), request.getIsActual());
-        logger.info(String.format("Update product(%d) info", id));
-        return entityMapper.productToResponse(productDAO.findProduct(id));
     }
 }

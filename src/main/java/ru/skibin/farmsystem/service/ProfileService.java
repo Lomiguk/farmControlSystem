@@ -31,10 +31,7 @@ public class ProfileService {
 
     /**
      * Adding profile to repository
-     * @param fio F - Surname, i - name, o - patronymic
-     * @param email email/login
-     * @param nonHashPas non-hashed password
-     * @param role employee role - set of permissions
+     * @param request Request with new profile data
      * @return saved profile
      */
     @Transactional
@@ -80,8 +77,8 @@ public class ProfileService {
 
     /**
      * Getting profile from repository
-     * @param id unique numerical identifier
-     * @return searched profile
+     * @param id Profile numerical identifier
+     * @return profile response model
      */
     public ProfileResponse get(Long id) {
         commonCheckHelper.checkProfileForActive(id, "Non-existed profile for getting.");
@@ -90,9 +87,9 @@ public class ProfileService {
 
     /**
      * Updating profile
-     * @param id  unique numerical identifier
+     * @param id  Profile numerical identifier
      * @param fio F - Surname, I - name, O - patronymic
-     * @return updated profile
+     * @return profile response model
      */
     @Transactional
     public ProfileResponse updateInf(Long id, String fio) {
@@ -103,10 +100,9 @@ public class ProfileService {
 
     /**
      * Updating profile password
-     * @param id unique numerical identifier
-     * @param oldPassword old password
-     * @param newPassword new password
-     * @return updated profile
+     * @param id       Profile numerical identifier
+     * @param request  Request with old & new passwor
+     * @return profile response model
      */
     @Transactional
     public ProfileResponse updatePassword(Long id, UpdatePasswordRequest request) {
@@ -121,9 +117,9 @@ public class ProfileService {
 
     /**
      * Updating profile admin status
-     * @param id unique numerical identifier
+     * @param id Profile numerical identifier
      * @param role flag - is admin profile
-     * @return updated profile
+     * @return profile response model
      */
     @Transactional
     public ProfileResponse updateRole(Long id, Role role) {
@@ -134,7 +130,7 @@ public class ProfileService {
 
     /**
      * Updating profile active status
-     * @param id unique numerical identifier
+     * @param id Profile numerical identifier
      * @param isActual flag - is active profile
      * @return update profile live status
      */
@@ -148,7 +144,7 @@ public class ProfileService {
 
     /**
      * Deleting or deactivate profile
-     * @param id unique numerical identifier
+     * @param id Profile numerical identifier
      * @return deleting status
      */
     @Transactional
@@ -166,14 +162,9 @@ public class ProfileService {
 
     /**
      * Updating profile
-     * @param id unique numerical identifier
-     * @param oldPassword old password
-     * @param newFio new F - Surname, I - name, O - patronymic
-     * @param newEmail new email
-     * @param newPassword new password
-     * @param role flag - is admin profile
-     * @param isActual flag - is active profile
-     * @return updated profile
+     * @param id Profile numerical identifier
+     * @param request Request with new data for profile
+     * @return profile response model
      */
     @Transactional
     public ProfileResponse update(
@@ -200,9 +191,9 @@ public class ProfileService {
 
     /**
      * Getting profiles
-     * @param limit count of profiles
-     * @param offset table offset
-     * @return searched profiles
+     * @param limit  pagination limit
+     * @param offset pagination offset
+     * @return profile response models
      */
     public Collection<ProfileResponse> getAllWithPagination(Integer limit, Integer offset) {
         Collection<ProfileResponse> profiles = new ArrayList<>();
@@ -218,7 +209,7 @@ public class ProfileService {
     /**
      * Getting profile entity by email
      * @param email email
-     * @return searched profile entity
+     * @return profile response model entity
      */
     private ProfileEntity getProfileEntityByEmail(String email) {
         return  commonCheckHelper.checkProfileForExistByEmail(email, String.format("Profile %s is not found", email));
@@ -228,7 +219,7 @@ public class ProfileService {
      * Getting profile by email/login
      * <p>
      * Needed for Spring Security
-     * @return пользователь
+     * @return Profile as UserDetailsService
      */
     public UserDetailsService userDetailsService() {
         return this::getProfileEntityByEmail;

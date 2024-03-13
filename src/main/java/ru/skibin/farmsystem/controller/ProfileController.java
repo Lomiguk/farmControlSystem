@@ -1,5 +1,6 @@
 package ru.skibin.farmsystem.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -35,6 +36,13 @@ import java.util.Collection;
 public class ProfileController {
     private final ProfileService profileService;
 
+    /**
+     * Adding new profile
+     * @param addProfileRequest Request with new profile data
+     * @param bindingResult     Request validation data
+     * @return Http response with added profile response model
+     */
+    @Operation(summary = "adding new profile")
     @PostMapping
     public ResponseEntity<ProfileResponse> add(
             @Valid
@@ -52,6 +60,12 @@ public class ProfileController {
         );
     }
 
+    /**
+     * Getting profile
+     * @param id Profile numerical identifier
+     * @return Http response with profile response model
+     */
+    @Operation(summary = "Getting profile")
     @GetMapping("/{id}")
     public ResponseEntity<ProfileResponse> get(
             @PathVariable("id")
@@ -65,6 +79,13 @@ public class ProfileController {
         );
     }
 
+    /**
+     * Getting profile with pagination
+     * @param limit  Pagination limit
+     * @param offset Pagination offset
+     * @return Http response with collection of profile response models
+     */
+    @Operation(summary = "Getting profile with pagination")
     @GetMapping("/all")
     public ResponseEntity<Collection<ProfileResponse>> getAll(
             @RequestParam("limit")
@@ -82,6 +103,13 @@ public class ProfileController {
         );
     }
 
+    /**
+     * Updating profile's information
+     * @param id  Profile numerical identifier
+     * @param fio fio: f - Surname, i - name, o - patronymic
+     * @return Http response with updated profile response model
+     */
+    @Operation(summary = "Updating profile information")
     @PatchMapping("/{id}/info")
     public ResponseEntity<ProfileResponse> updateInfo(
             @PathVariable("id")
@@ -92,13 +120,21 @@ public class ProfileController {
             @Size(min = 2, max = 50, message = "\"profile name size 2-50 chars\"")
             @RequestBody
             String fio
-    ) throws ValidationException {
+    ) {
         return new ResponseEntity<>(
                 profileService.updateInf(id, fio),
                 HttpStatus.OK
         );
     }
 
+    /**
+     * Updating profile's password
+     * @param id                     Profile numerical identifier
+     * @param updatePasswordRequest  Request with old & new password
+     * @param bindingResult          Request validation data
+     * @return Http response with updated profile response model
+     */
+    @Operation(summary = "Updating profile password")
     @PatchMapping("/{id}/password")
     public ResponseEntity<ProfileResponse> updatePassword(
             @PathVariable("id")
@@ -109,7 +145,7 @@ public class ProfileController {
             @RequestBody
             UpdatePasswordRequest updatePasswordRequest,
             BindingResult bindingResult
-    ) throws ValidationException {
+    ) {
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
@@ -119,6 +155,13 @@ public class ProfileController {
         );
     }
 
+    /**
+     * Updating profile's role
+     * @param id   Profile numerical identifier
+     * @param role Profile role
+     * @return Http response with updated profile response model
+     */
+    @Operation(summary = "Updating profile's role")
     @PatchMapping("/{id}/role")
     public ResponseEntity<ProfileResponse> updateRole(
             @PathVariable("id")
@@ -133,7 +176,14 @@ public class ProfileController {
         );
     }
 
-    @PatchMapping("/{id}/active")
+    /**
+     * Updating profile's actuality status
+     * @param id     Profile numerical identifier
+     * @param status New actuality status for profile
+     * @return Http response with updated profile response model
+     */
+    @Operation(summary = "Updating profile's role")
+    @PatchMapping("/{id}/actuality")
     public ResponseEntity<ProfileResponse> updateActiveStatus(
             @PathVariable("id")
             @Validated
@@ -147,6 +197,13 @@ public class ProfileController {
         );
     }
 
+    /**
+     * Updating profile
+     * @param id                   Profile numerical identifier
+     * @param updateProfileRequest Request with new data for profile
+     * @param bindingResult        Request validation data
+     * @return Http response with updated profile response model
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ProfileResponse> updateProfile(
             @PathVariable("id")
@@ -155,7 +212,7 @@ public class ProfileController {
             Long id,
             @Valid @RequestBody UpdateProfileRequest updateProfileRequest,
             BindingResult bindingResult
-    ) throws ValidationException {
+    ) {
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
@@ -165,6 +222,11 @@ public class ProfileController {
         );
     }
 
+    /**
+     * Deleting or deactivate profile
+     * @param id Profile numerical identifier
+     * @return true - if successful
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteProfile(
             @PathVariable("id")

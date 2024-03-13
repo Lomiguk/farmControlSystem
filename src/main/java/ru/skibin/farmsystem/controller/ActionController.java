@@ -1,5 +1,6 @@
 package ru.skibin.farmsystem.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -33,6 +34,13 @@ import java.util.Collection;
 public class ActionController {
     private final ActionService actionService;
 
+    /**
+     * Adding action to repository
+     * @param addActionRequest  request with action data
+     * @param bindingResult     request validation data
+     * @return Http response with added action data
+     */
+    @Operation(summary = "Adding action to repository")
     @PostMapping
     public ResponseEntity<ActionResponse> addAction(
             @Valid @RequestBody
@@ -48,7 +56,13 @@ public class ActionController {
         );
     }
 
+    /**
+     * Getting action from repository
+     * @param id numerical identifier of required action
+     * @return Http response with required action data
+     */
     @GetMapping("/{id}")
+    @Operation(summary = "Getting action from repository")
     public ResponseEntity<ActionResponse> getAction(
             @PathVariable("id")
             @Validated
@@ -61,7 +75,16 @@ public class ActionController {
         );
     }
 
+    /**
+     * Receiving actions created during the periodR
+     * @param limit         pagination limit
+     * @param offset        pagination offset
+     * @param request       request with period data
+     * @param bindingResult request validation data
+     * @return Http response with data of added actions
+     */
     @PostMapping("/period")
+    @Operation(summary = "Receiving actions created during the period")
     public ResponseEntity<Collection<ActionResponse>> getPeriodActions(
             @RequestParam("limit")
             @Validated
@@ -85,7 +108,14 @@ public class ActionController {
         );
     }
 
+    /**
+     * Replace the profile id of the person responsible for the action
+     * @param id           action identifier
+     * @param newProfileId new profile identifier
+     * @return  Http response with updated action data
+     */
     @PatchMapping("/{id}/profile")
+    @Operation(summary = "Replace the profile id of the person responsible for the action")
     public ResponseEntity<ActionResponse> updateActionProfileId(
             @PathVariable("id")
             @Validated
@@ -100,7 +130,15 @@ public class ActionController {
         );
     }
 
+    /**
+     * Replace the product id for the action
+     * @param id           action identifier
+     * @param newProductId new product identifier
+     * @param value        new product value
+     * @return Http response with updated action data
+     */
     @PatchMapping("/{id}/product")
+    @Operation(summary = "Replace the product id for the action")
     public ResponseEntity<ActionResponse> updateActionProductId(
             @PathVariable("id")
             @Validated
@@ -115,7 +153,14 @@ public class ActionController {
         );
     }
 
+    /**
+     * Updating of the actuality status
+     * @param id       action identifier
+     * @param isActual actual boolean status
+     * @return Http response with updated action data
+     */
     @PatchMapping("/{id}/actual-status")
+    @Operation(summary = "Updating of the actuality status")
     public ResponseEntity<ActionResponse> updateActionActualStatus(
             @PathVariable("id")
             @Validated
@@ -129,7 +174,15 @@ public class ActionController {
         );
     }
 
+    /**
+     * Updating action
+     * @param id            action identifier
+     * @param request       request with new action data
+     * @param bindingResult request validation data
+     * @return Http response with updated action data
+     */
     @PutMapping("/{id}")
+    @Operation(summary = "Updating action")
     public ResponseEntity<ActionResponse> updateAction(
             @PathVariable("id")
             @Validated
@@ -148,7 +201,13 @@ public class ActionController {
         );
     }
 
+    /**
+     * Deleting or deactivate action
+     * @param id action identifier
+     * @return Http response, true - if action was deleted or deactivated
+     */
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deleting or deactivate action")
     public ResponseEntity<Boolean> deleteAction(
             @PathVariable("id")
             @Validated

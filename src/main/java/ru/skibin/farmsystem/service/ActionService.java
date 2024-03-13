@@ -31,6 +31,11 @@ public class ActionService {
     private final Logger logger = Logger.getLogger(ProductService.class.getName());
     private final CommonCheckHelper checkHelper;
 
+    /**
+     * Adding action to the repository
+     * @param addActionRequest Request with action data
+     * @return Action response model
+     */
     @Transactional
     public ActionResponse addAction(AddActionRequest addActionRequest) {
         ProductEntity product = checkHelper
@@ -53,17 +58,18 @@ public class ActionService {
                 addActionRequest.getValue(),
                 addActionRequest.getTime()
         );
-        ActionEntity actionEntity = actionDAO.findProfileActionByProductAndTime(
-                addActionRequest.getProfileId(),
-                addActionRequest.getProductId(),
-                addActionRequest.getTime()
-        );
+        ActionEntity actionEntity = actionDAO.findAction(id);
 
         logger.info(String.format("Add action (%s)", actionEntity.getId()));
 
         return entityMapper.actionMapper(actionEntity, product.getValueType());
     }
 
+    /**
+     * Searching action by id
+     * @param id Action numerical identifier
+     * @return Action response model
+     */
     @Transactional
     public ActionResponse findAction(Long id) {
 
@@ -78,6 +84,11 @@ public class ActionService {
         return null;
     }
 
+    /**
+     * Getting action by id
+     * @param id Action numerical identifier
+     * @return Action response model
+     */
     @Transactional
     public ActionResponse getAction(Long id) {
         ActionResponse actionResponse = findAction(id);
@@ -87,6 +98,13 @@ public class ActionService {
         throw new TryToGetNotExistedEntityException(String.format("Trying to get a non-existent action(%s)", id));
     }
 
+    /**
+     * Getting collection of actions by time period
+     * @param request request with time period data
+     * @param limit   pagination limit
+     * @param offset  pagination offset
+     * @return Collection of action response models
+     */
     @Transactional
     public Collection<ActionResponse> findPeriodActions(
             GetAllActionsForPeriodRequest request,
@@ -128,6 +146,12 @@ public class ActionService {
         return result;
     }
 
+    /**
+     * Updating action's profile id
+     * @param id           Action's numerical identifier
+     * @param newProfileId New profile identifier
+     * @return Action response model
+     */
     @Transactional
     public ActionResponse updateActionProfileId(Long id, Long newProfileId) {
         ActionEntity actionEntity = checkHelper
@@ -149,6 +173,12 @@ public class ActionService {
         return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
     }
 
+    /**
+     * Updating action's product id
+     * @param id           Action's numerical identifier
+     * @param newProductId New product identifier
+     * @return Action response model
+     */
     @Transactional
     public ActionResponse updateActionProductId(Long id, Long newProductId, Float value) {
         ProductEntity productEntity = checkHelper
@@ -176,6 +206,12 @@ public class ActionService {
 
     }
 
+    /**
+     * Updating action's status of actuality
+     * @param id              Action's numerical identifier
+     * @param newActualStatus New status of actuality
+     * @return Action response model
+     */
     @Transactional
     public ActionResponse updateActionActualStatus(Long id, Boolean newActualStatus) {
         ActionEntity actionEntity = checkHelper
@@ -195,6 +231,12 @@ public class ActionService {
         return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
     }
 
+    /**
+     * Updating action's status of actuality
+     * @param id       Action's numerical identifier
+     * @param request  Request with action's new data
+     * @return Action response model
+     */
     @Transactional
     public ActionResponse updateAction(Long id, UpdateActionRequest request) {
         ProductEntity productEntity = checkHelper

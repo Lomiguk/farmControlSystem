@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.skibin.farmsystem.api.enumTypes.Role;
 import ru.skibin.farmsystem.api.response.JwtAuthenticationResponse;
 import ru.skibin.farmsystem.api.response.ProfileResponse;
 import ru.skibin.farmsystem.api.enumTypes.JwtType;
@@ -42,7 +43,7 @@ public class AuthenticationService {
                 .fio(request.getFio())
                 .email(request.getEmail())
                 .password(encodedPassword)
-                .role(request.getRole())
+                .role(Role.USER)
                 .build();
 
         return profileService.save(profileEntity);
@@ -92,6 +93,12 @@ public class AuthenticationService {
 
         return profileId != null && jwtService.deleteProfileToken(profileId);
     }
+
+    /**
+     * Refreshing profile's tokens
+     * @param refreshToken Refresh token
+     * @return new access & refresh tokens
+     */
     @Transactional
     public JwtAuthenticationResponse refreshTokens(String refreshToken) {
         jwtService.validateRefreshToken(refreshToken);
