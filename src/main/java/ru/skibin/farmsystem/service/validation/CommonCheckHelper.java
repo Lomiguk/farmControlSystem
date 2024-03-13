@@ -1,6 +1,7 @@
 package ru.skibin.farmsystem.service.validation;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 import ru.skibin.farmsystem.api.enumTypes.Role;
 import ru.skibin.farmsystem.entity.ActionEntity;
@@ -16,7 +17,6 @@ import ru.skibin.farmsystem.repository.ActionDAO;
 import ru.skibin.farmsystem.repository.ProductDAO;
 import ru.skibin.farmsystem.repository.ProfileDAO;
 
-import org.springframework.security.access.AccessDeniedException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -99,6 +99,7 @@ public class CommonCheckHelper {
     public ActionEntity checkActionForActive(Long id, String exceptionMessage) {
         ActionEntity actionEntity = actionDAO.findAction(id);
         if (actionEntity == null || !actionEntity.getIsActual()) {
+            logger.info(exceptionMessage);
             throw new TryToGetNotExistedEntityException(exceptionMessage);
         }
         return actionEntity;
@@ -107,24 +108,25 @@ public class CommonCheckHelper {
     public ActionEntity checkActionForExist(Long id, String exceptionMessage) {
         ActionEntity actionEntity = actionDAO.findAction(id);
         if (actionEntity == null) {
+            logger.info(exceptionMessage);
             throw new TryToGetNotExistedEntityException(exceptionMessage);
         }
         return actionEntity;
     }
 
-    public Boolean boolCheckProfileInActions(Long id, String warningMessage) {
+    public Boolean boolCheckProfileInActions(Long id, String message) {
         Collection<ActionEntity> actions = actionDAO.findProfileActions(id, 10, 0);
         if (!actions.isEmpty()) {
-            logger.info(warningMessage);
+            logger.info(message);
             return false;
         }
         return true;
     }
 
-    public boolean boolCheckProductInActions(Long id, String warningMessage) {
+    public boolean boolCheckProductInActions(Long id, String message) {
         Collection<ActionEntity> actions = actionDAO.findProductActions(id, 10, 0);
         if (!actions.isEmpty()) {
-            logger.info(warningMessage);
+            logger.info(message);
             return false;
         }
         return true;
@@ -133,6 +135,7 @@ public class CommonCheckHelper {
     public CommonCheckHelper chainCheckForProfileEmailUnique(String email, String exceptionMessage) {
         ProfileEntity profileEntity = profileDAO.findProfileByEmail(email);
         if (profileEntity != null) {
+            logger.info(exceptionMessage);
             throw new UniqueConstraintException(exceptionMessage);
         }
         return this;
@@ -141,6 +144,7 @@ public class CommonCheckHelper {
     public ProductEntity checkProductForExistByName(String name, String exceptionMessage) {
         ProductEntity productEntity = productDAO.findProductByName(name);
         if (productEntity != null) {
+            logger.info(exceptionMessage);
             throw new UniqueConstraintException(exceptionMessage);
         }
         return productEntity;
@@ -149,6 +153,7 @@ public class CommonCheckHelper {
     public ProfileEntity checkProfileForExistByEmail(String email, String exceptionMessage) {
         ProfileEntity profileEntity = profileDAO.findProfileByEmail(email);
         if (profileEntity == null) {
+            logger.info(exceptionMessage);
             throw new TryToGetNotExistedEntityException(exceptionMessage);
         }
         return profileEntity;
@@ -158,6 +163,7 @@ public class CommonCheckHelper {
         ProfileEntity profileEntity = authorizationCheckHelper.checkForExistedAuthorizedProfileFromContext();
         if (profileEntity.getRole() != Role.ADMIN) {
             if (!profileEntity.getId().equals(equalId)) {
+                logger.info(REQUESTED_RESOURCE_UNACCEPTABLE);
                 throw new AccessDeniedException(REQUESTED_RESOURCE_UNACCEPTABLE);
             }
         }
