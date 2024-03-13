@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skibin.farmsystem.api.request.action.AddActionRequest;
-import ru.skibin.farmsystem.api.request.action.GetAllActionsForPeriodRequest;
+import ru.skibin.farmsystem.api.request.action.PeriodRequest;
 import ru.skibin.farmsystem.api.request.action.UpdateActionRequest;
 import ru.skibin.farmsystem.api.response.ActionResponse;
 import ru.skibin.farmsystem.entity.ActionEntity;
@@ -17,6 +17,7 @@ import ru.skibin.farmsystem.service.mapper.EntityToResponseMapper;
 import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -62,7 +63,7 @@ public class ActionService {
 
         logger.info(String.format("Add action (%s)", actionEntity.getId()));
 
-        return entityMapper.actionMapper(actionEntity, product.getValueType());
+        return entityMapper.toResponse(actionEntity, product.getValueType());
     }
 
     /**
@@ -78,7 +79,7 @@ public class ActionService {
         if (actionEntity != null) {
             logger.info(String.format("Get action (%s)", id));
             ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
-            return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
+            return entityMapper.toResponse(actionEntity, productEntity.getValueType());
         }
         logger.info(String.format("Action (%s) doesn't exist", id));
         return null;
@@ -107,7 +108,7 @@ public class ActionService {
      */
     @Transactional
     public Collection<ActionResponse> findPeriodActions(
-            GetAllActionsForPeriodRequest request,
+            PeriodRequest request,
             Integer limit,
             Integer offset
     ) {
@@ -116,7 +117,6 @@ public class ActionService {
                 request.getEnd(),
                 "Start date biggest end date"
         );
-        Collection<ActionResponse> result = new ArrayList<>();
 
         if (limit == null) {
             limit = Integer.MAX_VALUE;
@@ -138,11 +138,15 @@ public class ActionService {
                 request.getEnd()
         ));
 
+        return mapCollectionEntityToResponse(actionEntities);
+    }
+
+    private Collection<ActionResponse> mapCollectionEntityToResponse(Collection<ActionEntity> actionEntities) {
+        Collection<ActionResponse> result = new ArrayList<>();
         for (var actionEntity : actionEntities) {
             ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
-            result.add(entityMapper.actionMapper(actionEntity, productEntity.getValueType()));
+            result.add(entityMapper.toResponse(actionEntity, productEntity.getValueType()));
         }
-
         return result;
     }
 
@@ -170,7 +174,7 @@ public class ActionService {
         logger.info(String.format("Action (%d) was updated (profile id)", id));
         actionEntity = actionDAO.findAction(id);
         ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
-        return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
+        return entityMapper.toResponse(actionEntity, productEntity.getValueType());
     }
 
     /**
@@ -202,7 +206,7 @@ public class ActionService {
         );
         logger.info(String.format("Action (%d) was updated (product id)", id));
         actionEntity = actionDAO.findAction(id);
-        return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
+        return entityMapper.toResponse(actionEntity, productEntity.getValueType());
 
     }
 
@@ -228,7 +232,7 @@ public class ActionService {
         logger.info(String.format("Action (%d) was updated (actual status)", id));
         actionEntity = actionDAO.findAction(id);
         ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
-        return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
+        return entityMapper.toResponse(actionEntity, productEntity.getValueType());
     }
 
     /**
@@ -273,7 +277,7 @@ public class ActionService {
         );
         logger.info(String.format("Action (%d) was updated", id));
         actionEntity = actionDAO.findAction(id);
-        return entityMapper.actionMapper(actionEntity, productEntity.getValueType());
+        return entityMapper.toResponse(actionEntity, productEntity.getValueType());
     }
 
     public Boolean deleteAction(Long id) {
@@ -281,8 +285,25 @@ public class ActionService {
         if (result) {
             logger.info(String.format("Action (%d) was deleted", id));
         } else {
-            logger.info(String.format("Action (%d) wasn't deleted", id));
+            logger.info(String.format("Action (%d) wastion't deleted", id));
         }
         return result;
+    }
+
+    public Collection<ActionResponse> findDayAction(LocalDate day, Integer limit, Integer offset) {
+        if (limit == null) {
+            limit = Integer.MAX_VALUE;
+        }
+        if (offset == null) {
+            offset = 0;
+        }
+        Collection<ActionEntity> actions = actionDAO.findDayActions(day, limit, offset);
+
+        return mapCollectionEntityToResponse(actions);
+    }
+    public Collection<ActionResponse> findDayAction(LocalDate day) {
+        Collection<ActionEntity> actions = actionDAO.findDayActions(day);
+
+        return mapCollectionEntityToResponse(actions);
     }
 }

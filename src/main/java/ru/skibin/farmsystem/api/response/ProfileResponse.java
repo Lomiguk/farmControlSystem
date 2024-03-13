@@ -3,7 +3,7 @@ package ru.skibin.farmsystem.api.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.skibin.farmsystem.api.enumTypes.Role;
+import ru.skibin.farmsystem.api.data.enumTypes.Role;
 
 @Data
 @AllArgsConstructor

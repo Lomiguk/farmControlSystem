@@ -1,4 +1,4 @@
-package ru.skibin.farmsystem.api.enumTypes;
+package ru.skibin.farmsystem.api.data.enumTypes;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

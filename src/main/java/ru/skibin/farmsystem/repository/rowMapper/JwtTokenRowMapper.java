@@ -1,7 +1,7 @@
 package ru.skibin.farmsystem.repository.rowMapper;
 
 import org.springframework.jdbc.core.RowMapper;
-import ru.skibin.farmsystem.api.enumTypes.JwtType;
+import ru.skibin.farmsystem.api.data.enumTypes.JwtType;
 import ru.skibin.farmsystem.entity.JwtTokenEntity;
 import ru.skibin.farmsystem.exception.common.RowMapperException;
 

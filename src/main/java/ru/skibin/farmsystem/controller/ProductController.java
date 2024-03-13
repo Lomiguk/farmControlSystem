@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.skibin.farmsystem.api.enumTypes.ValueType;
+import ru.skibin.farmsystem.api.data.enumTypes.ValueType;
 import ru.skibin.farmsystem.api.request.product.AddProductRequest;
 import ru.skibin.farmsystem.api.request.product.UpdateProductRequest;
 import ru.skibin.farmsystem.api.response.ProductResponse;
@@ -43,7 +43,7 @@ public class ProductController {
      * @param bindingResult     Request validation data
      * @return Http response with new product response model
      */
-    @Operation(summary = "dding product to repository")
+    @Operation(summary = "Adding product to repository")
     @PostMapping
     public ResponseEntity<ProductResponse> addProduct(
             @Valid @RequestBody

@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @Schema(description = "Request for getting actions by period of time")
-public class GetAllActionsForPeriodRequest {
+public class PeriodRequest {
     @NotNull
     @Schema(description = "Start of the time period")
     private LocalDate start;

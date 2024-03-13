@@ -1,4 +1,4 @@
-package ru.skibin.farmsystem.api.enumTypes;
+package ru.skibin.farmsystem.api.data.enumTypes;
 
 public enum ValueType {
     LITER,

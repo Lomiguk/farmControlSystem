@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.skibin.farmsystem.api.enumTypes.Role;
+import ru.skibin.farmsystem.api.data.enumTypes.Role;
 import ru.skibin.farmsystem.api.request.profile.AddProfileRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdatePasswordRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdateProfileRequest;
@@ -51,7 +51,7 @@ public class ProfileService {
         );
 
         ProfileEntity profileEntity = profileDAO.findProfile(id);
-        return entityMapper.profileToResponse(profileEntity);
+        return entityMapper.toResponse(profileEntity);
     }
 
     /**
@@ -71,7 +71,7 @@ public class ProfileService {
         );
 
         profileEntity = profileDAO.findProfile(id);
-        return entityMapper.profileToResponse(profileEntity);
+        return entityMapper.toResponse(profileEntity);
     }
 
 
@@ -85,7 +85,7 @@ public class ProfileService {
                 .checkAuthPermission(id)
                 .checkProfileForActive(id, "Non-existed profile for getting.");
 
-        return entityMapper.profileToResponse(profileDAO.findProfile(id));
+        return entityMapper.toResponse(profileDAO.findProfile(id));
     }
 
     /**
@@ -98,7 +98,7 @@ public class ProfileService {
     public ProfileResponse updateInf(Long id, String fio) {
         commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update.");
         profileDAO.updateProfileInformation(id, fio);
-        return entityMapper.profileToResponse(profileDAO.findProfile(id));
+        return entityMapper.toResponse(profileDAO.findProfile(id));
     }
 
     /**
@@ -117,7 +117,7 @@ public class ProfileService {
 
         profileDAO.updatePassword(id, newPassHash);
 
-        return entityMapper.profileToResponse(profileDAO.findProfile(id));
+        return entityMapper.toResponse(profileDAO.findProfile(id));
     }
 
     /**
@@ -130,7 +130,7 @@ public class ProfileService {
     public ProfileResponse updateRole(Long id, Role role) {
         commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update admin status.");
         profileDAO.updateProfileRole(id, role);
-        return entityMapper.profileToResponse(profileDAO.findProfile(id));
+        return entityMapper.toResponse(profileDAO.findProfile(id));
     }
 
     /**
@@ -144,7 +144,7 @@ public class ProfileService {
         ProfileEntity profileEntity = commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update actual status.");
         if (isActual == null) isActual = profileEntity.getIsActual();
         profileDAO.updateProfileActualStatus(id, isActual);
-        return entityMapper.profileToResponse(profileDAO.findProfile(id));
+        return entityMapper.toResponse(profileDAO.findProfile(id));
     }
 
     /**
@@ -191,7 +191,7 @@ public class ProfileService {
                 isActual
         );
 
-        return entityMapper.profileToResponse(profileDAO.findProfile(id));
+        return entityMapper.toResponse(profileDAO.findProfile(id));
     }
 
     /**
@@ -205,7 +205,7 @@ public class ProfileService {
         Collection<ProfileEntity> profileEntities = profileDAO.getAllProfileWithPagination(limit, offset);
 
         for (var profileEntity : profileEntities) {
-            profiles.add(entityMapper.profileToResponse(profileEntity));
+            profiles.add(entityMapper.toResponse(profileEntity));
         }
 
         return profiles;

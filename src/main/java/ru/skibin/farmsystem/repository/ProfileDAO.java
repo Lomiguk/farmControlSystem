@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.skibin.farmsystem.api.enumTypes.Role;
+import ru.skibin.farmsystem.api.data.enumTypes.Role;
 import ru.skibin.farmsystem.entity.ProfileEntity;
 import ru.skibin.farmsystem.repository.rowMapper.ProfileRowMapper;
 

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.skibin.farmsystem.api.enumTypes.Role;
+import ru.skibin.farmsystem.api.data.enumTypes.Role;
 import ru.skibin.farmsystem.api.request.profile.AddProfileRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdatePasswordRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdateProfileRequest;

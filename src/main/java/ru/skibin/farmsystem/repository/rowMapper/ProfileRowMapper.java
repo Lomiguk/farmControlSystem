@@ -1,6 +1,6 @@
 package ru.skibin.farmsystem.repository.rowMapper;
 
-import ru.skibin.farmsystem.api.enumTypes.Role;
+import ru.skibin.farmsystem.api.data.enumTypes.Role;
 import ru.skibin.farmsystem.entity.ProfileEntity;
 import org.springframework.jdbc.core.RowMapper;
 import ru.skibin.farmsystem.exception.common.RowMapperException;

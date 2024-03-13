@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import ru.skibin.farmsystem.api.enumTypes.JwtType;
+import ru.skibin.farmsystem.api.data.enumTypes.JwtType;
 import ru.skibin.farmsystem.repository.JwtDAO;
 import ru.skibin.farmsystem.service.validation.AuthorizationCheckHelper;
 import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
