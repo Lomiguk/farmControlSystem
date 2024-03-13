@@ -78,7 +78,7 @@ public class AuthenticationService {
      * @return authorized profile id
      */
     public Long getProfileId() {
-        ProfileEntity authProfile = authorizationCheckHelper.checkForExistedAuthorizedProfile();
+        ProfileEntity authProfile = authorizationCheckHelper.checkForExistedAuthorizedProfileFromContext();
 
         return authProfile == null ? null : authProfile.getId();
     }

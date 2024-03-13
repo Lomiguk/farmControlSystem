@@ -2,6 +2,7 @@ package ru.skibin.farmsystem.service.validation;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import ru.skibin.farmsystem.api.enumTypes.Role;
 import ru.skibin.farmsystem.entity.ActionEntity;
 import ru.skibin.farmsystem.entity.ProductEntity;
 import ru.skibin.farmsystem.entity.ProfileEntity;
@@ -15,6 +16,7 @@ import ru.skibin.farmsystem.repository.ActionDAO;
 import ru.skibin.farmsystem.repository.ProductDAO;
 import ru.skibin.farmsystem.repository.ProfileDAO;
 
+import org.springframework.security.access.AccessDeniedException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collection;
@@ -23,9 +25,12 @@ import java.util.logging.Logger;
 @Component
 @RequiredArgsConstructor
 public class CommonCheckHelper {
+    private final String REQUESTED_RESOURCE_UNACCEPTABLE = "The requested resource cannot be accessed";
+
     private final ProfileDAO profileDAO;
     private final ProductDAO productDAO;
     private final ActionDAO  actionDAO;
+    private final AuthorizationCheckHelper authorizationCheckHelper;
     private final Logger logger = Logger.getLogger(CommonCheckHelper.class.getName());
 
     public ProfileEntity checkProfileForActive(Long id, String exceptionMessage) {
@@ -147,5 +152,15 @@ public class CommonCheckHelper {
             throw new TryToGetNotExistedEntityException(exceptionMessage);
         }
         return profileEntity;
+    }
+
+    public CommonCheckHelper checkAuthPermission(Long equalId) {
+        ProfileEntity profileEntity = authorizationCheckHelper.checkForExistedAuthorizedProfileFromContext();
+        if (profileEntity.getRole() != Role.ADMIN) {
+            if (!profileEntity.getId().equals(equalId)) {
+                throw new AccessDeniedException(REQUESTED_RESOURCE_UNACCEPTABLE);
+            }
+        }
+        return this;
     }
 }

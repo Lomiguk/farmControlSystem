@@ -29,8 +29,13 @@ public class AuthorizationCheckHelper {
 
     private final ProfileDAO profileDAO;
     private final JwtDAO jwtDAO;
-    public ProfileEntity checkForExistedAuthorizedProfile() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    public ProfileEntity checkForExistedAuthorizedProfileFromContext() {
+        return checkForExistedAuthorizedProfile(
+                SecurityContextHolder.getContext().getAuthentication()
+        );
+    }
+
+    public ProfileEntity checkForExistedAuthorizedProfile(Authentication auth) {
         if (auth != null) {
             Object principal = auth.getPrincipal();
             if (principal instanceof ProfileEntity) {

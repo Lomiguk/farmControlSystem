@@ -81,7 +81,10 @@ public class ProfileService {
      * @return profile response model
      */
     public ProfileResponse get(Long id) {
-        commonCheckHelper.checkProfileForActive(id, "Non-existed profile for getting.");
+        commonCheckHelper
+                .checkAuthPermission(id)
+                .checkProfileForActive(id, "Non-existed profile for getting.");
+
         return entityMapper.profileToResponse(profileDAO.findProfile(id));
     }
 
@@ -106,7 +109,9 @@ public class ProfileService {
      */
     @Transactional
     public ProfileResponse updatePassword(Long id, UpdatePasswordRequest request) {
-        commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update status.");
+        commonCheckHelper
+                .checkAuthPermission(id)
+                .checkProfileForActive(id, "Non-existed profile for update status.");
         profileCheckHelper.checkPasswords(id, request.getOldPassword(), request.getNewPassword());
         String newPassHash = PasswordUtil.getHash(request.getNewPassword()).toString();
 
