@@ -1,11 +1,11 @@
 package ru.skibin.farmsystem.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.skibin.farmsystem.api.data.enumTypes.ValueType;
 
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WorkResultEntity {
     private final Long productId;
     private final String productName;

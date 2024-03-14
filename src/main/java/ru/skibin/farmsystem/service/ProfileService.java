@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import ru.skibin.farmsystem.api.data.enumTypes.Role;
 import ru.skibin.farmsystem.api.request.profile.AddProfileRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdatePasswordRequest;
@@ -23,8 +24,8 @@ import java.util.logging.Logger;
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
+    private static final Logger LOGGER = Logger.getLogger(ProductService.class.getName());
     private final ProfileDAO profileDAO;
-    private final Logger logger = Logger.getLogger(ProductService.class.getName());
     private final CommonCheckHelper commonCheckHelper;
     private final ProfileCheckHelper profileCheckHelper;
     private final EntityToResponseMapper entityMapper;
@@ -36,8 +37,10 @@ public class ProfileService {
      * @return saved profile
      */
     @Transactional
-    public ProfileResponse save(AddProfileRequest request) {
-        commonCheckHelper.chainCheckForProfileEmailUnique(request.getEmail());
+    public ProfileResponse add(BindingResult bindingResult, AddProfileRequest request) {
+        commonCheckHelper
+                .chainCheckValidation(bindingResult)
+                .chainCheckForProfileEmailUnique(request.getEmail());
 
         long hash = PasswordUtil.getHash(request.getPassword());
 
@@ -58,7 +61,7 @@ public class ProfileService {
      * @return saved profile
      */
     @Transactional
-    public ProfileResponse save(ProfileEntity profileEntity) {
+    public ProfileResponse add(ProfileEntity profileEntity) {
         commonCheckHelper.chainCheckForProfileEmailUnique(profileEntity.getEmail());
 
         Long id = profileDAO.add(
@@ -112,8 +115,9 @@ public class ProfileService {
      * @return profile response model
      */
     @Transactional
-    public ProfileResponse updatePassword(Long id, UpdatePasswordRequest request) {
+    public ProfileResponse updatePassword(BindingResult bindingResult, Long id, UpdatePasswordRequest request) {
         commonCheckHelper
+                .chainCheckValidation(bindingResult)
                 .chainCheckAuthPermission(id)
                 .checkProfileForActive(id);
         profileCheckHelper.checkPasswords(id, request.getOldPassword(), request.getNewPassword());
@@ -164,10 +168,10 @@ public class ProfileService {
     public Boolean delete(Long id) {
         commonCheckHelper.checkProfileForActive(id);
         if (commonCheckHelper.boolCheckProfileInActions(id)) {
-            logger.info(String.format("Try to delete profile (%d)", id));
+            LOGGER.info(String.format("Try to delete profile (%d)", id));
             return profileDAO.deleteProfile(id) > 0;
         } else {
-            logger.info(String.format("Profile (%d) set actual status to false", id));
+            LOGGER.info(String.format("Profile (%d) set actual status to false", id));
             updateActualStatus(id, false);
             return true;
         }
@@ -176,17 +180,22 @@ public class ProfileService {
     /**
      * Updating profile
      *
-     * @param id      Profile numerical identifier
-     * @param request Request with new data for profile
+     * @param bindingResult  Request validation data
+     * @param id             Profile numerical identifier
+     * @param request        Request with new data for profile
      * @return profile response model
      */
     @Transactional
     public ProfileResponse update(
+            BindingResult bindingResult,
             Long id,
             UpdateProfileRequest request
     ) {
-        ProfileEntity profileEntity = commonCheckHelper.checkProfileForExist(id);
-        profileCheckHelper.checkPasswords(id, request.getOldPassword(), request.getNewPassword());
+        ProfileEntity profileEntity = commonCheckHelper
+                .chainCheckValidation(bindingResult)
+                .checkProfileForExist(id);
+        profileCheckHelper
+                .checkPasswords(id, request.getOldPassword(), request.getNewPassword());
         String newPassHash = PasswordUtil.getHash(request.getNewPassword()).toString();
 
         Role newRole = request.getRole() == null ? profileEntity.getRole() : request.getRole();

@@ -2,8 +2,8 @@ package ru.skibin.farmsystem.service.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.skibin.farmsystem.api.data.enumTypes.ValueType;
-import ru.skibin.farmsystem.api.request.other.WorkResult;
-import ru.skibin.farmsystem.api.request.other.Worker;
+import ru.skibin.farmsystem.api.response.WorkResultResponse;
+import ru.skibin.farmsystem.api.response.WorkerResponse;
 import ru.skibin.farmsystem.api.response.ActionResponse;
 import ru.skibin.farmsystem.api.response.MarkResponse;
 import ru.skibin.farmsystem.api.response.ProductResponse;
@@ -48,8 +48,8 @@ public class EntityToResponseMapper {
         );
     }
 
-    public Worker toResponse(WorkerEntity worker) {
-        return new Worker(
+    public WorkerResponse toResponse(WorkerEntity worker) {
+        return new WorkerResponse(
                 worker.getProfileId(),
                 worker.getProfileFio(),
                 worker.getProfileEmail(),
@@ -57,8 +57,8 @@ public class EntityToResponseMapper {
         );
     }
 
-    public WorkResult toResponse(WorkResultEntity product) {
-        return new WorkResult(
+    public WorkResultResponse toResponse(WorkResultEntity product) {
+        return new WorkResultResponse(
                 product.getProductId(),
                 product.getProductName(),
                 product.getProductValueType(),

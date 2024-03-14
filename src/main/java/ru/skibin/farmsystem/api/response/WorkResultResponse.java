@@ -1,4 +1,4 @@
-package ru.skibin.farmsystem.api.request.other;
+package ru.skibin.farmsystem.api.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -8,7 +8,7 @@ import ru.skibin.farmsystem.api.data.enumTypes.ValueType;
 @Data
 @RequiredArgsConstructor
 @Schema(description = "Result of work")
-public class WorkResult {
+public class WorkResultResponse {
     @Schema(description = "Product id")
     private final Long productId;
     @Schema(description = "Product name")

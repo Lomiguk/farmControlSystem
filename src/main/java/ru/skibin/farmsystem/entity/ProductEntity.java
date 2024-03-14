@@ -1,14 +1,14 @@
 package ru.skibin.farmsystem.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.skibin.farmsystem.api.data.enumTypes.ValueType;
 
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProductEntity {
-    private Long id;
-    private String name;
-    private ValueType valueType;
-    private Boolean isActual;
+    private final Long id;
+    private final String name;
+    private final ValueType valueType;
+    private final Boolean isActual;
 }

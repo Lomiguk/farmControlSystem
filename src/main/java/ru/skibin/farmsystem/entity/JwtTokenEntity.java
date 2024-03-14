@@ -1,14 +1,14 @@
 package ru.skibin.farmsystem.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.skibin.farmsystem.api.data.enumTypes.JwtType;
 
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class JwtTokenEntity {
-    private Long id;
-    private Long profileId;
-    private String token;
-    private JwtType type;
+    private final Long id;
+    private final Long profileId;
+    private final String token;
+    private final JwtType type;
 }

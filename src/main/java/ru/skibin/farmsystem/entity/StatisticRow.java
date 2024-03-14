@@ -1,12 +1,12 @@
 package ru.skibin.farmsystem.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.skibin.farmsystem.api.data.enumTypes.Role;
 import ru.skibin.farmsystem.api.data.enumTypes.ValueType;
 
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class StatisticRow {
     private final Long profileId;
     private final String profileFio;

@@ -22,42 +22,40 @@ import ru.skibin.farmsystem.api.data.enumTypes.Role;
 import ru.skibin.farmsystem.security.filter.JwtFilter;
 import ru.skibin.farmsystem.service.ProfileService;
 
-import java.util.List;
+import static org.apache.naming.ResourceRef.AUTH;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.ALLOW_CREDENTIALS;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.DELETE_DEL_PRODUCT;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.DELETE_DEL_PROFILE;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.DELETE_MARK;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.GET_MARK;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.GET_MARK_BY_DAY;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.GET_PROFILE_MARK;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.HEADERS;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.HTTP_METHODS;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.ORIGINS_PATTERNS;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.PATCH_ACTION;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.PATCH_ACTIVE_PROFILE;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.PATCH_FIO_PROFILE;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.PATCH_PASSWORD_PROFILE;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.PATCH_PRODUCT;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.PATCH_ROLE_PROFILE;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.POST_ADD_PRODUCT;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.POST_ADD_PROFILE;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.POST_GET_MARK_BY_PERIOD;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.POST_MARK;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.PUT_UPDATE_MARK;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.PUT_UPDATE_PRODUCT;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.PUT_UPDATE_PROFILE;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.STATISTIC;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.SWAGGER_DOC_API;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.SWAGGER_RESOURCES;
+import static ru.skibin.farmsystem.util.SecurityConfigurationConstants.SWAGGER_UI;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SpringSecurityConfiguration {
-    private final String POST_ADD_PROFILE = "/profile";
-    private final String DELETE_DEL_PROFILE = "/profile/*";
-    private final String PUT_UPDATE_PROFILE = "/profile/*";
-    private final String PATCH_FIO_PROFILE = "/profile/*/info";
-    private final String PATCH_ROLE_PROFILE = "/profile/*/admin";
-    private final String PATCH_ACTIVE_PROFILE = "/profile/*/active";
-    private final String PATCH_PASSWORD_PROFILE = "/profile/*/password";
-    private final String PUT_UPDATE_PRODUCT = "/product/*";
-    private final String DELETE_DEL_PRODUCT = "/product/*";
-    private final String POST_ADD_PRODUCT = "/product";
-    private final String PATCH_PRODUCT = "/product/**";
-    private final String PATCH_ACTION = "/action/**";
-    private final String POST_MARK = "/profile/mark";
-    private final String GET_MARK = "/profile/mark/*";
-    private final String GET_PROFILE_MARK = "/profile/*/mark";
-    private final String GET_MARK_BY_DAY = "/profile/mark/day";
-    private final String POST_GET_MARK_BY_PERIOD = "/profile/mark/period";
-    private final String PUT_UPDATE_MARK = "/profile/mark/*";
-    private final String DELETE_MARK = "/profile/mark/*";
-    private final String STATISTIC = "/statistic/**";
-    private final String AUTH = "/auth/**";
-    private final String SWAGGER_UI = "/swagger-ui/**";
-    private final String SWAGGER_RESOURCES = "/swagger-resources/*";
-    private final String SWAGGER_DOC_API = "/v3/api-docs/**";
-    private final List<String> HTTP_METHODS = List.of("GET", "POST", "PUT", "PATCH", "DELETE");
-    private final List<String> ORIGINS_PATTERNS = List.of("*");
-    private final List<String> HEADERS = List.of("*");
-    private final Boolean ALLOW_CREDENTIALS = true;
-
     private final JwtFilter jwtFilter;
     private final ProfileService profileService;
     private final String ADMIN_ROLE = Role.ADMIN.name();

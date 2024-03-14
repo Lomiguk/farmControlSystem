@@ -52,8 +52,8 @@ public class StatisticDAO {
                 OFFSET :offset;
                 """;
         Map<String, Object> params = Map.of(
-                "start_date", start,
-                "end_date", end,
+                "start", start,
+                "end", end,
                 "limit", limit,
                 "offset", offset
         );

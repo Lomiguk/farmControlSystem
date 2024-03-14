@@ -1,6 +1,7 @@
 package ru.skibin.farmsystem.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -26,7 +27,6 @@ import ru.skibin.farmsystem.api.data.enumTypes.ValueType;
 import ru.skibin.farmsystem.api.request.product.AddProductRequest;
 import ru.skibin.farmsystem.api.request.product.UpdateProductRequest;
 import ru.skibin.farmsystem.api.response.ProductResponse;
-import ru.skibin.farmsystem.exception.common.ValidationException;
 import ru.skibin.farmsystem.service.ProductService;
 
 import java.util.Collection;
@@ -34,6 +34,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/product")
 @RequiredArgsConstructor
+@Tag(name = "Product")
 public class ProductController {
     private final ProductService productService;
 
@@ -47,15 +48,13 @@ public class ProductController {
     @Operation(summary = "Adding product to repository")
     @PostMapping
     public ResponseEntity<ProductResponse> addProduct(
-            @Valid @RequestBody
+            @Valid
+            @RequestBody
             AddProductRequest addProductRequest,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult);
-        }
         return new ResponseEntity<>(
-                productService.addProduct(addProductRequest),
+                productService.addProduct(bindingResult, addProductRequest),
                 HttpStatus.OK
         );
     }
@@ -160,7 +159,8 @@ public class ProductController {
             @Validated
             @Positive
             Long id,
-            @RequestParam("value") ValueType valueType
+            @RequestParam("value")
+            ValueType valueType
     ) {
         return new ResponseEntity<>(
                 productService.updateProductValueType(id, valueType),
@@ -182,7 +182,8 @@ public class ProductController {
             @Validated
             @Positive
             Long id,
-            @RequestParam("value") Boolean status
+            @RequestParam("value")
+            Boolean status
     ) {
         return new ResponseEntity<>(
                 productService.updateProductActualStatus(id, status),
@@ -204,14 +205,13 @@ public class ProductController {
             @Validated
             @Positive
             Long id,
-            @Valid @RequestBody UpdateProductRequest updateProductRequest,
+            @Valid
+            @RequestBody
+            UpdateProductRequest updateProductRequest,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult);
-        }
         return new ResponseEntity<>(
-                productService.updateProduct(id, updateProductRequest),
+                productService.updateProduct(bindingResult, id, updateProductRequest),
                 HttpStatus.OK
         );
     }
@@ -222,6 +222,7 @@ public class ProductController {
      * @param id product numerical idetifier
      * @return Http response with product response model
      */
+    @Operation(summary = "Deleting or deactivate product")
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteProduct(
             @PathVariable("id")

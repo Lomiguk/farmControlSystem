@@ -2,9 +2,9 @@ package ru.skibin.farmsystem.service.mapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.skibin.farmsystem.api.request.other.WorkResult;
-import ru.skibin.farmsystem.api.request.other.Worker;
-import ru.skibin.farmsystem.api.response.WorkerWithResult;
+import ru.skibin.farmsystem.api.response.WorkResultResponse;
+import ru.skibin.farmsystem.api.response.WorkerResponse;
+import ru.skibin.farmsystem.api.response.WorkerWithResultResponse;
 import ru.skibin.farmsystem.entity.WorkResultEntity;
 import ru.skibin.farmsystem.entity.StatisticRow;
 import ru.skibin.farmsystem.entity.WorkerEntity;
@@ -17,8 +17,8 @@ import java.util.Collection;
 public class StatisticMapper {
     private final EntityToResponseMapper entityToResponseMapper;
 
-    public Worker mapToWorker(StatisticRow statisticRow) {
-        return new Worker(
+    public WorkerResponse mapToWorker(StatisticRow statisticRow) {
+        return new WorkerResponse(
                 statisticRow.getProfileId(),
                 statisticRow.getProfileFio(),
                 statisticRow.getProfileEmail(),
@@ -26,8 +26,8 @@ public class StatisticMapper {
         );
     }
 
-    public WorkResult mapToProduct(StatisticRow statisticRow) {
-        return new WorkResult(
+    public WorkResultResponse mapToProduct(StatisticRow statisticRow) {
+        return new WorkResultResponse(
                 statisticRow.getProductId(),
                 statisticRow.getProductName(),
                 statisticRow.getProductValueType(),
@@ -35,19 +35,19 @@ public class StatisticMapper {
         );
     }
 
-    public Collection<WorkerWithResult> mapEntityRowCollectionWorkerWithResult(
+    public Collection<WorkerWithResultResponse> mapEntityRowCollectionWorkerWithResult(
             Collection<StatisticRow> statisticResult
     ) {
-        Collection<WorkerWithResult> result = new ArrayList<>();
-        Worker worker = null;
-        WorkerWithResult workerWithResult = null;
+        Collection<WorkerWithResultResponse> result = new ArrayList<>();
+        WorkerResponse worker = null;
+        WorkerWithResultResponse workerWithResult = null;
         for (var row : statisticResult) {
             if (worker == null || !row.getProfileId().equals(worker.getProfileId())) {
                 if (worker != null) {
                     result.add(workerWithResult);
                 }
                 worker = mapToWorker(row);
-                workerWithResult = new WorkerWithResult(worker);
+                workerWithResult = new WorkerWithResultResponse(worker);
             }
             workerWithResult.getResults().add(mapToProduct(row));
         }
@@ -57,20 +57,20 @@ public class StatisticMapper {
         return result;
     }
 
-    public Collection<Worker> mapWorkEntityCollectionToWorker(
+    public Collection<WorkerResponse> mapWorkEntityCollectionToWorker(
             Collection<WorkerEntity> workerEntities
     ) {
-        Collection<Worker> result = new ArrayList<>();
+        Collection<WorkerResponse> result = new ArrayList<>();
         for (var entity : workerEntities) {
             result.add(entityToResponseMapper.toResponse(entity));
         }
         return result;
     }
 
-    public Collection<WorkResult> mapProductEntityCollectionToProductEntity(
+    public Collection<WorkResultResponse> mapProductEntityCollectionToProductEntity(
             Collection<WorkResultEntity> productDataEntities
     ) {
-        Collection<WorkResult> products = new ArrayList<>();
+        Collection<WorkResultResponse> products = new ArrayList<>();
         for (var entities : productDataEntities) {
             products.add(entityToResponseMapper.toResponse(entities));
         }

@@ -11,11 +11,11 @@ import lombok.Data;
 @Schema(description = "Request with new & old passwords")
 public class UpdatePasswordRequest {
     @NotNull
-    @Size(min = 5, message = "min password size - 5")
-    @Schema(description = "old password")
+    @Size(min = 5, message = "Min password size - 5")
+    @Schema(description = "Old password")
     private String oldPassword;
     @NotNull
-    @Size(min = 5, message = "min password size - 5")
-    @Schema(description = "new password")
+    @Size(min = 5, message = "Min password size - 5")
+    @Schema(description = "New password")
     private String newPassword;
 }

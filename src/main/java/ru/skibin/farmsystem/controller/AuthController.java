@@ -16,7 +16,6 @@ import ru.skibin.farmsystem.api.request.security.SignInRequest;
 import ru.skibin.farmsystem.api.request.security.SignUpRequest;
 import ru.skibin.farmsystem.api.response.JwtAuthenticationResponse;
 import ru.skibin.farmsystem.api.response.ProfileResponse;
-import ru.skibin.farmsystem.exception.common.ValidationException;
 import ru.skibin.farmsystem.service.security.AuthenticationService;
 
 @RestController
@@ -40,11 +39,8 @@ public class AuthController {
             @RequestBody @Valid SignUpRequest request,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult);
-        }
         return new ResponseEntity<>(
-                authenticationService.signUp(request),
+                authenticationService.signUp(bindingResult, request),
                 HttpStatus.OK
         );
     }
@@ -76,11 +72,8 @@ public class AuthController {
             @RequestBody @Valid SignInRequest request,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult);
-        }
         return new ResponseEntity<>(
-                authenticationService.signIn(request),
+                authenticationService.signIn(bindingResult, request),
                 HttpStatus.OK
         );
     }

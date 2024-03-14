@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class JwtService {
-    @Value("${token.signing.key}")
+    @Value("${token.access.secret}")
     private String jwtSigningKey;
     @Value("${token.access.lifetime}")
     private Duration accessLifetime;
@@ -89,6 +89,12 @@ public class JwtService {
                 .getPayload();
     }
 
+    /**
+     * Extracting claims from token
+     *
+     * @param token token
+     * @return token's claims
+     */
     private Claims extractAllClaimsRefresh(String token) {
         return Jwts.parser()
                 .setSigningKey(getRefreshSigKey())
@@ -144,6 +150,12 @@ public class JwtService {
         return jwtDAO.deleteProfileTokens(profileId) > 0;
     }
 
+    /**
+     * Generating access token
+     *
+     * @param userDetails User details
+     * @return jwt access token
+     */
     public String generateAccessToken(UserDetails userDetails) {
         Date issuedDate = new Date();
         Date expiredDate = new Date(issuedDate.getTime() + accessLifetime.toMillis());
@@ -162,6 +174,12 @@ public class JwtService {
                 .compact();
     }
 
+    /**
+     * Generating refresh token
+     *
+     * @param userDetails User details
+     * @return jwt refresh token
+     */
     public String generateRefreshToken(UserDetails userDetails) {
         Date issuedDate = new Date();
         Date expiredDate = new Date(issuedDate.getTime() + refreshLifetime.toMillis());
@@ -174,19 +192,39 @@ public class JwtService {
                 .compact();
     }
 
-    public String registerToken(Long profileId, String accessToken, JwtType jwtType) {
+    /**
+     * Save token to token repository
+     *
+     * @param profileId    Profile numerical identifier
+     * @param token        Token
+     * @param jwtType      Token type
+     * @return saved token
+     */
+    public String registerToken(Long profileId, String token, JwtType jwtType) {
         jwtDAO.addJwtToken(
                 profileId,
-                accessToken,
+                token,
                 jwtType
         );
-        return jwtDAO.findToken(accessToken).getToken();
+        return jwtDAO.findToken(token).getToken();
     }
 
+    /**
+     * Validating refresh token
+     *
+     * @param refreshToken Token
+     * @return true - if valid
+     */
     public Boolean validateRefreshToken(String refreshToken) {
         return authorizationCheckHelper.boolCheckTokenForValidation(refreshToken, getRefreshSigKey());
     }
 
+    /**
+     * Validating access token
+     *
+     * @param token Token
+     * @return true - if valid
+     */
     public Boolean validateAccessToken(String token) {
         return authorizationCheckHelper.boolCheckTokenForValidation(token, getSigKey());
     }

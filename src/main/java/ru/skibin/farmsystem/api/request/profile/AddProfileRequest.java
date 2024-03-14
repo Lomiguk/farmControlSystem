@@ -13,8 +13,8 @@ import ru.skibin.farmsystem.api.data.enumTypes.Role;
 @AllArgsConstructor
 @Schema(description = "Request with new profile data")
 public class AddProfileRequest {
-    @NotNull
-    @Size(min = 2, max = 50, message = "profile name size 2-50 chars")
+    @NotBlank(message = "Fio can't be blank")
+    @Size(min = 2, max = 50, message = "Profile name size 2-50 chars")
     @Schema(description = "User's fio: f - Surname, i - name, o - patronymic")
     private String fio;
     @NotNull
@@ -22,8 +22,8 @@ public class AddProfileRequest {
     @Email(message = "Wrong email format")
     @Schema(description = "Profile email/login")
     private String email;
-    @NotNull
-    @Size(min = 5, message = "min password size - 5")
+    @NotBlank
+    @Size(min = 5, message = "Min password size - 5")
     @Schema(description = "Profile password")
     private String password;
     @Schema(description = "Profile role - set of permissions")

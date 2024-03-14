@@ -17,10 +17,12 @@ import ru.skibin.farmsystem.util.LimitOffsetTransformer;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
 public class MarkService {
+    private static final Logger LOGGER = Logger.getLogger(MarkService.class.getName());
     private final MarkDAO markDAO;
     private final CommonCheckHelper checkHelper;
     private final EntityToResponseMapper entityMapper;
@@ -45,7 +47,7 @@ public class MarkService {
                 addMarkRequest.getMark(),
                 addMarkRequest.getDate() == null ? LocalDate.now() : addMarkRequest.getDate()
         );
-
+        LOGGER.info(String.format("Mark %d  was added to repository", id));
         return getMark(id);
     }
 
@@ -58,17 +60,8 @@ public class MarkService {
     public MarkResponse getMark(Long id) {
         checkHelper.chainCheckAuthPermission(id);
         MarkEntity mark = checkHelper.checkMarkForExist(id);
+        LOGGER.info(String.format("Mark %d was got", id));
         return entityMapper.toResponse(mark);
-    }
-
-    /**
-     * Find mark from repository
-     *
-     * @param id mark id
-     * @return Mark response model
-     */
-    public MarkResponse findMark(Long id) {
-        return entityMapper.toResponse(markDAO.find(id));
     }
 
     /**
@@ -83,10 +76,9 @@ public class MarkService {
     public Collection<MarkResponse> findMarksByProfile(Long profileId, Integer limit, Integer offset) {
         checkHelper.checkProfileForExist(profileId);
 
-
         limit = limitOffsetTransformer.getLimit(limit);
         offset = limitOffsetTransformer.getOffset(offset);
-
+        LOGGER.info(String.format("Try to get marks by profile %d", profileId));
         return markCollectionMapper.mapEntitiesToResponses(
                 markDAO.findByProfileId(profileId, limit, offset)
         );
@@ -103,6 +95,7 @@ public class MarkService {
     public Collection<MarkResponse> findMarksByDay(LocalDate day, Integer limit, Integer offset) {
         limit = limitOffsetTransformer.getLimit(limit);
         offset = limitOffsetTransformer.getOffset(offset);
+        LOGGER.info(String.format("Try to get marks by day - %s", day));
         return markCollectionMapper.mapEntitiesToResponses(
                 markDAO.findAllByDay(day, limit, offset)
         );
@@ -111,7 +104,6 @@ public class MarkService {
     /**
      * Find marks by period
      *
-     * @param bindingResult Request validation result
      * @param periodRequest Request with period data
      * @param limit         Pagination's limit
      * @param offset        Pagination's offset
@@ -119,15 +111,14 @@ public class MarkService {
      */
     @Transactional
     public Collection<MarkResponse> findMarksByPeriod(
-            BindingResult bindingResult,
             PeriodRequest periodRequest,
             Integer limit,
             Integer offset
     ) {
-        checkHelper.chainCheckValidation(bindingResult)
-                .chainCheckStartEndOfPeriod(periodRequest.getStart(), periodRequest.getEnd());
+        checkHelper.chainCheckStartEndOfPeriod(periodRequest.getStart(), periodRequest.getEnd());
         limit = limitOffsetTransformer.getLimit(limit);
         offset = limitOffsetTransformer.getOffset(offset);
+        LOGGER.info(String.format("Try to get marks by period %s - %s", periodRequest.getStart(), periodRequest.getEnd()));
         return markCollectionMapper.mapEntitiesToResponses(
                 markDAO.findAllByPeriod(periodRequest.getStart(), periodRequest.getEnd(), limit, offset)
         );
@@ -151,6 +142,7 @@ public class MarkService {
                 updateMarkRequest.getMark(),
                 updateMarkRequest.getDate()
         );
+        LOGGER.info(String.format("Mark %d was updated", id));
         return getMark(id);
     }
 
@@ -161,6 +153,7 @@ public class MarkService {
      * @return true - if mark is deleted
      */
     public Boolean deleteMark(Long id) {
+        LOGGER.info(String.format("Try to delete mark %d", id));
         return markDAO.delete(id) > 0;
     }
 }

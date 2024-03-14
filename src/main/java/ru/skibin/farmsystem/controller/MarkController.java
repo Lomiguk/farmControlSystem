@@ -1,6 +1,7 @@
 package ru.skibin.farmsystem.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -31,6 +32,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/profile")
 @RequiredArgsConstructor
+@Tag(name = "Mark")
 public class MarkController {
     private final MarkService markService;
 
@@ -44,7 +46,8 @@ public class MarkController {
     @Operation(summary = "Adding mark data to repository")
     @PostMapping("/mark")
     public ResponseEntity<MarkResponse> add(
-            @Valid @RequestBody
+            @Valid
+            @RequestBody
             AddMarkRequest addMarkRequest,
             BindingResult bindingResult
     ) {
@@ -86,13 +89,16 @@ public class MarkController {
     @GetMapping("/{id}/mark")
     public ResponseEntity<Collection<MarkResponse>> findByProfile(
             @PathVariable("id")
-            @Validated @Positive
+            @Validated
+            @Positive
             Long profileId,
             @RequestParam("limit")
-            @Validated @Positive
+            @Validated
+            @Positive
             Integer limit,
             @RequestParam("offset")
-            @Validated @PositiveOrZero
+            @Validated
+            @PositiveOrZero
             Integer offset
     ) {
         return new ResponseEntity<>(
@@ -113,13 +119,16 @@ public class MarkController {
     @GetMapping("/mark/day")
     public ResponseEntity<Collection<MarkResponse>> findByDay(
             @RequestParam("date")
-            @Validated @NotNull
+            @Validated
+            @NotNull
             LocalDate date,
             @RequestParam("limit")
-            @Validated @Positive
+            @Validated
+            @Positive
             Integer limit,
             @RequestParam("offset")
-            @Validated @PositiveOrZero
+            @Validated
+            @PositiveOrZero
             Integer offset
     ) {
         return new ResponseEntity<>(
@@ -134,24 +143,24 @@ public class MarkController {
      * @param limit         Pagination's limit
      * @param offset        Pagination's offset
      * @param periodRequest Request with period data
-     * @param bindingResult Request validation data
      * @return Http response with collection of mark response models
      */
     @Operation(summary = "Getting marks by day")
-    @PostMapping("/mark/period")
+    @GetMapping("/mark/period")
     public ResponseEntity<Collection<MarkResponse>> findByPeriod(
             @RequestParam("limit")
-            @Validated @Positive
+            @Validated
+            @Positive
             Integer limit,
             @RequestParam("offset")
-            @Validated @PositiveOrZero
+            @Validated
+            @PositiveOrZero
             Integer offset,
-            @Valid @RequestBody
-            PeriodRequest periodRequest,
-            BindingResult bindingResult
+            @Validated
+            PeriodRequest periodRequest
     ) {
         return new ResponseEntity<>(
-                markService.findMarksByPeriod(bindingResult, periodRequest, limit, offset),
+                markService.findMarksByPeriod(periodRequest, limit, offset),
                 HttpStatus.OK
         );
     }
@@ -168,9 +177,11 @@ public class MarkController {
     @PutMapping("/mark/{id}")
     public ResponseEntity<MarkResponse> updateMark(
             @PathVariable("id")
-            @Validated @Positive
+            @Validated
+            @Positive
             Long markId,
-            @Valid @RequestBody
+            @Valid
+            @RequestBody
             UpdateMarkRequest updateMarkRequest,
             BindingResult bindingResult
     ) {
@@ -190,7 +201,8 @@ public class MarkController {
     @DeleteMapping("/mark/{id}")
     public ResponseEntity<Boolean> deleteMark(
             @PathVariable("id")
-            @Validated @Positive
+            @Validated
+            @Positive
             Long markId
     ) {
         return new ResponseEntity<>(

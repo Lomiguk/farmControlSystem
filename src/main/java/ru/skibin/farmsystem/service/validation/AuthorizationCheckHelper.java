@@ -20,12 +20,12 @@ import java.util.logging.Logger;
 @Component
 @RequiredArgsConstructor
 public class AuthorizationCheckHelper {
-    private final String NON_PROFILE_EXCEPTION_MESSAGE = "Authorization: Non existed profile";
-    private final String WRONG_SIGNATURE_MESSAGE = "A token with an incorrect signature was received";
-    private final String EXPIRED_JWT_MESSAGE = "Expired token received";
-    private final String UNEXPECTED_ERROR_MESSAGE = "Unexpected error while validating JWT";
-    private final String NON_EXISTED_TOKEN_MESSAGE = "Non-existed token";
-    private final Logger logger = Logger.getLogger(AuthorizationCheckHelper.class.getName());
+    private static final String NON_PROFILE_EXCEPTION_MESSAGE = "Authorization: Non existed profile";
+    private static final String WRONG_SIGNATURE_MESSAGE = "A token with an incorrect signature was received";
+    private static final String EXPIRED_JWT_MESSAGE = "Expired token received";
+    private static final String UNEXPECTED_ERROR_MESSAGE = "Unexpected error while validating JWT";
+    private static final String NON_EXISTED_TOKEN_MESSAGE = "Non-existed token";
+    private static final Logger logger = Logger.getLogger(AuthorizationCheckHelper.class.getName());
 
     private final ProfileDAO profileDAO;
     private final JwtDAO jwtDAO;
