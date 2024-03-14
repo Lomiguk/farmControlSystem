@@ -27,21 +27,23 @@ public class ProductService {
 
     /**
      * Adding product to repository
+     *
      * @param request Request with new product data
      * @return Product response model
      */
     @Transactional
     public ProductResponse addProduct(AddProductRequest request) {
-        checkHelper.checkProductForExistByName(request.getName(), "Product with that name already exist");
+        checkHelper.checkProductForExistByName(request.getName());
 
         Long id = productDAO.addProduct(request.getName(), request.getValueType());
-        ProductEntity productEntity = productDAO.findProduct(id);
-        logger.info(String.format("Add new product (%d)", productEntity.getId()));
-        return entityMapper.toResponse(productEntity);
+        ProductResponse productResponse = findProduct(id);
+        logger.info(String.format("Add new product (%d)", productResponse.getId()));
+        return getProduct(id);
     }
 
     /**
      * Getting product from repository
+     *
      * @param id Product numerical identifier
      * @return Product response model
      */
@@ -55,6 +57,7 @@ public class ProductService {
 
     /**
      * Searching product from repository
+     *
      * @param id Product numerical identifier
      * @return Product response model or nul
      */
@@ -70,6 +73,7 @@ public class ProductService {
 
     /**
      * Searching product from repository by name
+     *
      * @param name Product name
      * @return Product response model or nul
      */
@@ -85,6 +89,7 @@ public class ProductService {
 
     /**
      * Searching products with pagination
+     *
      * @param limit  Pagination limit
      * @param offset Pagination offset
      * @return Product response model or nul
@@ -103,76 +108,81 @@ public class ProductService {
 
     /**
      * Updating product name
-     * @param id Product numerical identifier
+     *
+     * @param id      Product numerical identifier
      * @param newName New name for product
      * @return Product response model or nul
      */
     @Transactional
     public ProductResponse updateProductName(Long id, String newName) {
-        ProductEntity productEntity = checkHelper.checkProductForActive(id, "Non existed product can't be update");
+        ProductEntity productEntity = checkHelper.checkProductForActive(id);
         if (!productEntity.getName().equals(newName)) {
             productDAO.updateProductName(id, newName);
         }
         logger.info(String.format("Update product (%d) name", id));
-        return entityMapper.toResponse(productDAO.findProduct(id));
+        return findProduct(id);
     }
 
     /**
      * Updating product value Type
-     * @param id Product numerical identifier
+     *
+     * @param id           Product numerical identifier
      * @param newValueType New value type for product
      * @return Product response model or nul
      */
     @Transactional
     public ProductResponse updateProductValueType(Long id, ValueType newValueType) {
-        ProductEntity productEntity = checkHelper.checkProductForActive(id, "Non existed product can't be update");
+        ProductEntity productEntity = checkHelper.checkProductForActive(id);
         if (!productEntity.getValueType().equals(newValueType)) {
             productDAO.updateProductValueType(id, newValueType);
         }
         logger.info(String.format("Update product (%d) value type to %s", id, newValueType));
-        return entityMapper.toResponse(productDAO.findProduct(id));
+        return findProduct(id);
     }
 
     /**
      * Updating product actuality status
-     * @param id Product numerical identifier
+     *
+     * @param id        Product numerical identifier
      * @param newStatus New status for product
      * @return Product response model or nul
      */
     @Transactional
     public ProductResponse updateProductActualStatus(Long id, Boolean newStatus) {
-        ProductEntity productEntity = checkHelper.checkProductForExist(id, "Non existed product can't be update");
+        ProductEntity productEntity = checkHelper.checkProductForExist(id);
 
-        if(!productEntity.getIsActual().equals(newStatus)) {
+        if (!productEntity.getIsActual().equals(newStatus)) {
             productDAO.updateActualStatus(id, newStatus);
         }
         logger.info(String.format("Update product (%d) active status to %s", id, newStatus));
-        return entityMapper.toResponse(productDAO.findProduct(id));
+        return findProduct(id);
     }
 
     /**
      * Updating product
-     * @param id Product numerical identifier
+     *
+     * @param id      Product numerical identifier
      * @param request New data for the product
      * @return Product response model or nul
      */
     @Transactional
     public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
-        checkHelper.checkProductForExist(id, "Non existed product can't be update");
+        checkHelper.checkProductForExist(id);
         productDAO.updateProduct(id, request.getName(), request.getValueType(), request.getIsActual());
         logger.info(String.format("Update product(%d) info", id));
-        return entityMapper.toResponse(productDAO.findProduct(id));
+        return findProduct(id);
     }
 
     /**
      * Deleting or deactivate product
+     *
      * @param id product numerical identifier
      * @return true - if successful
      */
     @Transactional
     public Boolean deleteProduct(Long id) {
-        checkHelper.checkProfileForActive(id, "Non-existed product for delete.");
-        if (checkHelper.boolCheckProductInActions(id, "Non-deletable product (has dependent actions)")) {
+        checkHelper.checkProfileForActive(id);
+        if (checkHelper.boolCheckProductInActions(id)) {
             logger.info(String.format("Try to delete product (%d)", id));
             return productDAO.deleteProduct(id) > 0;
         } else {

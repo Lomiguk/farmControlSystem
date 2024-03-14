@@ -10,11 +10,11 @@ import ru.skibin.farmsystem.api.response.ActionResponse;
 import ru.skibin.farmsystem.entity.ActionEntity;
 import ru.skibin.farmsystem.entity.ProductEntity;
 import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
-import ru.skibin.farmsystem.exception.common.WrongProductValueException;
 import ru.skibin.farmsystem.repository.ActionDAO;
 import ru.skibin.farmsystem.repository.ProductDAO;
 import ru.skibin.farmsystem.service.mapper.EntityToResponseMapper;
 import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
+import ru.skibin.farmsystem.util.LimitOffsetTransformer;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -31,27 +31,20 @@ public class ActionService {
 
     private final Logger logger = Logger.getLogger(ProductService.class.getName());
     private final CommonCheckHelper checkHelper;
+    private final LimitOffsetTransformer limitOffsetTransformer;
 
     /**
      * Adding action to the repository
+     *
      * @param addActionRequest Request with action data
      * @return Action response model
      */
     @Transactional
     public ActionResponse addAction(AddActionRequest addActionRequest) {
         ProductEntity product = checkHelper
-                .chainCheckProfileForActive(
-                        addActionRequest.getProfileId(),
-                        "Attempt to add an action for non-existed profile"
-                )
-                .chainCheckTimeForFutureException(
-                        addActionRequest.getTime(),
-                        "Attempt to add an action with the future tense"
-                )
-                .checkProductForActive(
-                        addActionRequest.getProductId(),
-                        "Attempt to add an action for non-existed product"
-                );
+                .chainCheckProfileForActive(addActionRequest.getProfileId())
+                .chainCheckTimeForFutureException(addActionRequest.getTime())
+                .checkProductForActive(addActionRequest.getProductId());
 
         Long id = actionDAO.addAction(
                 addActionRequest.getProfileId(),
@@ -59,15 +52,16 @@ public class ActionService {
                 addActionRequest.getValue(),
                 addActionRequest.getTime()
         );
-        ActionEntity actionEntity = actionDAO.findAction(id);
+        ActionResponse actionResponse = getAction(id);
 
-        logger.info(String.format("Add action (%s)", actionEntity.getId()));
+        logger.info(String.format("Add action (%s)", actionResponse.getId()));
 
-        return entityMapper.toResponse(actionEntity, product.getValueType());
+        return actionResponse;
     }
 
     /**
      * Searching action by id
+     *
      * @param id Action numerical identifier
      * @return Action response model
      */
@@ -87,6 +81,7 @@ public class ActionService {
 
     /**
      * Getting action by id
+     *
      * @param id Action numerical identifier
      * @return Action response model
      */
@@ -101,6 +96,7 @@ public class ActionService {
 
     /**
      * Getting collection of actions by time period
+     *
      * @param request request with time period data
      * @param limit   pagination limit
      * @param offset  pagination offset
@@ -112,18 +108,10 @@ public class ActionService {
             Integer limit,
             Integer offset
     ) {
-        checkHelper.chainCheckStartEndOfPeriod(
-                request.getStart(),
-                request.getEnd(),
-                "Start date biggest end date"
-        );
+        checkHelper.chainCheckStartEndOfPeriod(request.getStart(), request.getEnd());
 
-        if (limit == null) {
-            limit = Integer.MAX_VALUE;
-        }
-        if (offset == null) {
-            offset = 0;
-        }
+        limit = limitOffsetTransformer.getLimit(limit);
+        offset = limitOffsetTransformer.getOffset(offset);
 
         Collection<ActionEntity> actionEntities = actionDAO.findPeriodActions(
                 request.getStart(),
@@ -152,6 +140,7 @@ public class ActionService {
 
     /**
      * Updating action's profile id
+     *
      * @param id           Action's numerical identifier
      * @param newProfileId New profile identifier
      * @return Action response model
@@ -159,8 +148,8 @@ public class ActionService {
     @Transactional
     public ActionResponse updateActionProfileId(Long id, Long newProfileId) {
         ActionEntity actionEntity = checkHelper
-                .chainCheckProfileForActive(newProfileId, "Attempt to add an action for non-existed profile")
-                .checkActionForActive(id, "Action doesn't exist");
+                .chainCheckProfileForActive(newProfileId)
+                .checkActionForActive(id);
 
         actionDAO.updateAction(
                 id,
@@ -172,13 +161,12 @@ public class ActionService {
         );
 
         logger.info(String.format("Action (%d) was updated (profile id)", id));
-        actionEntity = actionDAO.findAction(id);
-        ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
-        return entityMapper.toResponse(actionEntity, productEntity.getValueType());
+        return findAction(id);
     }
 
     /**
      * Updating action's product id
+     *
      * @param id           Action's numerical identifier
      * @param newProductId New product identifier
      * @return Action response model
@@ -186,14 +174,12 @@ public class ActionService {
     @Transactional
     public ActionResponse updateActionProductId(Long id, Long newProductId, Float value) {
         ProductEntity productEntity = checkHelper
-                .checkProductForActive(newProductId, "Attempt to add an action for non-existed product");
+                .checkProductForActive(newProductId);
 
-        ActionEntity actionEntity = checkHelper.checkActionForActive(id, "Action doesn't exist");
+        ActionEntity actionEntity = checkHelper.checkActionForActive(id);
 
         if (value == null) {
             value = actionEntity.getValue();
-        } else if (value < 0) {
-            throw new WrongProductValueException("Negative value");
         }
 
         actionDAO.updateAction(
@@ -205,13 +191,13 @@ public class ActionService {
                 actionEntity.getIsActual()
         );
         logger.info(String.format("Action (%d) was updated (product id)", id));
-        actionEntity = actionDAO.findAction(id);
-        return entityMapper.toResponse(actionEntity, productEntity.getValueType());
+        return findAction(id);
 
     }
 
     /**
      * Updating action's status of actuality
+     *
      * @param id              Action's numerical identifier
      * @param newActualStatus New status of actuality
      * @return Action response model
@@ -219,7 +205,7 @@ public class ActionService {
     @Transactional
     public ActionResponse updateActionActualStatus(Long id, Boolean newActualStatus) {
         ActionEntity actionEntity = checkHelper
-                .checkActionForExist(id, "Action doesn't exist");
+                .checkActionForExist(id);
 
         actionDAO.updateAction(
                 id,
@@ -230,43 +216,36 @@ public class ActionService {
                 newActualStatus
         );
         logger.info(String.format("Action (%d) was updated (actual status)", id));
-        actionEntity = actionDAO.findAction(id);
-        ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
-        return entityMapper.toResponse(actionEntity, productEntity.getValueType());
+        return findAction(id);
     }
 
     /**
      * Updating action's status of actuality
-     * @param id       Action's numerical identifier
-     * @param request  Request with action's new data
+     *
+     * @param id      Action's numerical identifier
+     * @param request Request with action's new data
      * @return Action response model
      */
     @Transactional
     public ActionResponse updateAction(Long id, UpdateActionRequest request) {
         ProductEntity productEntity = checkHelper
-                .chainCheckProfileForActive(
-                        request.getProfileId(),
-                        "Attempt to add an action for non-existed profile"
-                )
-                .chainCheckValueForPositive(request.getValue(), "Negative value")
-                .checkProductForActive(
-                        request.getProductId(),
-                        "Attempt to add an action for non-existed product"
-                );
+                .chainCheckActionForExist(id)
+                .chainCheckProfileForActive(request.getProfileId())
+                .chainCheckValueForPositive(request.getValue())
+                .checkProductForActive(request.getProductId());
 
-        ActionEntity actionEntity = actionDAO.findAction(id);
+        ActionResponse actionResponse = findAction(id);
+
 
         Boolean newIsActual = request.getIsActual();
         Instant newTime = request.getTime();
         if (newIsActual == null) {
-            newIsActual = actionEntity.getIsActual();
+            newIsActual = actionResponse.isActual();
         }
         if (newTime == null) {
-            newTime = actionEntity.getTime();
-        } else {
-            checkHelper.chainCheckTimeForFutureException(newTime, "Attempt to add an action with the future tense");
+            newTime = actionResponse.getTime();
         }
-
+        checkHelper.chainCheckTimeForFutureException(newTime);
         actionDAO.updateAction(
                 id,
                 request.getProfileId(),
@@ -275,9 +254,7 @@ public class ActionService {
                 newTime,
                 newIsActual
         );
-        logger.info(String.format("Action (%d) was updated", id));
-        actionEntity = actionDAO.findAction(id);
-        return entityMapper.toResponse(actionEntity, productEntity.getValueType());
+        return findAction(id);
     }
 
     public Boolean deleteAction(Long id) {
@@ -291,16 +268,13 @@ public class ActionService {
     }
 
     public Collection<ActionResponse> findDayAction(LocalDate day, Integer limit, Integer offset) {
-        if (limit == null) {
-            limit = Integer.MAX_VALUE;
-        }
-        if (offset == null) {
-            offset = 0;
-        }
+        limit = limitOffsetTransformer.getLimit(limit);
+        offset = limitOffsetTransformer.getOffset(offset);
         Collection<ActionEntity> actions = actionDAO.findDayActions(day, limit, offset);
 
         return mapCollectionEntityToResponse(actions);
     }
+
     public Collection<ActionResponse> findDayAction(LocalDate day) {
         Collection<ActionEntity> actions = actionDAO.findDayActions(day);
 

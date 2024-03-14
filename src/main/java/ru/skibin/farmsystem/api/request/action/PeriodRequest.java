@@ -17,5 +17,5 @@ public class PeriodRequest {
     private LocalDate start;
     @NotNull
     @Schema(description = "End of the time period")
-    private LocalDate  end;
+    private LocalDate end;
 }

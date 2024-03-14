@@ -1,13 +1,14 @@
-CREATE TABLE action (
-    id          bigserial                    PRIMARY KEY,
-    profile_id  BIGINT                       NOT NULL,
-    product_id  BIGINT                       NOT NULL,
-    value       float4                       NOT NULL,
-    time        timestamp without time zone  NOT NULL,
-    is_actual   bool                         DEFAULT true,
+CREATE TABLE action
+(
+    id         bigserial PRIMARY KEY,
+    profile_id BIGINT                      NOT NULL,
+    product_id BIGINT                      NOT NULL,
+    value      float4                      NOT NULL,
+    time       timestamp without time zone NOT NULL,
+    is_actual  bool DEFAULT true,
 
-    CONSTRAINT action_profile_fk FOREIGN KEY (profile_id) REFERENCES profile(id),
-    CONSTRAINT action_product_fk FOREIGN KEY (product_id) REFERENCES product(id)
+    CONSTRAINT action_profile_fk FOREIGN KEY (profile_id) REFERENCES profile (id),
+    CONSTRAINT action_product_fk FOREIGN KEY (product_id) REFERENCES product (id)
 );
 
 COMMENT ON COLUMN action.id IS 'Unique numerical action identifier';

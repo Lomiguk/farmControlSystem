@@ -1,13 +1,11 @@
-package ru.skibin.farmsystem.entity;
+package ru.skibin.farmsystem.api.response;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
-@RequiredArgsConstructor
-public class MarkEntity {
+public class MarkResponse {
     private final Long id;
     private final Long profileId;
     private final Integer mark;

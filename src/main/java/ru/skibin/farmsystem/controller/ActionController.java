@@ -36,8 +36,9 @@ public class ActionController {
 
     /**
      * Adding action to repository
-     * @param addActionRequest  request with action data
-     * @param bindingResult     request validation data
+     *
+     * @param addActionRequest request with action data
+     * @param bindingResult    request validation data
      * @return Http response with added action data
      */
     @Operation(summary = "Adding action to repository")
@@ -58,6 +59,7 @@ public class ActionController {
 
     /**
      * Getting action from repository
+     *
      * @param id numerical identifier of required action
      * @return Http response with required action data
      */
@@ -77,6 +79,7 @@ public class ActionController {
 
     /**
      * Receiving actions created during the periodR
+     *
      * @param limit         pagination limit
      * @param offset        pagination offset
      * @param request       request with period data
@@ -110,9 +113,10 @@ public class ActionController {
 
     /**
      * Replace the profile id of the person responsible for the action
+     *
      * @param id           action identifier
      * @param newProfileId new profile identifier
-     * @return  Http response with updated action data
+     * @return Http response with updated action data
      */
     @PatchMapping("/{id}/profile")
     @Operation(summary = "Replace the profile id of the person responsible for the action")
@@ -132,6 +136,7 @@ public class ActionController {
 
     /**
      * Replace the product id for the action
+     *
      * @param id           action identifier
      * @param newProductId new product identifier
      * @param value        new product value
@@ -155,6 +160,7 @@ public class ActionController {
 
     /**
      * Updating of the actuality status
+     *
      * @param id       action identifier
      * @param isActual actual boolean status
      * @return Http response with updated action data
@@ -176,6 +182,7 @@ public class ActionController {
 
     /**
      * Updating action
+     *
      * @param id            action identifier
      * @param request       request with new action data
      * @param bindingResult request validation data
@@ -203,6 +210,7 @@ public class ActionController {
 
     /**
      * Deleting or deactivate action
+     *
      * @param id action identifier
      * @return Http response, true - if action was deleted or deactivated
      */

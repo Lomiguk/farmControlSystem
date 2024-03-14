@@ -11,6 +11,7 @@ import ru.skibin.farmsystem.util.PasswordUtil;
 @RequiredArgsConstructor
 public class ProfileCheckHelper {
     private final ProfileDAO profileDAO;
+
     public void checkPasswords(Long id, String oldPassword, String newPassword) {
         ProfileEntity profileEntity = profileDAO.findProfile(id);
 

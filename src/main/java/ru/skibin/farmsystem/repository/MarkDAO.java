@@ -8,16 +8,18 @@ import ru.skibin.farmsystem.entity.MarkEntity;
 import ru.skibin.farmsystem.repository.rowMapper.MarkRowMapper;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
 public class MarkDAO {
     private final NamedParameterJdbcTemplate jdbcTemplate;
+
     public Long save(Long profileId, Integer mark, LocalDate date) {
         String sql = """
                 INSERT INTO day_mark (profile_id, mark, date)
-                VALUES (:profile_Id, :mark, :date)
+                VALUES (:profile_id, :mark, :date)
                 RETURNING id;
                 """;
         var params = Map.of(
@@ -31,7 +33,7 @@ public class MarkDAO {
 
     public MarkEntity find(Long markId) {
         String sql = """
-                SELECT (id, profile_id, mark, date)
+                SELECT id, profile_id, mark, date
                 FROM day_mark
                 WHERE id = :id;
                 """;
@@ -39,6 +41,56 @@ public class MarkDAO {
                 "id", markId
         );
         return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new MarkRowMapper()));
+    }
+
+    public Collection<MarkEntity> findByProfileId(Long profileId, Integer limit, Integer offset) {
+        String sql = """
+                SELECT id, profile_id, mark, date
+                FROM day_mark
+                WHERE profile_id = :id
+                LIMIT :limit
+                OFFSET :offset;
+                """;
+        var params = Map.of(
+                "id", profileId,
+                "limit", limit,
+                "offset", offset
+        );
+        return jdbcTemplate.query(sql, params, new MarkRowMapper());
+    }
+
+    public Collection<MarkEntity> findAllByPeriod(LocalDate start, LocalDate end, Integer limit, Integer offset) {
+        String sql = """
+                SELECT id, profile_id, mark, date
+                FROM day_mark
+                WHERE date >= :start
+                  AND date <= :end
+                LIMIT :limit
+                OFFSET :offset;
+                """;
+        var params = Map.of(
+                "start", start,
+                "end", end,
+                "limit", limit,
+                "offset", offset
+        );
+        return jdbcTemplate.query(sql, params, new MarkRowMapper());
+    }
+
+    public Collection<MarkEntity> findAllByDay(LocalDate day, Integer limit, Integer offset) {
+        String sql = """
+                SELECT id, profile_id, mark, date
+                FROM day_mark
+                WHERE DATE(date) = :day
+                LIMIT :limit
+                OFFSET :offset;
+                """;
+        var params = Map.of(
+                "day", day,
+                "limit", limit,
+                "offset", offset
+        );
+        return jdbcTemplate.query(sql, params, new MarkRowMapper());
     }
 
     public Long update(Long markId, Long profileId, Integer mark, LocalDate date) {

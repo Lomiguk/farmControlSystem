@@ -32,6 +32,7 @@ public class AuthenticationService {
 
     /**
      * Profile sign-up
+     *
      * @param request user data
      * @return token
      */
@@ -51,6 +52,7 @@ public class AuthenticationService {
 
     /**
      * Profile authentication
+     *
      * @param request user data
      * @return token
      */
@@ -75,6 +77,7 @@ public class AuthenticationService {
 
     /**
      * Getting authorized profile id
+     *
      * @return authorized profile id
      */
     public Long getProfileId() {
@@ -85,6 +88,7 @@ public class AuthenticationService {
 
     /**
      * Invalidate authorized profile token
+     *
      * @return invalidation status
      */
     @Transactional
@@ -96,6 +100,7 @@ public class AuthenticationService {
 
     /**
      * Refreshing profile's tokens
+     *
      * @param refreshToken Refresh token
      * @return new access & refresh tokens
      */
@@ -108,7 +113,7 @@ public class AuthenticationService {
                 .loadUserByUsername(userLogin);
 
         ProfileEntity profile = profileDAO.findProfileByEmail(userLogin);
-        checkHelper.checkProfileForExistByEmail(userLogin, "Profile wasn't found");
+        checkHelper.checkProfileForExistByEmail(userLogin);
         jwtService.deleteProfileToken(profile.getId());
         String newAccessToken = jwtService.generateAccessToken(userDetails);
         String newRefreshToken = jwtService.generateRefreshToken(userDetails);

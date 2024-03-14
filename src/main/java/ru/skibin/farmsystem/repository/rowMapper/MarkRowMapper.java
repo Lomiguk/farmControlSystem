@@ -13,7 +13,7 @@ public class MarkRowMapper implements RowMapper<MarkEntity> {
                 rs.getLong("id"),
                 rs.getLong("profile_id"),
                 rs.getInt("mark"),
-                rs.getDate("birth_date").toLocalDate()
+                rs.getDate("date").toLocalDate()
         );
     }
 }

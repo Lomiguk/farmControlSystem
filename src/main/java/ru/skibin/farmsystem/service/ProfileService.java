@@ -31,15 +31,13 @@ public class ProfileService {
 
     /**
      * Adding profile to repository
+     *
      * @param request Request with new profile data
      * @return saved profile
      */
     @Transactional
     public ProfileResponse save(AddProfileRequest request) {
-        commonCheckHelper.chainCheckForProfileEmailUnique(
-                request.getEmail(),
-                "Profile with that email already exist"
-        );
+        commonCheckHelper.chainCheckForProfileEmailUnique(request.getEmail());
 
         long hash = PasswordUtil.getHash(request.getPassword());
 
@@ -50,18 +48,18 @@ public class ProfileService {
                 request.getRole()
         );
 
-        ProfileEntity profileEntity = profileDAO.findProfile(id);
-        return entityMapper.toResponse(profileEntity);
+        return get(id);
     }
 
     /**
      * Save entity to repository
+     *
      * @param profileEntity new entity
      * @return saved profile
      */
     @Transactional
     public ProfileResponse save(ProfileEntity profileEntity) {
-        commonCheckHelper.chainCheckForProfileEmailUnique(profileEntity.getEmail(), "Profile with that email already exist");
+        commonCheckHelper.chainCheckForProfileEmailUnique(profileEntity.getEmail());
 
         Long id = profileDAO.add(
                 profileEntity.getFio(),
@@ -70,92 +68,102 @@ public class ProfileService {
                 profileEntity.getRole()
         );
 
-        profileEntity = profileDAO.findProfile(id);
-        return entityMapper.toResponse(profileEntity);
+        return findProfile(id);
     }
-
 
     /**
      * Getting profile from repository
+     *
      * @param id Profile numerical identifier
      * @return profile response model
      */
+    @Transactional
     public ProfileResponse get(Long id) {
         commonCheckHelper
-                .checkAuthPermission(id)
-                .checkProfileForActive(id, "Non-existed profile for getting.");
+                .chainCheckAuthPermission(id)
+                .checkProfileForActive(id);
 
+        return findProfile(id);
+    }
+
+    public ProfileResponse findProfile(Long id) {
         return entityMapper.toResponse(profileDAO.findProfile(id));
     }
 
     /**
      * Updating profile
+     *
      * @param id  Profile numerical identifier
      * @param fio F - Surname, I - name, O - patronymic
      * @return profile response model
      */
     @Transactional
     public ProfileResponse updateInf(Long id, String fio) {
-        commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update.");
+        commonCheckHelper.checkProfileForActive(id);
         profileDAO.updateProfileInformation(id, fio);
-        return entityMapper.toResponse(profileDAO.findProfile(id));
+        return findProfile(id);
     }
 
     /**
      * Updating profile password
-     * @param id       Profile numerical identifier
-     * @param request  Request with old & new passwor
+     *
+     * @param id      Profile numerical identifier
+     * @param request Request with old & new passwor
      * @return profile response model
      */
     @Transactional
     public ProfileResponse updatePassword(Long id, UpdatePasswordRequest request) {
         commonCheckHelper
-                .checkAuthPermission(id)
-                .checkProfileForActive(id, "Non-existed profile for update status.");
+                .chainCheckAuthPermission(id)
+                .checkProfileForActive(id);
         profileCheckHelper.checkPasswords(id, request.getOldPassword(), request.getNewPassword());
         String newPassHash = PasswordUtil.getHash(request.getNewPassword()).toString();
 
         profileDAO.updatePassword(id, newPassHash);
 
-        return entityMapper.toResponse(profileDAO.findProfile(id));
+        return findProfile(id);
     }
 
     /**
      * Updating profile admin status
-     * @param id Profile numerical identifier
+     *
+     * @param id   Profile numerical identifier
      * @param role flag - is admin profile
      * @return profile response model
      */
     @Transactional
     public ProfileResponse updateRole(Long id, Role role) {
-        commonCheckHelper.checkProfileForActive(id, "Non-existed profile for update admin status.");
+        commonCheckHelper.checkProfileForActive(id);
         profileDAO.updateProfileRole(id, role);
-        return entityMapper.toResponse(profileDAO.findProfile(id));
+        return findProfile(id);
     }
 
     /**
      * Updating profile active status
-     * @param id Profile numerical identifier
+     *
+     * @param id       Profile numerical identifier
      * @param isActual flag - is active profile
      * @return update profile live status
      */
     @Transactional
     public ProfileResponse updateActualStatus(Long id, Boolean isActual) {
-        ProfileEntity profileEntity = commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update actual status.");
+        ProfileEntity profileEntity = commonCheckHelper
+                .checkProfileForExist(id);
         if (isActual == null) isActual = profileEntity.getIsActual();
         profileDAO.updateProfileActualStatus(id, isActual);
-        return entityMapper.toResponse(profileDAO.findProfile(id));
+        return findProfile(id);
     }
 
     /**
      * Deleting or deactivate profile
+     *
      * @param id Profile numerical identifier
      * @return deleting status
      */
     @Transactional
     public Boolean delete(Long id) {
-        commonCheckHelper.checkProfileForActive(id, "Non-existed profile for delete.");
-        if (commonCheckHelper.boolCheckProfileInActions(id, "Non-deletable (has dependent actions)")) {
+        commonCheckHelper.checkProfileForActive(id);
+        if (commonCheckHelper.boolCheckProfileInActions(id)) {
             logger.info(String.format("Try to delete profile (%d)", id));
             return profileDAO.deleteProfile(id) > 0;
         } else {
@@ -167,7 +175,8 @@ public class ProfileService {
 
     /**
      * Updating profile
-     * @param id Profile numerical identifier
+     *
+     * @param id      Profile numerical identifier
      * @param request Request with new data for profile
      * @return profile response model
      */
@@ -176,7 +185,7 @@ public class ProfileService {
             Long id,
             UpdateProfileRequest request
     ) {
-        ProfileEntity profileEntity = commonCheckHelper.checkProfileForExist(id, "Non-existed profile for update.");
+        ProfileEntity profileEntity = commonCheckHelper.checkProfileForExist(id);
         profileCheckHelper.checkPasswords(id, request.getOldPassword(), request.getNewPassword());
         String newPassHash = PasswordUtil.getHash(request.getNewPassword()).toString();
 
@@ -191,11 +200,12 @@ public class ProfileService {
                 isActual
         );
 
-        return entityMapper.toResponse(profileDAO.findProfile(id));
+        return findProfile(id);
     }
 
     /**
      * Getting profiles
+     *
      * @param limit  pagination limit
      * @param offset pagination offset
      * @return profile response models
@@ -213,21 +223,22 @@ public class ProfileService {
 
     /**
      * Getting profile entity by email
+     *
      * @param email email
      * @return profile response model entity
      */
     private ProfileEntity getProfileEntityByEmail(String email) {
-        return  commonCheckHelper.checkProfileForExistByEmail(email, String.format("Profile %s is not found", email));
+        return commonCheckHelper.checkProfileForExistByEmail(email);
     }
 
     /**
      * Getting profile by email/login
      * <p>
      * Needed for Spring Security
+     *
      * @return Profile as UserDetailsService
      */
     public UserDetailsService userDetailsService() {
         return this::getProfileEntityByEmail;
     }
-
 }

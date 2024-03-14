@@ -1,9 +1,11 @@
 package ru.skibin.farmsystem.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,9 +30,10 @@ public class StatisticController {
 
     /**
      * Getting all actions by day
-     * @param day     Day
-     * @param limit   Limit for pagination
-     * @param offset  Offset for pagination
+     *
+     * @param day    Day
+     * @param limit  Limit for pagination
+     * @param offset Offset for pagination
      * @return Http response with collection of action response model
      */
     @Operation(summary = "Getting all actions by day")
@@ -48,6 +51,7 @@ public class StatisticController {
 
     /**
      * Getting all actions by period
+     *
      * @param periodRequest Request with period date
      * @param limit         Limit for pagination
      * @param offset        Offset for pagination
@@ -56,21 +60,25 @@ public class StatisticController {
     @Operation(summary = "Getting all actions by period")
     @PostMapping("/action")
     public ResponseEntity<Collection<ActionResponse>> getAllActionsByPeriod(
-            @RequestBody PeriodRequest periodRequest,
             @RequestParam("limit") Integer limit,
-            @RequestParam("offset") Integer offset
+            @RequestParam("offset") Integer offset,
+            @Valid
+            @RequestBody
+            PeriodRequest periodRequest,
+            BindingResult bindingResult
     ) {
         return new ResponseEntity<>(
-                statisticService.getAllActionsByPeriod(periodRequest, limit, offset),
+                statisticService.getAllActionsByPeriod(bindingResult, periodRequest, limit, offset),
                 HttpStatus.OK
         );
     }
 
     /**
      * Getting all workers with their work results by day
-     * @param day     Day
-     * @param limit   Limit for pagination
-     * @param offset  Offset for pagination
+     *
+     * @param day    Day
+     * @param limit  Limit for pagination
+     * @param offset Offset for pagination
      * @return Http response with collection of workers with results response model
      */
     @Operation(summary = "Getting all workers with their work results by day")
@@ -88,6 +96,7 @@ public class StatisticController {
 
     /**
      * Getting all workers with their work results by day
+     *
      * @param periodRequest Request with period date
      * @param limit         Limit for pagination
      * @param offset        Offset for pagination
@@ -96,21 +105,25 @@ public class StatisticController {
     @Operation(summary = "Getting all workers with their work results by day")
     @PostMapping("/all")
     public ResponseEntity<Collection<WorkerWithResult>> getPeriodWorkersWithResultsByPeriod(
-            @RequestBody PeriodRequest periodRequest,
             @RequestParam("limit") Integer limit,
-            @RequestParam("offset") Integer offset
+            @RequestParam("offset") Integer offset,
+            @Valid
+            @RequestBody
+            PeriodRequest periodRequest,
+            BindingResult bindingResult
     ) {
         return new ResponseEntity<>(
-                statisticService.getWorkersWithResultsByPeriod(periodRequest, limit, offset),
+                statisticService.getWorkersWithResultsByPeriod(bindingResult, periodRequest, limit, offset),
                 HttpStatus.OK
         );
     }
 
     /**
      * Getting all workers by day results
-     * @param day     Day
-     * @param limit   Limit for pagination
-     * @param offset  Offset for pagination
+     *
+     * @param day    Day
+     * @param limit  Limit for pagination
+     * @param offset Offset for pagination
      * @return Http response with collection of workers response model
      */
     @Operation(summary = "Getting all workers by day results")
@@ -128,6 +141,7 @@ public class StatisticController {
 
     /**
      * Getting all workers by period
+     *
      * @param periodRequest Request with period date
      * @param limit         Limit for pagination
      * @param offset        Offset for pagination
@@ -136,21 +150,25 @@ public class StatisticController {
     @Operation(summary = "Getting all workers by period")
     @PostMapping("/worker")
     public ResponseEntity<Collection<Worker>> getWorkersPerPeriod(
-            @RequestBody PeriodRequest periodRequest,
             @RequestParam("limit") Integer limit,
-            @RequestParam("offset") Integer offset
+            @RequestParam("offset") Integer offset,
+            @Valid
+            @RequestBody
+            PeriodRequest periodRequest,
+            BindingResult bindingResult
     ) {
         return new ResponseEntity<>(
-                statisticService.getWorkersByPeriod(periodRequest, limit, offset),
+                statisticService.getWorkersByPeriod(bindingResult, periodRequest, limit, offset),
                 HttpStatus.OK
         );
     }
 
     /**
      * Getting all products by day results
-     * @param day     Day
-     * @param limit   Limit for pagination
-     * @param offset  Offset for pagination
+     *
+     * @param day    Day
+     * @param limit  Limit for pagination
+     * @param offset Offset for pagination
      * @return Http response with collection of products response model
      */
     @Operation(summary = "Getting all products by day results")
@@ -168,6 +186,7 @@ public class StatisticController {
 
     /**
      * Getting all products by period
+     *
      * @param periodRequest Request with period date
      * @param limit         Limit for pagination
      * @param offset        Offset for pagination
@@ -176,12 +195,15 @@ public class StatisticController {
     @Operation(summary = "Getting all products by period")
     @PostMapping("/product")
     public ResponseEntity<Collection<WorkResult>> getProductsPerPeriod(
-            @RequestBody PeriodRequest periodRequest,
             @RequestParam("limit") Integer limit,
-            @RequestParam("offset") Integer offset
+            @RequestParam("offset") Integer offset,
+            @Valid
+            @RequestBody
+            PeriodRequest periodRequest,
+            BindingResult bindingResult
     ) {
         return new ResponseEntity<>(
-                statisticService.getProductsByPeriod(periodRequest, limit, offset),
+                statisticService.getProductsByPeriod(bindingResult, periodRequest, limit, offset),
                 HttpStatus.OK
         );
     }
