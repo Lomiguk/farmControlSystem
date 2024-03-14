@@ -16,6 +16,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class StatisticMapper {
     private final EntityToResponseMapper entityToResponseMapper;
+
     public Worker mapToWorker(StatisticRow statisticRow) {
         return new Worker(
                 statisticRow.getProfileId(),

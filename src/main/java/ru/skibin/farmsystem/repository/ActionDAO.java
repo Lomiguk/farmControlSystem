@@ -129,11 +129,11 @@ public class ActionDAO {
 
     public ActionEntity findProfileActionByProductAndTime(Long profileId, Long productId, Instant time) {
         String sql = """
-                    SELECT id, profile_id, product_id, value, time, is_actual
-                    FROM action
-                    WHERE profile_id = :profile_id AND product_id = :product_id AND time = :time
-                    ORDER BY time DESC;
-                    """;
+                SELECT id, profile_id, product_id, value, time, is_actual
+                FROM action
+                WHERE profile_id = :profile_id AND product_id = :product_id AND time = :time
+                ORDER BY time DESC;
+                """;
         Map<String, Object> params = Map.of(
                 "profile_id", profileId,
                 "product_id", productId,

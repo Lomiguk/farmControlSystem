@@ -42,20 +42,24 @@ public class JwtService {
     private final CommonCheckHelper commonCheckHelper;
     private final AuthorizationCheckHelper authorizationCheckHelper;
     private final Logger logger = Logger.getLogger(JwtService.class.getName());
+
     /**
      * Extract user login
+     *
      * @param token token
      * @return profile login
      */
     public String extractUserLogin(String token) {
         return extractClaim(token, Claims::getSubject);
     }
+
     public String extractRefreshUserLogin(String refreshToken) {
         return extractClaimRefresh(refreshToken, Claims::getSubject);
     }
 
     /**
      * Getting data from the token
+     *
      * @param token           token
      * @param claimsResolvers function for extraction data
      * @param <T>             data type
@@ -73,6 +77,7 @@ public class JwtService {
 
     /**
      * Getting all data from token
+     *
      * @param token token
      * @return data
      */
@@ -94,6 +99,7 @@ public class JwtService {
 
     /**
      * Check token for expiration
+     *
      * @param token token
      * @return true, if token is expired
      */
@@ -103,6 +109,7 @@ public class JwtService {
 
     /**
      * Getting time of expiration
+     *
      * @param token token
      * @return time og expiration
      */
@@ -113,23 +120,27 @@ public class JwtService {
     private Key getRefreshSigKey() {
         return getKey(refreshJwtSigningKey);
     }
+
     private Key getSigKey() {
         return getKey(jwtSigningKey);
     }
+
     private Key getKey(String key) {
         return Keys.hmacShaKeyFor(getByteKey(key));
     }
+
     private byte[] getByteKey(String key) {
-        return  Decoders.BASE64.decode(key);
+        return Decoders.BASE64.decode(key);
     }
 
     /**
      * Deleting profile tokens from repository
+     *
      * @param profileId profile identifier
      * @return deleting status
      */
     public Boolean deleteProfileToken(Long profileId) {
-        commonCheckHelper.checkProfileForExist(profileId, "Try to remove non-existed profile tokens");
+        commonCheckHelper.checkProfileForExist(profileId);
         return jwtDAO.deleteProfileTokens(profileId) > 0;
     }
 

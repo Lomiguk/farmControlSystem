@@ -12,7 +12,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.skibin.farmsystem.exception.action.StartEndDateException;
 import ru.skibin.farmsystem.exception.common.FutureInstantException;
-import ru.skibin.farmsystem.exception.common.NonExistedProfileException;
+import ru.skibin.farmsystem.exception.common.NonExistedEntityException;
 import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
 import ru.skibin.farmsystem.exception.common.ValidationException;
 import ru.skibin.farmsystem.exception.common.WrongProductValueException;
@@ -22,10 +22,12 @@ import ru.skibin.farmsystem.exception.profile.UpdatePasswordException;
 @AllArgsConstructor
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  @NotNull HttpHeaders headers,
-                                                                  @NotNull HttpStatusCode status,
-                                                                  @NotNull WebRequest request) {
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            @NotNull HttpHeaders headers,
+            @NotNull HttpStatusCode status,
+            @NotNull WebRequest request
+    ) {
         logger.info("Valid Exception");
         return ResponseEntity.badRequest().body(ex.getBody().getTitle());
     }
@@ -55,14 +57,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponse("Wrong product value: ", e);
     }
 
-    @ExceptionHandler(NonExistedProfileException.class)
-    protected ResponseEntity<Object> handleNonExistedProfileException(NonExistedProfileException e) {
-        return buildResponse("Non-existed profile: ", e);
+    @ExceptionHandler(NonExistedEntityException.class)
+    protected ResponseEntity<Object> handleNonExistedEntityException(NonExistedEntityException e) {
+        return buildResponse("Non-existed entity: ", e);
     }
 
     @ExceptionHandler(FutureInstantException.class)
     protected ResponseEntity<Object> handleFutureInstantException(FutureInstantException e) {
-        return buildResponse("Request with future", e);
+        return buildResponse("Request with future time", e);
     }
 
     @ExceptionHandler(StartEndDateException.class)

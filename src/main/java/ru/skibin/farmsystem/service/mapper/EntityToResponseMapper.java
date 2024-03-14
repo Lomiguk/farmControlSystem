@@ -5,9 +5,11 @@ import ru.skibin.farmsystem.api.data.enumTypes.ValueType;
 import ru.skibin.farmsystem.api.request.other.WorkResult;
 import ru.skibin.farmsystem.api.request.other.Worker;
 import ru.skibin.farmsystem.api.response.ActionResponse;
+import ru.skibin.farmsystem.api.response.MarkResponse;
 import ru.skibin.farmsystem.api.response.ProductResponse;
 import ru.skibin.farmsystem.api.response.ProfileResponse;
 import ru.skibin.farmsystem.entity.ActionEntity;
+import ru.skibin.farmsystem.entity.MarkEntity;
 import ru.skibin.farmsystem.entity.WorkResultEntity;
 import ru.skibin.farmsystem.entity.ProductEntity;
 import ru.skibin.farmsystem.entity.ProfileEntity;
@@ -61,6 +63,15 @@ public class EntityToResponseMapper {
                 product.getProductName(),
                 product.getProductValueType(),
                 product.getProductValue()
+        );
+    }
+
+    public MarkResponse toResponse(MarkEntity mark) {
+        return new MarkResponse(
+                mark.getId(),
+                mark.getProfileId(),
+                mark.getMark(),
+                mark.getDate()
         );
     }
 }

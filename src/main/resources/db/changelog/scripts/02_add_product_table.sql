@@ -1,10 +1,11 @@
-CREATE TYPE value_type AS ENUM('LITER', 'KILOGRAM', 'PIECE');
+CREATE TYPE value_type AS ENUM ('LITER', 'KILOGRAM', 'PIECE');
 
-CREATE TABLE product (
-    id         bigserial   PRIMARY KEY,
-    name       text        NOT NULL,
-    value      value_type  NOT NULL,
-    is_actual  bool        DEFAULT false,
+CREATE TABLE product
+(
+    id        bigserial PRIMARY KEY,
+    name      text       NOT NULL,
+    value     value_type NOT NULL,
+    is_actual bool DEFAULT false,
 
     CONSTRAINT product_name_u UNIQUE (name)
 );

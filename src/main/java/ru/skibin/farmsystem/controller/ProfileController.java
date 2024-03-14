@@ -38,6 +38,7 @@ public class ProfileController {
 
     /**
      * Adding new profile
+     *
      * @param addProfileRequest Request with new profile data
      * @param bindingResult     Request validation data
      * @return Http response with added profile response model
@@ -49,8 +50,7 @@ public class ProfileController {
             @RequestBody
             AddProfileRequest addProfileRequest,
             BindingResult bindingResult
-    ) throws ValidationException
-    {
+    ) {
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
@@ -62,6 +62,7 @@ public class ProfileController {
 
     /**
      * Getting profile
+     *
      * @param id Profile numerical identifier
      * @return Http response with profile response model
      */
@@ -81,6 +82,7 @@ public class ProfileController {
 
     /**
      * Getting profile with pagination
+     *
      * @param limit  Pagination limit
      * @param offset Pagination offset
      * @return Http response with collection of profile response models
@@ -105,6 +107,7 @@ public class ProfileController {
 
     /**
      * Updating profile's information
+     *
      * @param id  Profile numerical identifier
      * @param fio fio: f - Surname, i - name, o - patronymic
      * @return Http response with updated profile response model
@@ -129,9 +132,10 @@ public class ProfileController {
 
     /**
      * Updating profile's password
-     * @param id                     Profile numerical identifier
-     * @param updatePasswordRequest  Request with old & new password
-     * @param bindingResult          Request validation data
+     *
+     * @param id                    Profile numerical identifier
+     * @param updatePasswordRequest Request with old & new password
+     * @param bindingResult         Request validation data
      * @return Http response with updated profile response model
      */
     @Operation(summary = "Updating profile password")
@@ -157,6 +161,7 @@ public class ProfileController {
 
     /**
      * Updating profile's role
+     *
      * @param id   Profile numerical identifier
      * @param role Profile role
      * @return Http response with updated profile response model
@@ -178,6 +183,7 @@ public class ProfileController {
 
     /**
      * Updating profile's actuality status
+     *
      * @param id     Profile numerical identifier
      * @param status New actuality status for profile
      * @return Http response with updated profile response model
@@ -199,6 +205,7 @@ public class ProfileController {
 
     /**
      * Updating profile
+     *
      * @param id                   Profile numerical identifier
      * @param updateProfileRequest Request with new data for profile
      * @param bindingResult        Request validation data
@@ -224,6 +231,7 @@ public class ProfileController {
 
     /**
      * Deleting or deactivate profile
+     *
      * @param id Profile numerical identifier
      * @return true - if successful
      */

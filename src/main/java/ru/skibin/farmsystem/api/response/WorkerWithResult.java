@@ -19,5 +19,5 @@ public class WorkerWithResult {
     public WorkerWithResult(Worker worker) {
         this.worker = worker;
         this.results = new ArrayList<>();
-    };
+    }
 }

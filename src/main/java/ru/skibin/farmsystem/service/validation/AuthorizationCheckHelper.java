@@ -9,7 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import ru.skibin.farmsystem.entity.ProfileEntity;
-import ru.skibin.farmsystem.exception.common.NonExistedProfileException;
+import ru.skibin.farmsystem.exception.common.NonExistedEntityException;
 import ru.skibin.farmsystem.repository.JwtDAO;
 import ru.skibin.farmsystem.repository.ProfileDAO;
 
@@ -29,6 +29,7 @@ public class AuthorizationCheckHelper {
 
     private final ProfileDAO profileDAO;
     private final JwtDAO jwtDAO;
+
     public ProfileEntity checkForExistedAuthorizedProfileFromContext() {
         return checkForExistedAuthorizedProfile(
                 SecurityContextHolder.getContext().getAuthentication()
@@ -43,7 +44,7 @@ public class AuthorizationCheckHelper {
                 return profileDAO.findProfileByEmail(profileEntity.getEmail());
             }
         }
-        throw new NonExistedProfileException(NON_PROFILE_EXCEPTION_MESSAGE);
+        throw new NonExistedEntityException(NON_PROFILE_EXCEPTION_MESSAGE);
     }
 
     public boolean boolCheckTokenForValidation(String token, Key key) {

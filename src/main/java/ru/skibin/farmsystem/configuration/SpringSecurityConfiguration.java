@@ -41,11 +41,22 @@ public class SpringSecurityConfiguration {
     private final String POST_ADD_PRODUCT = "/product";
     private final String PATCH_PRODUCT = "/product/**";
     private final String PATCH_ACTION = "/action/**";
+    private final String POST_MARK = "/profile/mark";
+    private final String GET_MARK = "/profile/mark/*";
+    private final String GET_PROFILE_MARK = "/profile/*/mark";
+    private final String GET_MARK_BY_DAY = "/profile/mark/day";
+    private final String POST_GET_MARK_BY_PERIOD = "/profile/mark/period";
+    private final String PUT_UPDATE_MARK = "/profile/mark/*";
+    private final String DELETE_MARK = "/profile/mark/*";
     private final String STATISTIC = "/statistic/**";
     private final String AUTH = "/auth/**";
     private final String SWAGGER_UI = "/swagger-ui/**";
     private final String SWAGGER_RESOURCES = "/swagger-resources/*";
     private final String SWAGGER_DOC_API = "/v3/api-docs/**";
+    private final List<String> HTTP_METHODS = List.of("GET", "POST", "PUT", "PATCH", "DELETE");
+    private final List<String> ORIGINS_PATTERNS = List.of("*");
+    private final List<String> HEADERS = List.of("*");
+    private final Boolean ALLOW_CREDENTIALS = true;
 
     private final JwtFilter jwtFilter;
     private final ProfileService profileService;
@@ -54,18 +65,16 @@ public class SpringSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                // CORS disable (allowing requests from all domains)
                 .cors(cors -> cors.configurationSource(
                         request -> {
                             var corsConfiguration = new CorsConfiguration();
-                            corsConfiguration.setAllowedOriginPatterns(List.of("*"));
-                            corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
-                            corsConfiguration.setAllowedHeaders(List.of("*"));
-                            corsConfiguration.setAllowCredentials(true);
+                            corsConfiguration.setAllowedOriginPatterns(ORIGINS_PATTERNS);
+                            corsConfiguration.setAllowedMethods(HTTP_METHODS);
+                            corsConfiguration.setAllowedHeaders(HEADERS);
+                            corsConfiguration.setAllowCredentials(ALLOW_CREDENTIALS);
                             return corsConfiguration;
                         }
                 ))
-                // set setting for endpoints access
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(AUTH).permitAll()
                         .requestMatchers(SWAGGER_UI, SWAGGER_RESOURCES, SWAGGER_DOC_API).permitAll()
@@ -81,7 +90,13 @@ public class SpringSecurityConfiguration {
                         .requestMatchers(HttpMethod.PATCH, PATCH_PRODUCT).hasAuthority(ADMIN_ROLE)
                         .requestMatchers(HttpMethod.PATCH, PATCH_PASSWORD_PROFILE).authenticated()
                         .requestMatchers(HttpMethod.PATCH, PATCH_ACTION).authenticated()
-                        .requestMatchers(STATISTIC).hasRole(ADMIN_ROLE)
+                        .requestMatchers(STATISTIC).hasAuthority(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.POST, POST_MARK).hasAuthority(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.GET, GET_MARK_BY_DAY).hasAuthority(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.POST, POST_GET_MARK_BY_PERIOD).hasAuthority(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.PUT, PUT_UPDATE_MARK).hasAuthority(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.DELETE, DELETE_MARK).hasAuthority(ADMIN_ROLE)
+                        .requestMatchers(HttpMethod.GET, GET_MARK, GET_PROFILE_MARK).authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

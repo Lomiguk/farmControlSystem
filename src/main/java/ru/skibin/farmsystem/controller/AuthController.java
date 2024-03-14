@@ -29,6 +29,7 @@ public class AuthController {
 
     /**
      * Creating new profile
+     *
      * @param request       request with new profile data
      * @param bindingResult request validation data
      * @return Http response with created profile response model
@@ -50,6 +51,7 @@ public class AuthController {
 
     /**
      * Logout authorized profile
+     *
      * @return true - if success
      */
     @Operation(summary = "User logout")
@@ -63,6 +65,7 @@ public class AuthController {
 
     /**
      * Sign-in profile
+     *
      * @param request       Profile credential
      * @param bindingResult Request validation data
      * @return Http response with access & refresh token
@@ -84,6 +87,7 @@ public class AuthController {
 
     /**
      * Updating user access token
+     *
      * @param refreshToken refresh token
      * @return Http response with new access & refresh token
      */

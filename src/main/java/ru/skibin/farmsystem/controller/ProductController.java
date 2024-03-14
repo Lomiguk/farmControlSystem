@@ -39,6 +39,7 @@ public class ProductController {
 
     /**
      * Adding product to repository
+     *
      * @param addProductRequest Request with new product data
      * @param bindingResult     Request validation data
      * @return Http response with new product response model
@@ -61,6 +62,7 @@ public class ProductController {
 
     /**
      * Getting product from repository
+     *
      * @param id Product numerical identifier
      * @return Http response with product response model
      */
@@ -80,6 +82,7 @@ public class ProductController {
 
     /**
      * Getting product from repository by name
+     *
      * @param name Product name
      * @return Http response with product response model
      */
@@ -101,6 +104,7 @@ public class ProductController {
 
     /**
      * Getting products from repository with pagination
+     *
      * @param limit  Pagination limit
      * @param offset Pagination offset
      * @return Http response with collection of product response models
@@ -125,6 +129,7 @@ public class ProductController {
 
     /**
      * Updating product name
+     *
      * @param id      Product numerical identifier
      * @param newName New product name
      * @return Http response with product response model
@@ -143,6 +148,7 @@ public class ProductController {
 
     /**
      * Updating product valueType
+     *
      * @param id        Product numerical identifier
      * @param valueType New product name
      * @return Http response with product response model
@@ -164,8 +170,9 @@ public class ProductController {
 
     /**
      * Updating product status of actuality
-     * @param id        Product numerical identifier
-     * @param status    New product actuality status
+     *
+     * @param id     Product numerical identifier
+     * @param status New product actuality status
      * @return Http response with product response model
      */
     @Operation(summary = "Updating product status of actuality")
@@ -185,8 +192,9 @@ public class ProductController {
 
     /**
      * Updating product
-     * @param id                      Product numerical identifier
-     * @param updateProductRequest    Request with new data of the product
+     *
+     * @param id                   Product numerical identifier
+     * @param updateProductRequest Request with new data of the product
      * @return Http response with product response model
      */
     @Operation(summary = "Updating product")
@@ -210,6 +218,7 @@ public class ProductController {
 
     /**
      * Deleting or deactivate product
+     *
      * @param id product numerical idetifier
      * @return Http response with product response model
      */

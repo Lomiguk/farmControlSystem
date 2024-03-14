@@ -1,13 +1,13 @@
-CREATE TYPE profile_status AS ENUM('ADMIN', 'USER');
+CREATE TYPE profile_status AS ENUM ('ADMIN', 'USER');
 
 CREATE TABLE profile
 (
-    id         bigserial         PRIMARY KEY,
-    fio        VARCHAR(50)       NOT NULL,
-    email      VARCHAR(255)      NOT NULL,
-    password   text              NOT NULL,
-    role       profile_status    NOT NULL DEFAULT 'USER'::profile_status,
-    is_actual  BOOLEAN           NOT NULL DEFAULT true,
+    id        bigserial PRIMARY KEY,
+    fio       VARCHAR(50)    NOT NULL,
+    email     VARCHAR(255)   NOT NULL,
+    password  text           NOT NULL,
+    role      profile_status NOT NULL DEFAULT 'USER'::profile_status,
+    is_actual BOOLEAN        NOT NULL DEFAULT true,
 
     CONSTRAINT profile_email_u UNIQUE (email)
 );
