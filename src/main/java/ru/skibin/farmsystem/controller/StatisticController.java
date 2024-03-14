@@ -1,22 +1,20 @@
 package ru.skibin.farmsystem.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.skibin.farmsystem.api.request.other.WorkResult;
-import ru.skibin.farmsystem.api.request.other.Worker;
 import ru.skibin.farmsystem.api.request.action.PeriodRequest;
 import ru.skibin.farmsystem.api.response.ActionResponse;
-import ru.skibin.farmsystem.api.response.WorkerWithResult;
+import ru.skibin.farmsystem.api.response.WorkResultResponse;
+import ru.skibin.farmsystem.api.response.WorkerResponse;
+import ru.skibin.farmsystem.api.response.WorkerWithResultResponse;
 import ru.skibin.farmsystem.service.StatisticService;
 
 import java.time.LocalDate;
@@ -25,6 +23,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/statistic")
 @RequiredArgsConstructor
+@Tag(name = "Statistic")
 public class StatisticController {
     private final StatisticService statisticService;
 
@@ -37,7 +36,7 @@ public class StatisticController {
      * @return Http response with collection of action response model
      */
     @Operation(summary = "Getting all actions by day")
-    @GetMapping("/action")
+    @GetMapping("/action/day")
     public ResponseEntity<Collection<ActionResponse>> getAllActionsByDay(
             @RequestParam("day") LocalDate day,
             @RequestParam("limit") Integer limit,
@@ -58,17 +57,14 @@ public class StatisticController {
      * @return Http response with collection of action response model
      */
     @Operation(summary = "Getting all actions by period")
-    @PostMapping("/action")
+    @GetMapping("/action/period")
     public ResponseEntity<Collection<ActionResponse>> getAllActionsByPeriod(
             @RequestParam("limit") Integer limit,
             @RequestParam("offset") Integer offset,
-            @Valid
-            @RequestBody
-            PeriodRequest periodRequest,
-            BindingResult bindingResult
+            @Validated PeriodRequest periodRequest
     ) {
         return new ResponseEntity<>(
-                statisticService.getAllActionsByPeriod(bindingResult, periodRequest, limit, offset),
+                statisticService.getAllActionsByPeriod(periodRequest, limit, offset),
                 HttpStatus.OK
         );
     }
@@ -82,8 +78,8 @@ public class StatisticController {
      * @return Http response with collection of workers with results response model
      */
     @Operation(summary = "Getting all workers with their work results by day")
-    @GetMapping("/all")
-    public ResponseEntity<Collection<WorkerWithResult>> getDayWorkersWithResultsByDay(
+    @GetMapping("/all/day")
+    public ResponseEntity<Collection<WorkerWithResultResponse>> getDayWorkersWithResultsByDay(
             @RequestParam("day") LocalDate day,
             @RequestParam("limit") Integer limit,
             @RequestParam("offset") Integer offset
@@ -103,17 +99,14 @@ public class StatisticController {
      * @return Http response with collection of workers with results response model
      */
     @Operation(summary = "Getting all workers with their work results by day")
-    @PostMapping("/all")
-    public ResponseEntity<Collection<WorkerWithResult>> getPeriodWorkersWithResultsByPeriod(
+    @GetMapping("/all/period")
+    public ResponseEntity<Collection<WorkerWithResultResponse>> getPeriodWorkersWithResultsByPeriod(
             @RequestParam("limit") Integer limit,
             @RequestParam("offset") Integer offset,
-            @Valid
-            @RequestBody
-            PeriodRequest periodRequest,
-            BindingResult bindingResult
+            @Validated PeriodRequest periodRequest
     ) {
         return new ResponseEntity<>(
-                statisticService.getWorkersWithResultsByPeriod(bindingResult, periodRequest, limit, offset),
+                statisticService.getWorkersWithResultsByPeriod(periodRequest, limit, offset),
                 HttpStatus.OK
         );
     }
@@ -127,8 +120,8 @@ public class StatisticController {
      * @return Http response with collection of workers response model
      */
     @Operation(summary = "Getting all workers by day results")
-    @GetMapping("/worker")
-    public ResponseEntity<Collection<Worker>> getWorkersPerDay(
+    @GetMapping("/worker/day")
+    public ResponseEntity<Collection<WorkerResponse>> getWorkersPerDay(
             @RequestParam("day") LocalDate day,
             @RequestParam("limit") Integer limit,
             @RequestParam("offset") Integer offset
@@ -148,17 +141,14 @@ public class StatisticController {
      * @return Http response with collection of workers response model
      */
     @Operation(summary = "Getting all workers by period")
-    @PostMapping("/worker")
-    public ResponseEntity<Collection<Worker>> getWorkersPerPeriod(
+    @GetMapping("/worker/period")
+    public ResponseEntity<Collection<WorkerResponse>> getWorkersPerPeriod(
             @RequestParam("limit") Integer limit,
             @RequestParam("offset") Integer offset,
-            @Valid
-            @RequestBody
-            PeriodRequest periodRequest,
-            BindingResult bindingResult
+            @Validated PeriodRequest periodRequest
     ) {
         return new ResponseEntity<>(
-                statisticService.getWorkersByPeriod(bindingResult, periodRequest, limit, offset),
+                statisticService.getWorkersByPeriod(periodRequest, limit, offset),
                 HttpStatus.OK
         );
     }
@@ -172,8 +162,8 @@ public class StatisticController {
      * @return Http response with collection of products response model
      */
     @Operation(summary = "Getting all products by day results")
-    @GetMapping("/product")
-    public ResponseEntity<Collection<WorkResult>> getProductsPerDay(
+    @GetMapping("/product/day")
+    public ResponseEntity<Collection<WorkResultResponse>> getProductsPerDay(
             @RequestParam("day") LocalDate day,
             @RequestParam("limit") Integer limit,
             @RequestParam("offset") Integer offset
@@ -193,17 +183,14 @@ public class StatisticController {
      * @return Http response with collection of products response model
      */
     @Operation(summary = "Getting all products by period")
-    @PostMapping("/product")
-    public ResponseEntity<Collection<WorkResult>> getProductsPerPeriod(
+    @GetMapping("/product/period")
+    public ResponseEntity<Collection<WorkResultResponse>> getProductsPerPeriod(
             @RequestParam("limit") Integer limit,
             @RequestParam("offset") Integer offset,
-            @Valid
-            @RequestBody
-            PeriodRequest periodRequest,
-            BindingResult bindingResult
+            @Validated PeriodRequest periodRequest
     ) {
         return new ResponseEntity<>(
-                statisticService.getProductsByPeriod(bindingResult, periodRequest, limit, offset),
+                statisticService.getProductsByPeriod(periodRequest, limit, offset),
                 HttpStatus.OK
         );
     }

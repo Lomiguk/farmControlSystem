@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import ru.skibin.farmsystem.api.data.enumTypes.Role;
 import ru.skibin.farmsystem.api.response.JwtAuthenticationResponse;
 import ru.skibin.farmsystem.api.response.ProfileResponse;
@@ -37,7 +38,8 @@ public class AuthenticationService {
      * @return token
      */
     @Transactional
-    public ProfileResponse signUp(SignUpRequest request) {
+    public ProfileResponse signUp(BindingResult bindingResult, SignUpRequest request) {
+        checkHelper.chainCheckValidation(bindingResult);
         String encodedPassword = new BCryptPasswordEncoder()
                 .encode(PasswordUtil.getHash(request.getPassword()).toString());
         ProfileEntity profileEntity = ProfileEntity.builder()
@@ -47,7 +49,7 @@ public class AuthenticationService {
                 .role(Role.USER)
                 .build();
 
-        return profileService.save(profileEntity);
+        return profileService.add(profileEntity);
     }
 
     /**
@@ -57,7 +59,8 @@ public class AuthenticationService {
      * @return token
      */
     @Transactional
-    public JwtAuthenticationResponse signIn(SignInRequest request) {
+    public JwtAuthenticationResponse signIn(BindingResult bindingResult, SignInRequest request) {
+        checkHelper.chainCheckValidation(bindingResult);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 PasswordUtil.getHash(request.getPassword()).toString()

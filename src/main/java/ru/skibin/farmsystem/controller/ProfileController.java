@@ -1,6 +1,7 @@
 package ru.skibin.farmsystem.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -25,7 +26,6 @@ import ru.skibin.farmsystem.api.request.profile.AddProfileRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdatePasswordRequest;
 import ru.skibin.farmsystem.api.request.profile.UpdateProfileRequest;
 import ru.skibin.farmsystem.api.response.ProfileResponse;
-import ru.skibin.farmsystem.exception.common.ValidationException;
 import ru.skibin.farmsystem.service.ProfileService;
 
 import java.util.Collection;
@@ -33,6 +33,7 @@ import java.util.Collection;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/profile")
+@Tag(name="Profile")
 public class ProfileController {
     private final ProfileService profileService;
 
@@ -51,11 +52,8 @@ public class ProfileController {
             AddProfileRequest addProfileRequest,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult);
-        }
         return new ResponseEntity<>(
-                profileService.save(addProfileRequest),
+                profileService.add(bindingResult, addProfileRequest),
                 HttpStatus.OK
         );
     }
@@ -150,11 +148,8 @@ public class ProfileController {
             UpdatePasswordRequest updatePasswordRequest,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult);
-        }
         return new ResponseEntity<>(
-                profileService.updatePassword(id, updatePasswordRequest),
+                profileService.updatePassword(bindingResult, id, updatePasswordRequest),
                 HttpStatus.OK
         );
     }
@@ -211,20 +206,20 @@ public class ProfileController {
      * @param bindingResult        Request validation data
      * @return Http response with updated profile response model
      */
+    @Operation(summary = "Updating profile")
     @PutMapping("/{id}")
     public ResponseEntity<ProfileResponse> updateProfile(
             @PathVariable("id")
             @Validated
             @Positive(message = "id must be positive")
             Long id,
-            @Valid @RequestBody UpdateProfileRequest updateProfileRequest,
+            @Valid
+            @RequestBody
+            UpdateProfileRequest updateProfileRequest,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult);
-        }
         return new ResponseEntity<>(
-                profileService.update(id, updateProfileRequest),
+                profileService.update(bindingResult, id, updateProfileRequest),
                 HttpStatus.OK
         );
     }
@@ -236,6 +231,7 @@ public class ProfileController {
      * @return true - if successful
      */
     @DeleteMapping("/{id}")
+    @Operation(summary = "Deleting or deactivate profile")
     public ResponseEntity<Boolean> deleteProfile(
             @PathVariable("id")
             @Validated

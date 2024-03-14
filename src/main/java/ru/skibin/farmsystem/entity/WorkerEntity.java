@@ -1,11 +1,11 @@
 package ru.skibin.farmsystem.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import ru.skibin.farmsystem.api.data.enumTypes.Role;
 
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WorkerEntity {
     private final Long profileId;
     private final String profileFio;

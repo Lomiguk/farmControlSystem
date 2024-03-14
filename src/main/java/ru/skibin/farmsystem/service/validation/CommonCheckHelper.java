@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 @Component
 @RequiredArgsConstructor
 public class CommonCheckHelper {
-    private final String REQUESTED_RESOURCE_UNACCEPTABLE = "The requested resource cannot be accessed";
+    private static final String REQUESTED_RESOURCE_UNACCEPTABLE = "The requested resource cannot be accessed";
 
     private final ProfileDAO profileDAO;
     private final ProductDAO productDAO;
@@ -194,7 +194,7 @@ public class CommonCheckHelper {
     }
 
     public CommonCheckHelper chainCheckValidation(BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+        if (bindingResult != null && bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
         return this;

@@ -2,16 +2,14 @@ package ru.skibin.farmsystem.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
-import ru.skibin.farmsystem.api.request.other.WorkResult;
-import ru.skibin.farmsystem.api.request.other.Worker;
 import ru.skibin.farmsystem.api.request.action.PeriodRequest;
 import ru.skibin.farmsystem.api.response.ActionResponse;
-import ru.skibin.farmsystem.api.response.WorkerWithResult;
+import ru.skibin.farmsystem.api.response.WorkResultResponse;
+import ru.skibin.farmsystem.api.response.WorkerResponse;
+import ru.skibin.farmsystem.api.response.WorkerWithResultResponse;
 import ru.skibin.farmsystem.entity.StatisticRow;
 import ru.skibin.farmsystem.repository.StatisticDAO;
 import ru.skibin.farmsystem.service.mapper.StatisticMapper;
-import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -22,7 +20,6 @@ public class StatisticService {
     private final StatisticMapper statisticMapper;
     private final ActionService actionService;
     private final StatisticDAO statisticDAO;
-    private final CommonCheckHelper commonCheckHelper;
 
     /**
      * Getting all actions by day
@@ -43,19 +40,16 @@ public class StatisticService {
     /**
      * Getting all actions by period
      *
-     * @param bindingResult Request validation data
      * @param periodRequest Request with period data
      * @param limit         Limit for pagination
      * @param offset        Offset for pagination
      * @return Collection of action response models
      */
     public Collection<ActionResponse> getAllActionsByPeriod(
-            BindingResult bindingResult,
             PeriodRequest periodRequest,
             Integer limit,
             Integer offset
     ) {
-        commonCheckHelper.chainCheckValidation(bindingResult);
         return actionService.findPeriodActions(periodRequest, limit, offset);
     }
 
@@ -67,7 +61,7 @@ public class StatisticService {
      * @param offset Offset for pagination
      * @return Collection of worker with their results response model
      */
-    public Collection<WorkerWithResult> getWorkersWithResultsByDay(
+    public Collection<WorkerWithResultResponse> getWorkersWithResultsByDay(
             LocalDate day,
             Integer limit,
             Integer offset
@@ -80,22 +74,33 @@ public class StatisticService {
     }
 
     /**
+     * Getting workers with results by day
+     *
+     * @param day    Day
+     * @return Collection of worker with their results response model
+     */
+    public Collection<WorkerWithResultResponse> getWorkersWithResultsByDay(LocalDate day) {
+        Collection<StatisticRow> statisticResult = statisticDAO.getWorkerWithResultsByDay(
+                day,
+                Integer.MAX_VALUE,
+                0
+        );
+        return statisticMapper.mapEntityRowCollectionWorkerWithResult(statisticResult);
+    }
+
+    /**
      * Getting workers with results by period
      *
-     * @param bindingResult Request validation data
      * @param periodRequest Request with period data
      * @param limit         Limit for pagination
      * @param offset        Offset for pagination
      * @return Collection of worker with their results response model
      */
-    public Collection<WorkerWithResult> getWorkersWithResultsByPeriod(
-            BindingResult bindingResult,
+    public Collection<WorkerWithResultResponse> getWorkersWithResultsByPeriod(
             PeriodRequest periodRequest,
             Integer limit,
             Integer offset
     ) {
-        commonCheckHelper.chainCheckValidation(bindingResult);
-
         if (limit == null) limit = Integer.MAX_VALUE;
         if (offset == null) offset = 0;
 
@@ -116,7 +121,7 @@ public class StatisticService {
      * @param offset Offset for pagination
      * @return Collection of worker response models
      */
-    public Collection<Worker> getWorkersByDay(LocalDate day, Integer limit, Integer offset) {
+    public Collection<WorkerResponse> getWorkersByDay(LocalDate day, Integer limit, Integer offset) {
         if (limit == null) limit = Integer.MAX_VALUE;
         if (offset == null) offset = 0;
 
@@ -126,20 +131,16 @@ public class StatisticService {
     /**
      * Getting workers by period
      *
-     * @param bindingResult Request validation data
      * @param periodRequest Request with period data
      * @param limit         Limit for pagination
      * @param offset        Offset for pagination
      * @return Collection of worker response models
      */
-    public Collection<Worker> getWorkersByPeriod(
-            BindingResult bindingResult,
+    public Collection<WorkerResponse> getWorkersByPeriod(
             PeriodRequest periodRequest,
             Integer limit,
             Integer offset
     ) {
-        commonCheckHelper.chainCheckValidation(bindingResult);
-
         if (limit == null) limit = Integer.MAX_VALUE;
         if (offset == null) offset = 0;
 
@@ -159,7 +160,7 @@ public class StatisticService {
      * @param offset Offset for pagination
      * @return Collection of work result response models
      */
-    public Collection<WorkResult> getProductsByDay(LocalDate day, Integer limit, Integer offset) {
+    public Collection<WorkResultResponse> getProductsByDay(LocalDate day, Integer limit, Integer offset) {
         if (limit == null) limit = Integer.MAX_VALUE;
         if (offset == null) offset = 0;
 
@@ -171,20 +172,16 @@ public class StatisticService {
     /**
      * Getting work results by period
      *
-     * @param bindingResult Request validation data
      * @param periodRequest Request with period data
      * @param limit         Limit for pagination
      * @param offset        Offset for pagination
      * @return Collection of work result response models
      */
-    public Collection<WorkResult> getProductsByPeriod(
-            BindingResult bindingResult,
+    public Collection<WorkResultResponse> getProductsByPeriod(
             PeriodRequest periodRequest,
             Integer limit,
             Integer offset
     ) {
-        commonCheckHelper.chainCheckValidation(bindingResult);
-
         if (limit == null) limit = Integer.MAX_VALUE;
         if (offset == null) offset = 0;
 

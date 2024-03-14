@@ -9,24 +9,34 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static ru.skibin.farmsystem.util.SwaggerConfigurationConstraint.BARER_AUTH;
+import static ru.skibin.farmsystem.util.SwaggerConfigurationConstraint.BARER_FORMAT;
+import static ru.skibin.farmsystem.util.SwaggerConfigurationConstraint.BARER_SCHEME;
+import static ru.skibin.farmsystem.util.SwaggerConfigurationConstraint.CONTACT_EMAIL;
+import static ru.skibin.farmsystem.util.SwaggerConfigurationConstraint.CONTACT_NAME;
+import static ru.skibin.farmsystem.util.SwaggerConfigurationConstraint.CONTACT_URL;
+import static ru.skibin.farmsystem.util.SwaggerConfigurationConstraint.DESCRIPTION;
+import static ru.skibin.farmsystem.util.SwaggerConfigurationConstraint.TITLE;
+import static ru.skibin.farmsystem.util.SwaggerConfigurationConstraint.VERSION;
+
 @Configuration
 public class SwaggerConfiguration {
     private SecurityScheme createAPIKeyScheme() {
         return new SecurityScheme().type(SecurityScheme.Type.HTTP)
-                .bearerFormat("JWT")
-                .scheme("bearer");
+                .bearerFormat(BARER_FORMAT)
+                .scheme(BARER_SCHEME);
     }
 
     @Bean
     public OpenAPI openAPI() {
-        return new OpenAPI().addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
+        return new OpenAPI().addSecurityItem(new SecurityRequirement().addList(BARER_AUTH))
                 .components(new Components().addSecuritySchemes
-                        ("Bearer Authentication", createAPIKeyScheme()))
-                .info(new Info().title("My REST API")
-                        .description("Description of API.")
-                        .version("1.0").contact(new Contact().name("Skibin Denis")
-                                .email("https://voronezh.hh.ru/resume/66bdd11eff0c279b6a0039ed1f53686b734a58")
-                                .url("d.sckibin2017@yandex.ru")
+                        (BARER_AUTH, createAPIKeyScheme()))
+                .info(new Info().title(TITLE)
+                        .description(DESCRIPTION)
+                        .version(VERSION).contact(new Contact().name(CONTACT_NAME)
+                                .email(CONTACT_EMAIL)
+                                .url(CONTACT_URL)
                         )
                 );
     }

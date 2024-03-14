@@ -3,6 +3,7 @@ package ru.skibin.farmsystem.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import ru.skibin.farmsystem.api.request.action.AddActionRequest;
 import ru.skibin.farmsystem.api.request.action.PeriodRequest;
 import ru.skibin.farmsystem.api.request.action.UpdateActionRequest;
@@ -40,8 +41,9 @@ public class ActionService {
      * @return Action response model
      */
     @Transactional
-    public ActionResponse addAction(AddActionRequest addActionRequest) {
-        ProductEntity product = checkHelper
+    public ActionResponse addAction(BindingResult bindingResult, AddActionRequest addActionRequest) {
+        checkHelper
+                .chainCheckValidation(bindingResult)
                 .chainCheckProfileForActive(addActionRequest.getProfileId())
                 .chainCheckTimeForFutureException(addActionRequest.getTime())
                 .checkProductForActive(addActionRequest.getProductId());
@@ -173,8 +175,7 @@ public class ActionService {
      */
     @Transactional
     public ActionResponse updateActionProductId(Long id, Long newProductId, Float value) {
-        ProductEntity productEntity = checkHelper
-                .checkProductForActive(newProductId);
+        checkHelper.checkProductForActive(newProductId);
 
         ActionEntity actionEntity = checkHelper.checkActionForActive(id);
 
@@ -227,8 +228,9 @@ public class ActionService {
      * @return Action response model
      */
     @Transactional
-    public ActionResponse updateAction(Long id, UpdateActionRequest request) {
-        ProductEntity productEntity = checkHelper
+    public ActionResponse updateAction(BindingResult bindingResult, Long id, UpdateActionRequest request) {
+        checkHelper
+                .chainCheckValidation(bindingResult)
                 .chainCheckActionForExist(id)
                 .chainCheckProfileForActive(request.getProfileId())
                 .chainCheckValueForPositive(request.getValue())
@@ -271,12 +273,6 @@ public class ActionService {
         limit = limitOffsetTransformer.getLimit(limit);
         offset = limitOffsetTransformer.getOffset(offset);
         Collection<ActionEntity> actions = actionDAO.findDayActions(day, limit, offset);
-
-        return mapCollectionEntityToResponse(actions);
-    }
-
-    public Collection<ActionResponse> findDayAction(LocalDate day) {
-        Collection<ActionEntity> actions = actionDAO.findDayActions(day);
 
         return mapCollectionEntityToResponse(actions);
     }

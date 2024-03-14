@@ -10,14 +10,14 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class SignUpRequest {
-    @NotNull
-    @Size(min = 2, max = 50, message = "\"profile name size 2-50 chars\"")
+    @NotBlank(message = "Fio can't be blank")
+    @Size(min = 2, max = 50, message = "Profile name size 2-50 chars")
     private String fio;
     @NotNull
     @NotBlank(message = "Email can't be blank")
     @Email(message = "Wrong email format")
     private String email;
     @NotNull
-    @Size(min = 5, message = "min password size - 5")
+    @Size(min = 5, message = "Min password size - 5")
     private String password;
 }

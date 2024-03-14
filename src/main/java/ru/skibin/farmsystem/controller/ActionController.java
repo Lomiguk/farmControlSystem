@@ -1,6 +1,7 @@
 package ru.skibin.farmsystem.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -23,7 +24,6 @@ import ru.skibin.farmsystem.api.request.action.AddActionRequest;
 import ru.skibin.farmsystem.api.request.action.PeriodRequest;
 import ru.skibin.farmsystem.api.request.action.UpdateActionRequest;
 import ru.skibin.farmsystem.api.response.ActionResponse;
-import ru.skibin.farmsystem.exception.common.ValidationException;
 import ru.skibin.farmsystem.service.ActionService;
 
 import java.util.Collection;
@@ -31,6 +31,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/action")
 @RequiredArgsConstructor
+@Tag(name = "Actions")
 public class ActionController {
     private final ActionService actionService;
 
@@ -38,7 +39,6 @@ public class ActionController {
      * Adding action to repository
      *
      * @param addActionRequest request with action data
-     * @param bindingResult    request validation data
      * @return Http response with added action data
      */
     @Operation(summary = "Adding action to repository")
@@ -48,11 +48,8 @@ public class ActionController {
             AddActionRequest addActionRequest,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult);
-        }
         return new ResponseEntity<>(
-                actionService.addAction(addActionRequest),
+                actionService.addAction(bindingResult, addActionRequest),
                 HttpStatus.OK
         );
     }
@@ -78,15 +75,14 @@ public class ActionController {
     }
 
     /**
-     * Receiving actions created during the periodR
+     * Receiving actions created during the period
      *
      * @param limit         pagination limit
      * @param offset        pagination offset
      * @param request       request with period data
-     * @param bindingResult request validation data
      * @return Http response with data of added actions
      */
-    @PostMapping("/period")
+    @GetMapping("/period")
     @Operation(summary = "Receiving actions created during the period")
     public ResponseEntity<Collection<ActionResponse>> getPeriodActions(
             @RequestParam("limit")
@@ -97,14 +93,9 @@ public class ActionController {
             @Validated
             @PositiveOrZero(message = "offset must be positive")
             Integer offset,
-            @Valid
-            @RequestBody
-            PeriodRequest request,
-            BindingResult bindingResult
+            @Validated
+            PeriodRequest request
     ) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult);
-        }
         return new ResponseEntity<>(
                 actionService.findPeriodActions(request, limit, offset),
                 HttpStatus.OK
@@ -199,11 +190,8 @@ public class ActionController {
             UpdateActionRequest request,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationException(bindingResult);
-        }
         return new ResponseEntity<>(
-                actionService.updateAction(id, request),
+                actionService.updateAction(bindingResult, id, request),
                 HttpStatus.OK
         );
     }

@@ -3,6 +3,7 @@ package ru.skibin.farmsystem.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import ru.skibin.farmsystem.api.data.enumTypes.ValueType;
 import ru.skibin.farmsystem.api.request.product.AddProductRequest;
 import ru.skibin.farmsystem.api.request.product.UpdateProductRequest;
@@ -20,8 +21,8 @@ import java.util.logging.Logger;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
+    private static final  Logger LOGGER = Logger.getLogger(ProductService.class.getName());
     private final ProductDAO productDAO;
-    private final Logger logger = Logger.getLogger(ProductService.class.getName());
     private final CommonCheckHelper checkHelper;
     private final EntityToResponseMapper entityMapper;
 
@@ -32,12 +33,14 @@ public class ProductService {
      * @return Product response model
      */
     @Transactional
-    public ProductResponse addProduct(AddProductRequest request) {
-        checkHelper.checkProductForExistByName(request.getName());
+    public ProductResponse addProduct(BindingResult bindingResult, AddProductRequest request) {
+        checkHelper
+                .chainCheckValidation(bindingResult)
+                .checkProductForExistByName(request.getName());
 
         Long id = productDAO.addProduct(request.getName(), request.getValueType());
         ProductResponse productResponse = findProduct(id);
-        logger.info(String.format("Add new product (%d)", productResponse.getId()));
+        LOGGER.info(String.format("Add new product (%d)", productResponse.getId()));
         return getProduct(id);
     }
 
@@ -64,10 +67,10 @@ public class ProductService {
     public ProductResponse findProduct(Long id) {
         ProductEntity productEntity = productDAO.findProduct(id);
         if (productEntity != null) {
-            logger.info(String.format("Get product (%d)", id));
+            LOGGER.info(String.format("Get product (%d)", id));
             return entityMapper.toResponse(productEntity);
         }
-        logger.info(String.format("Product (%d) doesn't exist", id));
+        LOGGER.info(String.format("Product (%d) doesn't exist", id));
         return null;
     }
 
@@ -80,10 +83,10 @@ public class ProductService {
     public ProductResponse findProductByName(String name) {
         ProductEntity productEntity = productDAO.findProductByName(name);
         if (productEntity != null) {
-            logger.info(String.format("Get product (%d)", productEntity.getId()));
+            LOGGER.info(String.format("Get product (%d)", productEntity.getId()));
             return entityMapper.toResponse(productEntity);
         }
-        logger.info(String.format("Product (\"%s\") doesn't exist", name));
+        LOGGER.info(String.format("Product (\"%s\") doesn't exist", name));
         return null;
     }
 
@@ -97,7 +100,7 @@ public class ProductService {
     @Transactional
     public Collection<ProductResponse> findAllProductsWithPagination(Integer limit, Integer offset) {
         Collection<ProductEntity> productEntities = productDAO.findAllProductsWithPagination(limit, offset);
-        logger.info(String.format("Get %d products, with offset: %d", limit, offset));
+        LOGGER.info(String.format("Get %d products, with offset: %d", limit, offset));
         Collection<ProductResponse> products = new ArrayList<>();
         for (var productEntity : productEntities) {
             products.add(entityMapper.toResponse(productEntity));
@@ -119,7 +122,7 @@ public class ProductService {
         if (!productEntity.getName().equals(newName)) {
             productDAO.updateProductName(id, newName);
         }
-        logger.info(String.format("Update product (%d) name", id));
+        LOGGER.info(String.format("Update product (%d) name", id));
         return findProduct(id);
     }
 
@@ -136,7 +139,7 @@ public class ProductService {
         if (!productEntity.getValueType().equals(newValueType)) {
             productDAO.updateProductValueType(id, newValueType);
         }
-        logger.info(String.format("Update product (%d) value type to %s", id, newValueType));
+        LOGGER.info(String.format("Update product (%d) value type to %s", id, newValueType));
         return findProduct(id);
     }
 
@@ -154,7 +157,7 @@ public class ProductService {
         if (!productEntity.getIsActual().equals(newStatus)) {
             productDAO.updateActualStatus(id, newStatus);
         }
-        logger.info(String.format("Update product (%d) active status to %s", id, newStatus));
+        LOGGER.info(String.format("Update product (%d) active status to %s", id, newStatus));
         return findProduct(id);
     }
 
@@ -166,10 +169,12 @@ public class ProductService {
      * @return Product response model or nul
      */
     @Transactional
-    public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
-        checkHelper.checkProductForExist(id);
+    public ProductResponse updateProduct(BindingResult bindingResult, Long id, UpdateProductRequest request) {
+        checkHelper
+                .chainCheckValidation(bindingResult)
+                .checkProductForExist(id);
         productDAO.updateProduct(id, request.getName(), request.getValueType(), request.getIsActual());
-        logger.info(String.format("Update product(%d) info", id));
+        LOGGER.info(String.format("Update product(%d) info", id));
         return findProduct(id);
     }
 
@@ -183,10 +188,10 @@ public class ProductService {
     public Boolean deleteProduct(Long id) {
         checkHelper.checkProfileForActive(id);
         if (checkHelper.boolCheckProductInActions(id)) {
-            logger.info(String.format("Try to delete product (%d)", id));
+            LOGGER.info(String.format("Try to delete product (%d)", id));
             return productDAO.deleteProduct(id) > 0;
         } else {
-            logger.info(String.format("product (%d) set actual status to false", id));
+            LOGGER.info(String.format("product (%d) set actual status to false", id));
             updateProductActualStatus(id, false);
             return true;
         }
