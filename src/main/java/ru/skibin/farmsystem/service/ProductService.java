@@ -36,7 +36,7 @@ public class ProductService {
     public ProductResponse addProduct(BindingResult bindingResult, AddProductRequest request) {
         checkHelper
                 .chainCheckValidation(bindingResult)
-                .checkProductForExistByName(request.getName());
+                .chainCheckProductForExistByName(request.getName());
 
         Long id = productDAO.addProduct(request.getName(), request.getValueType());
         ProductResponse productResponse = findProduct(id);
@@ -80,11 +80,16 @@ public class ProductService {
      * @param name Product name
      * @return Product response model or nul
      */
-    public ProductResponse findProductByName(String name) {
-        ProductEntity productEntity = productDAO.findProductByName(name);
-        if (productEntity != null) {
-            LOGGER.info(String.format("Get product (%d)", productEntity.getId()));
-            return entityMapper.toResponse(productEntity);
+    public Collection<ProductResponse> findProductByName(String name) {
+        Collection<ProductEntity> productEntities = productDAO.findProductByName(name);
+
+        if (!productEntities.isEmpty()) {
+            LOGGER.info(String.format("Get product's with name (%s)", name));
+            Collection<ProductResponse> products = new ArrayList<>();
+            for (var productEntity : productEntities) {
+                products.add(entityMapper.toResponse(productEntity));
+            }
+            return products;
         }
         LOGGER.info(String.format("Product (\"%s\") doesn't exist", name));
         return null;

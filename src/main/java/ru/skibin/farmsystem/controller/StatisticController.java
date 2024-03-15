@@ -59,9 +59,9 @@ public class StatisticController {
     @Operation(summary = "Getting all actions by period")
     @GetMapping("/action/period")
     public ResponseEntity<Collection<ActionResponse>> getAllActionsByPeriod(
+            @Validated PeriodRequest periodRequest,
             @RequestParam("limit") Integer limit,
-            @RequestParam("offset") Integer offset,
-            @Validated PeriodRequest periodRequest
+            @RequestParam("offset") Integer offset
     ) {
         return new ResponseEntity<>(
                 statisticService.getAllActionsByPeriod(periodRequest, limit, offset),
@@ -101,9 +101,9 @@ public class StatisticController {
     @Operation(summary = "Getting all workers with their work results by day")
     @GetMapping("/all/period")
     public ResponseEntity<Collection<WorkerWithResultResponse>> getPeriodWorkersWithResultsByPeriod(
+            @Validated PeriodRequest periodRequest,
             @RequestParam("limit") Integer limit,
-            @RequestParam("offset") Integer offset,
-            @Validated PeriodRequest periodRequest
+            @RequestParam("offset") Integer offset
     ) {
         return new ResponseEntity<>(
                 statisticService.getWorkersWithResultsByPeriod(periodRequest, limit, offset),
@@ -143,9 +143,9 @@ public class StatisticController {
     @Operation(summary = "Getting all workers by period")
     @GetMapping("/worker/period")
     public ResponseEntity<Collection<WorkerResponse>> getWorkersPerPeriod(
+            @Validated PeriodRequest periodRequest,
             @RequestParam("limit") Integer limit,
-            @RequestParam("offset") Integer offset,
-            @Validated PeriodRequest periodRequest
+            @RequestParam("offset") Integer offset
     ) {
         return new ResponseEntity<>(
                 statisticService.getWorkersByPeriod(periodRequest, limit, offset),

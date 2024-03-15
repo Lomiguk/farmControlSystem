@@ -45,7 +45,7 @@ public class ProductDAO {
         return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ProductRowMapper()));
     }
 
-    public ProductEntity findProductByName(String name) {
+    public Collection<ProductEntity> findProductByName(String name) {
         String sql = """
                 SELECT id, name, value, is_actual
                 FROM product
@@ -54,7 +54,7 @@ public class ProductDAO {
         Map<String, Object> params = Map.of(
                 "name", name
         );
-        return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ProductRowMapper()));
+        return jdbcTemplate.query(sql, params, new ProductRowMapper());
     }
 
     public Collection<ProductEntity> findAllProductsWithPagination(Integer limit, Integer offset) {

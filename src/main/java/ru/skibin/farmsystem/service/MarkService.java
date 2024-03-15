@@ -37,13 +37,13 @@ public class MarkService {
      * @return mark response model
      */
     @Transactional
-    public MarkResponse addMark(BindingResult bindingResult, AddMarkRequest addMarkRequest) {
+    public MarkResponse addMark(BindingResult bindingResult, AddMarkRequest addMarkRequest, Long profileId) {
         checkHelper
-                .chainCheckValidation(bindingResult)
-                .chainCheckAuthPermission(addMarkRequest.getProfileId());
+                .chainCheckAuthPermission(profileId)
+                .chainCheckValidation(bindingResult);
 
         long id = markDAO.save(
-                addMarkRequest.getProfileId(),
+                profileId,
                 addMarkRequest.getMark(),
                 addMarkRequest.getDate() == null ? LocalDate.now() : addMarkRequest.getDate()
         );

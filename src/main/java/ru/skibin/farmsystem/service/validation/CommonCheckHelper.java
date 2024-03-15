@@ -162,14 +162,14 @@ public class CommonCheckHelper {
         return this;
     }
 
-    public ProductEntity checkProductForExistByName(String name) {
+    public CommonCheckHelper chainCheckProductForExistByName(String name) {
         String message = String.format("Profile with name \"%s\" non-exist", name);
-        ProductEntity productEntity = productDAO.findProductByName(name);
-        if (productEntity == null) {
+        Collection<ProductEntity> productEntities = productDAO.findProductByName(name);
+        if (!productEntities.isEmpty()) {
             logger.info(message);
             throw new UniqueConstraintException(message);
         }
-        return productEntity;
+        return this;
     }
 
     public ProfileEntity checkProfileForExistByEmail(String email) {

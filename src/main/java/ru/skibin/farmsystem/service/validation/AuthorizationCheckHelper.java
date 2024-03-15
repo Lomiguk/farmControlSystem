@@ -70,4 +70,16 @@ public class AuthorizationCheckHelper {
             throw new AccessDeniedException(UNEXPECTED_ERROR_MESSAGE);
         }
     }
+
+    public ProfileEntity checkForExistedProfileProfileOrAccessDenied() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            Object principal = auth.getPrincipal();
+            if (principal instanceof ProfileEntity) {
+                ProfileEntity profileEntity = (ProfileEntity) auth.getPrincipal();
+                return profileDAO.findProfileByEmail(profileEntity.getEmail());
+            }
+        }
+        throw new AccessDeniedException(NON_PROFILE_EXCEPTION_MESSAGE);
+    }
 }

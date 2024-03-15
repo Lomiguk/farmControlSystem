@@ -30,7 +30,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/profile")
+@RequestMapping("/profile/")
 @RequiredArgsConstructor
 @Tag(name = "Mark")
 public class MarkController {
@@ -44,15 +44,18 @@ public class MarkController {
      * @return Http response with mark response model
      */
     @Operation(summary = "Adding mark data to repository")
-    @PostMapping("/mark")
+    @PostMapping("{id}/mark")
     public ResponseEntity<MarkResponse> add(
+            @Validated
+            @Positive
+            Long profileId,
             @Valid
             @RequestBody
             AddMarkRequest addMarkRequest,
             BindingResult bindingResult
     ) {
         return new ResponseEntity<>(
-                markService.addMark(bindingResult, addMarkRequest),
+                markService.addMark(bindingResult, addMarkRequest, profileId),
                 HttpStatus.OK
         );
     }
@@ -64,11 +67,11 @@ public class MarkController {
      * @return Http response with mark response model
      */
     @Operation(summary = "Getting the mark data from repository")
-    @GetMapping("/mark/{id}")
+    @GetMapping("mark/{id}")
     public ResponseEntity<MarkResponse> get(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long markId
     ) {
         return new ResponseEntity<>(
@@ -86,19 +89,19 @@ public class MarkController {
      * @return Http response with collection of mark response models
      */
     @Operation(summary = "Getting marks of profile")
-    @GetMapping("/{id}/mark")
+    @GetMapping("{id}/mark")
     public ResponseEntity<Collection<MarkResponse>> findByProfile(
+            @Positive
+            @Validated
             @PathVariable("id")
-            @Validated
-            @Positive
             Long profileId,
-            @RequestParam("limit")
-            @Validated
             @Positive
+            @Validated
+            @RequestParam("limit")
             Integer limit,
-            @RequestParam("offset")
             @Validated
             @PositiveOrZero
+            @RequestParam("offset")
             Integer offset
     ) {
         return new ResponseEntity<>(
@@ -116,19 +119,19 @@ public class MarkController {
      * @return Http response with collection of mark response models
      */
     @Operation(summary = "Getting marks by day")
-    @GetMapping("/mark/day")
+    @GetMapping("mark/day")
     public ResponseEntity<Collection<MarkResponse>> findByDay(
-            @RequestParam("date")
-            @Validated
             @NotNull
-            LocalDate date,
-            @RequestParam("limit")
             @Validated
+            @RequestParam("date")
+            LocalDate date,
             @Positive
+            @Validated
+            @RequestParam("limit")
             Integer limit,
-            @RequestParam("offset")
             @Validated
             @PositiveOrZero
+            @RequestParam("offset")
             Integer offset
     ) {
         return new ResponseEntity<>(
@@ -140,24 +143,24 @@ public class MarkController {
     /**
      * Getting marks by day
      *
+     * @param periodRequest Request with period data
      * @param limit         Pagination's limit
      * @param offset        Pagination's offset
-     * @param periodRequest Request with period data
      * @return Http response with collection of mark response models
      */
     @Operation(summary = "Getting marks by day")
-    @GetMapping("/mark/period")
+    @GetMapping("mark/period")
     public ResponseEntity<Collection<MarkResponse>> findByPeriod(
-            @RequestParam("limit")
             @Validated
+            PeriodRequest periodRequest,
             @Positive
+            @Validated
+            @RequestParam("limit")
             Integer limit,
-            @RequestParam("offset")
             @Validated
             @PositiveOrZero
-            Integer offset,
-            @Validated
-            PeriodRequest periodRequest
+            @RequestParam("offset")
+            Integer offset
     ) {
         return new ResponseEntity<>(
                 markService.findMarksByPeriod(periodRequest, limit, offset),
@@ -174,11 +177,11 @@ public class MarkController {
      * @return Http response with mark response model
      */
     @Operation(summary = "Updating mark")
-    @PutMapping("/mark/{id}")
+    @PutMapping("mark/{id}")
     public ResponseEntity<MarkResponse> updateMark(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long markId,
             @Valid
             @RequestBody
@@ -198,11 +201,11 @@ public class MarkController {
      * @return Http response with boolean value, true - if mark is deleted
      */
     @Operation(summary = "Deleting mark")
-    @DeleteMapping("/mark/{id}")
+    @DeleteMapping("mark/{id}")
     public ResponseEntity<Boolean> deleteMark(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long markId
     ) {
         return new ResponseEntity<>(

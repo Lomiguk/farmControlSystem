@@ -79,26 +79,15 @@ public class AuthenticationService {
     }
 
     /**
-     * Getting authorized profile id
-     *
-     * @return authorized profile id
-     */
-    public Long getProfileId() {
-        ProfileEntity authProfile = authorizationCheckHelper.checkForExistedAuthorizedProfileFromContext();
-
-        return authProfile == null ? null : authProfile.getId();
-    }
-
-    /**
      * Invalidate authorized profile token
      *
      * @return invalidation status
      */
     @Transactional
     public Boolean invalidateToken() {
-        Long profileId = getProfileId();
+        ProfileEntity profile = authorizationCheckHelper.checkForExistedProfileProfileOrAccessDenied();
 
-        return profileId != null && jwtService.deleteProfileToken(profileId);
+        return profile != null && jwtService.deleteProfileToken(profile.getId());
     }
 
     /**

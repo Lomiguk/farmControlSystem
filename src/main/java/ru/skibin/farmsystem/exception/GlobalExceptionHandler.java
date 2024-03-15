@@ -2,8 +2,10 @@ package ru.skibin.farmsystem.exception;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -32,46 +34,52 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(jakarta.validation.ValidationException.class)
     protected ResponseEntity<Object> handlerValidationException(jakarta.validation.ValidationException e) {
-        return buildResponse("Jakarta validation exception:", e);
+        return build400Response("Jakarta validation exception:", e);
     }
 
     @ExceptionHandler(UpdatePasswordException.class)
     protected ResponseEntity<Object> handlerUpdatePasswordException(UpdatePasswordException e) {
-        return buildResponse("Troubles with password: ", e);
+        return build400Response("Troubles with password: ", e);
     }
 
     @ExceptionHandler(TryToGetNotExistedEntityException.class)
     protected ResponseEntity<Object> handleTryToGetNotExistedEntityException(TryToGetNotExistedEntityException e) {
-        return buildResponse("Non-existent entity: ", e);
+        return build400Response("Non-existent entity: ", e);
     }
 
     @ExceptionHandler(ValidationException.class)
     protected ResponseEntity<Object> handleValidationException(ValidationException e) {
-        return buildResponse("Validation exception: ", e);
+        return build400Response("Validation exception: ", e);
     }
 
     @ExceptionHandler(WrongProductValueException.class)
     protected ResponseEntity<Object> handleWrongProductNameValueException(WrongProductValueException e) {
-        return buildResponse("Wrong product value: ", e);
+        return build400Response("Wrong product value: ", e);
     }
 
     @ExceptionHandler(NonExistedEntityException.class)
     protected ResponseEntity<Object> handleNonExistedEntityException(NonExistedEntityException e) {
-        return buildResponse("Non-existed entity: ", e);
+        return build400Response("Non-existed entity: ", e);
     }
 
     @ExceptionHandler(FutureInstantException.class)
     protected ResponseEntity<Object> handleFutureInstantException(FutureInstantException e) {
-        return buildResponse("Request with future time", e);
+        return build400Response("Request with future time", e);
     }
 
     @ExceptionHandler(StartEndDateException.class)
     protected ResponseEntity<Object> handleStartEndDateException(StartEndDateException e) {
-        return buildResponse("Wrong period format: ", e);
+        return build400Response("Wrong period format: ", e);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    protected ResponseEntity<String> handleAccessDeniedException(AccessDeniedException e) {
+        logger.info(String.format("Unauthorized request: %s", e));
+        return new ResponseEntity<>("Unauthorized request", HttpStatus.UNAUTHORIZED);
     }
 
     // util
-    protected ResponseEntity<Object> buildResponse(String message, RuntimeException e) {
+    protected ResponseEntity<Object> build400Response(String message, RuntimeException e) {
         logger.error(message + e.getMessage());
         return ResponseEntity.badRequest().body(e.getMessage());
     }

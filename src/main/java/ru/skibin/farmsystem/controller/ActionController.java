@@ -44,7 +44,8 @@ public class ActionController {
     @Operation(summary = "Adding action to repository")
     @PostMapping
     public ResponseEntity<ActionResponse> addAction(
-            @Valid @RequestBody
+            @Valid
+            @RequestBody
             AddActionRequest addActionRequest,
             BindingResult bindingResult
     ) {
@@ -63,9 +64,9 @@ public class ActionController {
     @GetMapping("/{id}")
     @Operation(summary = "Getting action from repository")
     public ResponseEntity<ActionResponse> getAction(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long id
     ) {
         return new ResponseEntity<>(
@@ -85,12 +86,12 @@ public class ActionController {
     @GetMapping("/period")
     @Operation(summary = "Receiving actions created during the period")
     public ResponseEntity<Collection<ActionResponse>> getPeriodActions(
-            @RequestParam("limit")
             @Validated
+            @RequestParam("limit")
             @PositiveOrZero(message = "limit must be positive")
             Integer limit,
-            @RequestParam("offset")
             @Validated
+            @RequestParam("offset")
             @PositiveOrZero(message = "offset must be positive")
             Integer offset,
             @Validated
@@ -112,9 +113,9 @@ public class ActionController {
     @PatchMapping("/{id}/profile")
     @Operation(summary = "Replace the profile id of the person responsible for the action")
     public ResponseEntity<ActionResponse> updateActionProfileId(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long id,
             @RequestParam("new-id")
             Long newProfileId
@@ -136,12 +137,14 @@ public class ActionController {
     @PatchMapping("/{id}/product")
     @Operation(summary = "Replace the product id for the action")
     public ResponseEntity<ActionResponse> updateActionProductId(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long id,
-            @RequestParam("newProfileId") Long newProductId,
-            @RequestParam("value") Float value
+            @RequestParam("newProfileId")
+            Long newProductId,
+            @RequestParam("value")
+            Float value
     ) {
         return new ResponseEntity<>(
                 actionService.updateActionProductId(id, newProductId, value),
@@ -159,11 +162,12 @@ public class ActionController {
     @PatchMapping("/{id}/actual-status")
     @Operation(summary = "Updating of the actuality status")
     public ResponseEntity<ActionResponse> updateActionActualStatus(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long id,
-            @RequestParam("actual") Boolean isActual
+            @RequestParam("actual")
+            Boolean isActual
     ) {
         return new ResponseEntity<>(
                 actionService.updateActionActualStatus(id, isActual),
@@ -182,11 +186,12 @@ public class ActionController {
     @PutMapping("/{id}")
     @Operation(summary = "Updating action")
     public ResponseEntity<ActionResponse> updateAction(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long id,
-            @Valid @RequestBody
+            @Valid
+            @RequestBody
             UpdateActionRequest request,
             BindingResult bindingResult
     ) {
@@ -205,9 +210,9 @@ public class ActionController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Deleting or deactivate action")
     public ResponseEntity<Boolean> deleteAction(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long id
     ) {
         return new ResponseEntity<>(

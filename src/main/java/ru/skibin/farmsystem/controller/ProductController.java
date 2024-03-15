@@ -3,8 +3,7 @@ package ru.skibin.farmsystem.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -68,9 +67,9 @@ public class ProductController {
     @Operation(summary = "Getting product from repository")
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProduct(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long id
     ) {
         return new ResponseEntity<>(
@@ -87,12 +86,11 @@ public class ProductController {
      */
     @Operation(summary = "Getting product from repository by name")
     @GetMapping()
-    public ResponseEntity<ProductResponse> getProductByName(
+    public ResponseEntity<Collection<ProductResponse>> getProductByName(
             @Validated
-            @NotNull(message = "product name can't be null")
-            @NotEmpty(message = "product name can't be empty")
-            @Size(min = 2, max = 50, message = "product name: 2-50 chars")
             @RequestParam("name")
+            @NotBlank(message = "product name can't be blank")
+            @Size(min = 2, max = 50, message = "product name: 2-50 chars")
             String name
     ) {
         return new ResponseEntity<>(
@@ -112,12 +110,12 @@ public class ProductController {
     @GetMapping("/all")
     public ResponseEntity<Collection<ProductResponse>> getAll(
             @Validated
-            @PositiveOrZero(message = "limit must be positive")
             @RequestParam("limit")
+            @PositiveOrZero(message = "limit must be positive")
             Integer limit,
             @Validated
-            @PositiveOrZero(message = "offset must be positive")
             @RequestParam("offset")
+            @PositiveOrZero(message = "offset must be positive")
             Integer offset
     ) {
         return new ResponseEntity<>(
@@ -155,9 +153,9 @@ public class ProductController {
     @Operation(summary = "Updating product valueType")
     @PatchMapping("/{id}/value-type")
     public ResponseEntity<ProductResponse> updateProductValueType(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long id,
             @RequestParam("value")
             ValueType valueType
@@ -178,9 +176,9 @@ public class ProductController {
     @Operation(summary = "Updating product status of actuality")
     @PatchMapping("/{id}/actual-status")
     public ResponseEntity<ProductResponse> updateProductActualStatus(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long id,
             @RequestParam("value")
             Boolean status
@@ -201,9 +199,9 @@ public class ProductController {
     @Operation(summary = "Updating product")
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long id,
             @Valid
             @RequestBody
@@ -225,9 +223,9 @@ public class ProductController {
     @Operation(summary = "Deleting or deactivate product")
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deleteProduct(
-            @PathVariable("id")
-            @Validated
             @Positive
+            @Validated
+            @PathVariable("id")
             Long id
     ) {
         return new ResponseEntity<>(

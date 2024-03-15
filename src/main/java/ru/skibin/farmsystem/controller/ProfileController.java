@@ -44,7 +44,7 @@ public class ProfileController {
      * @param bindingResult     Request validation data
      * @return Http response with added profile response model
      */
-    @Operation(summary = "adding new profile")
+    @Operation(summary = "Adding new profile")
     @PostMapping
     public ResponseEntity<ProfileResponse> add(
             @Valid
@@ -59,7 +59,7 @@ public class ProfileController {
     }
 
     /**
-     * Getting profile
+     * Getting profile by the id
      *
      * @param id Profile numerical identifier
      * @return Http response with profile response model
