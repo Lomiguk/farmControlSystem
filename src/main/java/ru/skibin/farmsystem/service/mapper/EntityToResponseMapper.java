@@ -2,6 +2,9 @@ package ru.skibin.farmsystem.service.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.skibin.farmsystem.api.data.enumTypes.ValueType;
+import ru.skibin.farmsystem.api.request.task.AddTaskRequest;
+import ru.skibin.farmsystem.api.request.task.UpdateTaskRequest;
+import ru.skibin.farmsystem.api.response.TaskResponse;
 import ru.skibin.farmsystem.api.response.WorkResultResponse;
 import ru.skibin.farmsystem.api.response.WorkerResponse;
 import ru.skibin.farmsystem.api.response.ActionResponse;
@@ -10,6 +13,7 @@ import ru.skibin.farmsystem.api.response.ProductResponse;
 import ru.skibin.farmsystem.api.response.ProfileResponse;
 import ru.skibin.farmsystem.entity.ActionEntity;
 import ru.skibin.farmsystem.entity.MarkEntity;
+import ru.skibin.farmsystem.entity.TaskEntity;
 import ru.skibin.farmsystem.entity.WorkResultEntity;
 import ru.skibin.farmsystem.entity.ProductEntity;
 import ru.skibin.farmsystem.entity.ProfileEntity;
@@ -73,5 +77,46 @@ public class EntityToResponseMapper {
                 mark.getMark(),
                 mark.getDate()
         );
+    }
+
+    public TaskResponse toResponse(TaskEntity taskEntity) {
+        return new TaskResponse(
+                taskEntity.getId(),
+                taskEntity.getStartDate(),
+                taskEntity.getEndDate(),
+                taskEntity.getDescription(),
+                taskEntity.getProfileId(),
+                taskEntity.getProductId(),
+                taskEntity.getValue(),
+                taskEntity.getCollectedValue(),
+                taskEntity.getIsDone(),
+                taskEntity.getIsAborted()
+        );
+    }
+
+    public TaskEntity fromRequest(UpdateTaskRequest updateTaskRequest) {
+        return TaskEntity.builder()
+                .startDate(updateTaskRequest.getStartDate())
+                .endDate(updateTaskRequest.getEndDate())
+                .description(updateTaskRequest.getDescription())
+                .profileId(updateTaskRequest.getProfileId())
+                .productId(updateTaskRequest.getProductId())
+                .profileId(updateTaskRequest.getProfileId())
+                .value(updateTaskRequest.getValue())
+                .collectedValue(updateTaskRequest.getCollectedValue())
+                .isDone(updateTaskRequest.getIsDone())
+                .isAborted(updateTaskRequest.getIsAborted())
+                .build();
+    }
+    public TaskEntity fromRequest(AddTaskRequest addTaskRequest) {
+        return TaskEntity.builder()
+                .startDate(addTaskRequest.getStartDate())
+                .endDate(addTaskRequest.getEndDate())
+                .description(addTaskRequest.getDescription())
+                .profileId(addTaskRequest.getProfileId())
+                .productId(addTaskRequest.getProductId())
+                .profileId(addTaskRequest.getProfileId())
+                .value(addTaskRequest.getValue())
+                .build();
     }
 }

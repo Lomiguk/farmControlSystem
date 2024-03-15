@@ -86,7 +86,7 @@ public class ProductController {
      */
     @Operation(summary = "Getting product from repository by name")
     @GetMapping()
-    public ResponseEntity<Collection<ProductResponse>> getProductByName(
+    public ResponseEntity<ProductResponse> getProductByName(
             @Validated
             @RequestParam("name")
             @NotBlank(message = "product name can't be blank")
