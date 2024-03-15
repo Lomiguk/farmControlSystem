@@ -97,18 +97,6 @@ public class ActionDAO {
         return jdbcTemplate.query(sql, params, new ActionRowMapper());
     }
 
-    public Collection<ActionEntity> findDayActions(LocalDate time) {
-        String sql = """
-                SELECT id, profile_id, product_id, value, time, is_actual
-                FROM action
-                WHERE DATE(time) = :day;
-                """;
-        Map<String, Object> params = Map.of(
-                "day", time
-        );
-        return jdbcTemplate.query(sql, params, new ActionRowMapper());
-    }
-
     public Collection<ActionEntity> findPeriodActions(LocalDate start, LocalDate end, Integer limit, Integer offset) {
         String sql = """
                 SELECT id, profile_id, product_id, value, time, is_actual
@@ -125,21 +113,6 @@ public class ActionDAO {
                 "offset", offset
         );
         return jdbcTemplate.query(sql, params, new ActionRowMapper());
-    }
-
-    public ActionEntity findProfileActionByProductAndTime(Long profileId, Long productId, Instant time) {
-        String sql = """
-                SELECT id, profile_id, product_id, value, time, is_actual
-                FROM action
-                WHERE profile_id = :profile_id AND product_id = :product_id AND time = :time
-                ORDER BY time DESC;
-                """;
-        Map<String, Object> params = Map.of(
-                "profile_id", profileId,
-                "product_id", productId,
-                "time", Timestamp.from(time)
-        );
-        return DataAccessUtils.singleResult(jdbcTemplate.query(sql, params, new ActionRowMapper()));
     }
 
     public void updateAction(Long id, Long profile_id, Long product_id, Float value, Instant time, Boolean isActual) {
@@ -174,5 +147,4 @@ public class ActionDAO {
 
         return jdbcTemplate.update(sql, params);
     }
-
 }

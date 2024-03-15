@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/scripts/04_add_jwt_token_table.sql
   - include:
       file: db/changelog/scripts/05_add_day_mark.sql
+  - include:
+      file: db/changelog/scripts/06_add_task_table.sql

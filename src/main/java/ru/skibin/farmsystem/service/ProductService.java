@@ -80,16 +80,12 @@ public class ProductService {
      * @param name Product name
      * @return Product response model or nul
      */
-    public Collection<ProductResponse> findProductByName(String name) {
-        Collection<ProductEntity> productEntities = productDAO.findProductByName(name);
+    public ProductResponse findProductByName(String name) {
+        ProductEntity productEntity = productDAO.findProductByName(name);
 
-        if (!productEntities.isEmpty()) {
+        if (productEntity != null) {
             LOGGER.info(String.format("Get product's with name (%s)", name));
-            Collection<ProductResponse> products = new ArrayList<>();
-            for (var productEntity : productEntities) {
-                products.add(entityMapper.toResponse(productEntity));
-            }
-            return products;
+            return entityMapper.toResponse(productEntity);
         }
         LOGGER.info(String.format("Product (\"%s\") doesn't exist", name));
         return null;
