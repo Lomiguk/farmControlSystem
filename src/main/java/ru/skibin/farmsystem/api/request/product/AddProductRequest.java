@@ -19,6 +19,4 @@ public class AddProductRequest {
     @NotNull(message = "Value type can't be null")
     @Schema(description = "New value type")
     private final ValueType valueType;
-    @Schema(description = "Boolean product actuality status")
-    private boolean isActual;
 }

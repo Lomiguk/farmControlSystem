@@ -187,7 +187,6 @@ public class ProductService {
      */
     @Transactional
     public Boolean deleteProduct(Long id) {
-        checkHelper.checkProfileForActive(id);
         if (checkHelper.boolCheckProductInActions(id)) {
             LOGGER.info(String.format("Try to delete product (%d)", id));
             return productDAO.deleteProduct(id) > 0;

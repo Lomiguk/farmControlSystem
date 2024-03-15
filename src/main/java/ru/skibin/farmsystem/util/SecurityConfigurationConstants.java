@@ -50,13 +50,13 @@ public class SecurityConfigurationConstants {
             POST_MARK,
             POST_GET_MARK_BY_PERIOD,
             POST_TASK,
-            DELETE_TASK,
             PUT_TASK
     };
     public static final String[] ADMIN_HTTP_DELETE = {
             DELETE_DEL_PROFILE,
             DELETE_DEL_PRODUCT,
-            DELETE_MARK
+            DELETE_MARK,
+            DELETE_TASK,
     };
     public static final String[] ADMIN_HTTP_PUT = {
             PUT_UPDATE_PROFILE,

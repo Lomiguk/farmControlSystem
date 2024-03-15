@@ -2,6 +2,7 @@ package ru.skibin.farmsystem.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -42,12 +43,13 @@ public class ProfileService {
                 .chainCheckValidation(bindingResult)
                 .chainCheckForProfileEmailUnique(request.getEmail());
 
-        long hash = PasswordUtil.getHash(request.getPassword());
+        String hashedPassword = new BCryptPasswordEncoder()
+                .encode(PasswordUtil.getHash(request.getPassword()).toString());;
 
         Long id = profileDAO.add(
                 request.getFio(),
                 request.getEmail(),
-                String.valueOf(hash),
+                hashedPassword,
                 request.getRole()
         );
 

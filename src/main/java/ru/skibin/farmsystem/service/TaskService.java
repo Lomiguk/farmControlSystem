@@ -12,6 +12,7 @@ import ru.skibin.farmsystem.entity.TaskEntity;
 import ru.skibin.farmsystem.exception.common.NonExistedEntityException;
 import ru.skibin.farmsystem.repository.TaskDAO;
 import ru.skibin.farmsystem.service.mapper.EntityToResponseMapper;
+import ru.skibin.farmsystem.service.validation.AuthorizationCheckHelper;
 import ru.skibin.farmsystem.service.validation.CommonCheckHelper;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.Collection;
 public class TaskService {
     private final TaskDAO taskDAO;
     private final CommonCheckHelper commonCheckHelper;
+    private final AuthorizationCheckHelper authorizationCheckHelper;
     private final EntityToResponseMapper entityMapper;
 
     @Transactional
@@ -51,6 +53,7 @@ public class TaskService {
 
     @Transactional
     public Collection<TaskResponse> getProfilesTasks(Long profileId) {
+        authorizationCheckHelper.checkForExistedProfileProfileOrAccessDenied();
         Collection<TaskEntity> entities = taskDAO.getByProfile(profileId);
         Collection<TaskResponse> taskResponses = new ArrayList<>();
         for (var entity : entities) {
