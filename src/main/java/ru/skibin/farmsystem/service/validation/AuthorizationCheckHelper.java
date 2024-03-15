@@ -25,7 +25,7 @@ public class AuthorizationCheckHelper {
     private static final String EXPIRED_JWT_MESSAGE = "Expired token received";
     private static final String UNEXPECTED_ERROR_MESSAGE = "Unexpected error while validating JWT";
     private static final String NON_EXISTED_TOKEN_MESSAGE = "Non-existed token";
-    private static final Logger logger = Logger.getLogger(AuthorizationCheckHelper.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AuthorizationCheckHelper.class.getName());
 
     private final ProfileDAO profileDAO;
     private final JwtDAO jwtDAO;
@@ -50,7 +50,7 @@ public class AuthorizationCheckHelper {
     public boolean boolCheckTokenForValidation(String token, Key key) {
         try {
             if (jwtDAO.findToken(token) == null) {
-                logger.info(NON_EXISTED_TOKEN_MESSAGE);
+                LOGGER.info(NON_EXISTED_TOKEN_MESSAGE);
                 throw new AccessDeniedException(NON_EXISTED_TOKEN_MESSAGE);
             }
 
@@ -60,13 +60,13 @@ public class AuthorizationCheckHelper {
                     .parseClaimsJws(token);
             return true;
         } catch (SignatureException e) {
-            logger.log(Level.INFO, WRONG_SIGNATURE_MESSAGE, e);
+            LOGGER.log(Level.INFO, WRONG_SIGNATURE_MESSAGE, e);
             throw new AccessDeniedException(WRONG_SIGNATURE_MESSAGE);
         } catch (ExpiredJwtException e) {
-            logger.log(Level.INFO, EXPIRED_JWT_MESSAGE, e);
+            LOGGER.log(Level.INFO, EXPIRED_JWT_MESSAGE, e);
             throw new AccessDeniedException(EXPIRED_JWT_MESSAGE);
         } catch (Exception e) {
-            logger.log(Level.INFO, UNEXPECTED_ERROR_MESSAGE, e);
+            LOGGER.log(Level.INFO, UNEXPECTED_ERROR_MESSAGE, e);
             throw new AccessDeniedException(UNEXPECTED_ERROR_MESSAGE);
         }
     }

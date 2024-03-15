@@ -36,7 +36,9 @@ public class AuthController {
     @Operation(summary = "User sign-up")
     @PostMapping("/sign-up")
     public ResponseEntity<ProfileResponse> signUp(
-            @RequestBody @Valid SignUpRequest request,
+            @Valid
+            @RequestBody
+            SignUpRequest request,
             BindingResult bindingResult
     ) {
         return new ResponseEntity<>(
@@ -69,7 +71,9 @@ public class AuthController {
     @Operation(summary = "User sign-in")
     @PostMapping("/sign-in")
     public ResponseEntity<JwtAuthenticationResponse> signIn(
-            @RequestBody @Valid SignInRequest request,
+            @Valid
+            @RequestBody
+            SignInRequest request,
             BindingResult bindingResult
     ) {
         return new ResponseEntity<>(

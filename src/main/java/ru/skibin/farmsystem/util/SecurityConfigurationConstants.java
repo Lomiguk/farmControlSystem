@@ -1,5 +1,7 @@
 package ru.skibin.farmsystem.util;
 
+import ru.skibin.farmsystem.api.data.enumTypes.Role;
+
 import java.util.List;
 
 public class SecurityConfigurationConstants {
@@ -23,6 +25,7 @@ public class SecurityConfigurationConstants {
     public static final String PUT_UPDATE_MARK = "/profile/mark/*";
     public static final String DELETE_MARK = "/profile/mark/*";
     public static final String STATISTIC = "/statistic/**";
+    public static final String AUTH = "/auth/**";
     public static final String SWAGGER_UI = "/swagger-ui/**";
     public static final String SWAGGER_RESOURCES = "/swagger-resources/*";
     public static final String SWAGGER_DOC_API = "/v3/api-docs/**";
@@ -30,4 +33,47 @@ public class SecurityConfigurationConstants {
     public static final List<String> ORIGINS_PATTERNS = List.of("*");
     public static final List<String> HEADERS = List.of("*");
     public static final Boolean ALLOW_CREDENTIALS = true;
+    public static final String ADMIN_ROLE = Role.ADMIN.name();
+
+    public static final String[] ADMIN_ROOTS = {
+            STATISTIC
+    };
+    public static final String[] ADMIN_HTTP_POST = {
+            POST_ADD_PROFILE,
+            POST_ADD_PRODUCT,
+            POST_MARK,
+            POST_GET_MARK_BY_PERIOD
+    };
+    public static final String[] ADMIN_HTTP_DELETE = {
+            DELETE_DEL_PROFILE,
+            DELETE_DEL_PRODUCT,
+            DELETE_MARK
+    };
+    public static final String[] ADMIN_HTTP_PUT = {
+            PUT_UPDATE_PROFILE,
+            PUT_UPDATE_PRODUCT,
+            PUT_UPDATE_MARK
+    };
+    public static final String[] ADMIN_HTTP_PATCH = {
+            PATCH_FIO_PROFILE,
+            PATCH_ROLE_PROFILE,
+            PATCH_ACTIVE_PROFILE,
+            PATCH_PRODUCT
+    };
+    public static final String[] ADMIN_HTTP_GET = {
+            GET_MARK_BY_DAY
+    };
+    public static final String[] AUTHENTICATED_HTTP_PATCH = {
+            PATCH_PASSWORD_PROFILE,
+            PATCH_ACTION
+    };
+    public static final String[] AUTHENTICATED_HTTP_GET = {
+            GET_MARK, GET_PROFILE_MARK
+    };
+    public static final String[] PERMITTED_ALL = {
+            AUTH,
+            SWAGGER_UI,
+            SWAGGER_RESOURCES,
+            SWAGGER_DOC_API
+    };
 }
