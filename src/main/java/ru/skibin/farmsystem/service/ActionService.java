@@ -8,6 +8,7 @@ import ru.skibin.farmsystem.api.request.action.AddActionRequest;
 import ru.skibin.farmsystem.api.request.action.PeriodRequest;
 import ru.skibin.farmsystem.api.request.action.UpdateActionRequest;
 import ru.skibin.farmsystem.api.response.ActionResponse;
+import ru.skibin.farmsystem.api.response.TaskResponse;
 import ru.skibin.farmsystem.entity.ActionEntity;
 import ru.skibin.farmsystem.entity.ProductEntity;
 import ru.skibin.farmsystem.exception.common.TryToGetNotExistedEntityException;
@@ -28,9 +29,10 @@ import java.util.logging.Logger;
 public class ActionService {
     private final ActionDAO actionDAO;
     private final ProductDAO productDAO;
+    private final TaskService taskService;
     private final EntityToResponseMapper entityMapper;
 
-    private final Logger logger = Logger.getLogger(ProductService.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ProductService.class.getName());
     private final CommonCheckHelper checkHelper;
     private final LimitOffsetTransformer limitOffsetTransformer;
 
@@ -56,7 +58,15 @@ public class ActionService {
         );
         ActionResponse actionResponse = getAction(id);
 
-        logger.info(String.format("Add action (%s)", actionResponse.getId()));
+        Collection<TaskResponse> tasks = taskService.getProfilesTasks(actionResponse.getProfileId());
+
+        for (var task : tasks) {
+            if (task.getProductId().equals(actionResponse.getProductId())) {
+                taskService.updateCollectedValue(task.getId(), actionResponse.getValue());
+            }
+        }
+
+        LOGGER.info(String.format("Add action (%s)", actionResponse.getId()));
 
         return actionResponse;
     }
@@ -73,11 +83,11 @@ public class ActionService {
         ActionEntity actionEntity = actionDAO.findAction(id);
 
         if (actionEntity != null) {
-            logger.info(String.format("Get action (%s)", id));
+            LOGGER.info(String.format("Get action (%s)", id));
             ProductEntity productEntity = productDAO.findProduct(actionEntity.getProductId());
             return entityMapper.toResponse(actionEntity, productEntity.getValueType());
         }
-        logger.info(String.format("Action (%s) doesn't exist", id));
+        LOGGER.info(String.format("Action (%s) doesn't exist", id));
         return null;
     }
 
@@ -121,7 +131,7 @@ public class ActionService {
                 limit,
                 offset
         );
-        logger.info(String.format(
+        LOGGER.info(String.format(
                 "Get %d actions at period (%s - %s)",
                 actionEntities.size(),
                 request.getStart(),
@@ -162,7 +172,7 @@ public class ActionService {
                 actionEntity.getIsActual()
         );
 
-        logger.info(String.format("Action (%d) was updated (profile id)", id));
+        LOGGER.info(String.format("Action (%d) was updated (profile id)", id));
         return findAction(id);
     }
 
@@ -191,7 +201,7 @@ public class ActionService {
                 actionEntity.getTime(),
                 actionEntity.getIsActual()
         );
-        logger.info(String.format("Action (%d) was updated (product id)", id));
+        LOGGER.info(String.format("Action (%d) was updated (product id)", id));
         return findAction(id);
 
     }
@@ -216,7 +226,7 @@ public class ActionService {
                 actionEntity.getTime(),
                 newActualStatus
         );
-        logger.info(String.format("Action (%d) was updated (actual status)", id));
+        LOGGER.info(String.format("Action (%d) was updated (actual status)", id));
         return findAction(id);
     }
 
@@ -262,9 +272,9 @@ public class ActionService {
     public Boolean deleteAction(Long id) {
         boolean result = actionDAO.deleteAction(id) > 1;
         if (result) {
-            logger.info(String.format("Action (%d) was deleted", id));
+            LOGGER.info(String.format("Action (%d) was deleted", id));
         } else {
-            logger.info(String.format("Action (%d) wastion't deleted", id));
+            LOGGER.info(String.format("Action (%d) wastion't deleted", id));
         }
         return result;
     }
