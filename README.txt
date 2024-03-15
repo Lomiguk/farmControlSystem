@@ -259,3 +259,29 @@ StatisticController [/statistic]
 		Payload: PeriodRequest Integer Integer(input), Collection<WorkResultResponse>(output)
 		Response: 200 OK (Успешное получение данных о продутках за период)
 			        400 Bad Request (Ошибка верификации данных)
+TaskContoller [/task]
+  POST [] - создание задачи
+    URL example: localhost:8081/task
+		Payload: AddTaskRequest Long(input), TaskResponse(output)
+		Response: 200 OK (Успешное создание задачи)
+			        400 Bad Request (Ошибка верификации данных)
+  GET [/{id}] - получение задачи по id
+    URL example: localhost:8081/profile/mark/{id}
+		Payload: Long(input), TaskResponse(output)
+		Response: 200 OK (Успешное получение данных о задаче)
+			        400 Bad Request (Ошибка верификации данных)
+  GET [/profile/{id}] - получение задач по id профиля
+    URL example: localhost:8081/profile/mark/{id}
+		Payload: Long(input), Collection<TaskResponse>(output)
+		Response: 200 OK (Успешное получение данных о задачах)
+			        400 Bad Request (Ошибка верификации данных)
+  PUT [/{id}] - изменение данных задачи
+    URL example: localhost:8081/profile/mark/{id}
+		Payload: Long UpdateTaskRequest(input), TaskResponse(output)
+		Response: 200 OK (Успешное изменение данных о задаче)
+			        400 Bad Request (Ошибка верификации данных)
+  DELETE [/{id}] - удаление данных задачи
+    URL example: localhost:8081/profile/mark/{id}
+		Payload: Long(input), TaskResponse(output)
+		Response: 200 OK (Успешное удаление данных о задаче)
+			        400 Bad Request (Ошибка верификации данных)
